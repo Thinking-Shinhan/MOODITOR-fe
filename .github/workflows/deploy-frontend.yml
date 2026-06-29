@@ -3,7 +3,7 @@ name: Deploy Frontend to GCS
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   deploy:
