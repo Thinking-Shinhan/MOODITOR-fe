@@ -20,6 +20,13 @@
 - async 함수는 반드시 try/catch 포함
 - Zod 스키마는 types/ 가 아닌 해당 기능 폴더 안에 위치
 
+## 컴포넌트 구현 규칙
+
+- 토큰 사용 시 Tailwind arbitrary value: className="bg-[var(--color-btn-primary-fill)]"
+- 버튼 높이는 --size-height-* 토큰 참조
+- 버튼 radius는 --radius-medium1 기준
+- hover/pressed/disabled 상태 반드시 구현 (토큰에 상태별 컬러 정의돼있음)
+
 ## 커밋 메시지 형식
 
 feat: 이미지 생성 탭 UI 추가

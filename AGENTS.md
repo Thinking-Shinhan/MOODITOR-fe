@@ -69,3 +69,39 @@ utils/ # 유틸 함수
 - 브랜드 메타데이터 스키마 변경 시 임의 수정 금지
 - 브랜드 컬러, 카메라 설정값, 조명 디스크립터 임의 변경 금지
 - eco/outdoor 관련 언어 사용 금지 (에이븐 브랜드 방향과 맞지 않음)
+
+## 디자인 시스템 토큰 (globals.css 기준)
+
+### 컬러 사용 규칙
+
+- 브랜드 컬러 하드코딩 금지, 반드시 CSS 변수 사용
+- primitive 컬러(--color-orange-50)보다 semantic 컬러 우선 사용
+  - 텍스트: --color-text-basic / subtle / subtler / disabled
+  - 배경: --color-bg-white / gray-subtler / gray-subtle / inverse
+  - 버튼: --color-btn-primary-fill / secondary-fill / tertiary-fill
+  - 보더: --color-border-basic / subtle / subtler / primary
+  - 아이콘: --color-icon-gray / gray-light / disabled / primary-basic
+
+### 간격 토큰
+
+- gap: --gap-1 (2px) ~ --gap-12 (80px)
+- padding: --padding-1 (2px) ~ --padding-10 (40px)
+
+### 크기 토큰
+
+- 컴포넌트 높이: --size-height-1 (4px) ~ --size-height-13 (80px)
+
+### radius 토큰
+
+- --radius-xsmall (2px): 인디케이터, 뱃지
+- --radius-small1 (4px): 칩, 체크박스, 태그
+- --radius-medium1 (6px): 버튼, 인풋
+- --radius-large1 (8px): 카드
+- --radius-large2 (12px): 다이얼로그
+- --radius-xlarge2 (14px): 배너, 바텀시트
+- --radius-max (1000px): 원형
+
+### 타이포그래피
+
+- 반드시 Typography 컴포넌트 사용 (components/commons/Typography.tsx)
+- 직접 font-size, font-weight 클래스 사용 금지
