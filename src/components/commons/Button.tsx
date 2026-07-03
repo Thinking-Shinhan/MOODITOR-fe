@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'outline' | 'ghost';
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 type ButtonSize = 'large' | 'medium' | 'small' | 'xsmall';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -16,31 +16,19 @@ const variantStyles: Record<ButtonVariant, string> = {
     'bg-btn-primary-fill text-text-border-inverse',
     'hover:enabled:bg-btn-primary-hovered',
     'active:enabled:bg-btn-primary-fill-pressed',
-    'disabled:bg-btn-disabled-fill disabled:text-text-disabled',
+    'disabled:bg-btn-disabled-fill disabled:text-text-disabled-on',
   ].join(' '),
   secondary: [
     'bg-btn-secondary-fill text-text-primary-basic border border-btn-secondary-border',
-    'hover:enabled:bg-btn-secondary-fill-hovered hover:enabled:border-btn-secondary-border-hovered',
-    'active:enabled:bg-btn-secondary-fill-pressed active:enabled:border-btn-secondary-border-pressed',
-    'disabled:bg-btn-disabled-fill disabled:text-text-disabled disabled:border-transparent',
+    'hover:enabled:bg-btn-secondary-fill-hovered hover:enabled:border-btn-secondary-border',
+    'active:enabled:bg-btn-secondary-fill-pressed active:enabled:border-btn-secondary-border',
+    'disabled:bg-btn-disabled-fill disabled:text-text-disabled-on disabled:border-transparent',
   ].join(' '),
   tertiary: [
-    'bg-btn-tertiary-fill text-text-basic',
-    'hover:enabled:bg-btn-tertiary-fill-hovered',
-    'active:enabled:bg-btn-tertiary-fill-pressed',
-    'disabled:bg-btn-disabled-fill disabled:text-text-disabled',
-  ].join(' '),
-  outline: [
-    'bg-transparent text-text-basic border border-btn-outline-border',
-    'hover:enabled:border-btn-outline-border-hovered',
-    'active:enabled:border-btn-outline-border-pressed',
-    'disabled:bg-btn-disabled-fill disabled:text-text-disabled disabled:border-transparent',
-  ].join(' '),
-  ghost: [
-    'bg-transparent text-text-basic',
-    'hover:enabled:bg-btn-tertiary-fill',
-    'active:enabled:bg-btn-tertiary-fill-pressed',
-    'disabled:text-text-disabled',
+    'bg-btn-tertiary-fill text-text-subtler border border-transparent',
+    'hover:enabled:bg-btn-tertiary-fill-hovered hover:enabled:border hover:enabled:border-btn-outline-border',
+    'active:enabled:bg-btn-tertiary-fill-pressed active:enabled:border active:enabled:border-btn-outline-border-pressed',
+    'disabled:bg-btn-disabled-fill disabled:text-text-disabled-on',
   ].join(' '),
 };
 
