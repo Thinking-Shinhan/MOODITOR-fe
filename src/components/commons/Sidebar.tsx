@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSidebarStore } from '@/stores/sidebarStore';
+import { Label } from '@/components/commons/Typography';
 import {
   Home,
   Library,
@@ -93,9 +94,9 @@ export const Sidebar = () => {
                 <Icon size={16} />
               </span>
               {!collapsed && (
-                <span className="text-[14px] leading-[1.5] whitespace-nowrap">
+                <Label size="small" className="whitespace-nowrap">
                   {label}
-                </span>
+                </Label>
               )}
             </Link>
           );
@@ -118,9 +119,9 @@ export const Sidebar = () => {
             <LogOut size={16} />
           </span>
           {!collapsed && (
-            <span className="text-[14px] leading-[1.5] whitespace-nowrap">
+            <Label size="small" className="whitespace-nowrap">
               로그아웃
-            </span>
+            </Label>
           )}
         </button>
       </div>
