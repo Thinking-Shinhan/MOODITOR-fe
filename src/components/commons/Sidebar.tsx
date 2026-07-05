@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useSidebarStore } from '@/stores/sidebarStore';
 import {
   Home,
   Library,
@@ -27,8 +27,14 @@ const NAV_ITEMS: NavItemConfig[] = [
 ];
 
 export const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const {
+    isCollapsed: collapsed,
+    toggle: toggleCollapsed,
+    _hasHydrated,
+  } = useSidebarStore();
   const pathname = usePathname();
+
+  if (!_hasHydrated) return null;
 
   return (
     <aside
@@ -57,7 +63,7 @@ export const Sidebar = () => {
         {/* 아이콘 뒤에 네모 추가 필요 */}
         <button
           type="button"
-          onClick={() => setCollapsed((prev) => !prev)}
+          onClick={toggleCollapsed}
           aria-label={collapsed ? '사이드바 열기' : '사이드바 닫기'}
           className="text-icon-disabled-on hover:text-icon-gray flex h-4 w-4 shrink-0 cursor-pointer items-center justify-center transition-colors"
         >
