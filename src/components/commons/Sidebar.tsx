@@ -80,6 +80,8 @@ export const Sidebar = () => {
             <Link
               key={href}
               href={href}
+              aria-label={label}
+              aria-current={isActive ? 'page' : undefined}
               className={[
                 'flex items-center rounded-[var(--radius-small2)] transition-colors',
                 collapsed
@@ -107,6 +109,7 @@ export const Sidebar = () => {
       <div>
         <button
           type="button"
+          aria-label="로그아웃"
           className={[
             'flex cursor-pointer items-center rounded-[var(--radius-small2)] transition-colors',
             'text-text-disabled-on hover:bg-btn-tertiary-fill-hovered hover:text-text-subtle',
