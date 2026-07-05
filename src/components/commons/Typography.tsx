@@ -99,11 +99,11 @@ export const Body = ({
 
 // Label
 const labelStyles: Record<LabelSize, string> = {
-  large: 'text-[20px] font-bold leading-[150%]',
-  medium: 'text-[16px] font-bold leading-[150%]',
-  small: 'text-[14px] font-bold leading-[150%]',
-  xsmall: 'text-[12px] font-bold leading-[150%]',
-  xxsmall: 'text-[8px]  font-normal leading-[150%]',
+  large: 'text-[20px] font-normal leading-[150%]',
+  medium: 'text-[16px] font-normal leading-[150%]',
+  small: 'text-[14px] font-normal leading-[150%]',
+  xsmall: 'text-[12px] font-normal leading-[150%]',
+  xxsmall: 'text-[8px] font-normal leading-[150%]',
 };
 
 export const Label = ({
