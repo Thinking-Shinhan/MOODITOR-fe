@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useId, useState } from 'react';
 
 type SegmentItem = {
   label: string;
@@ -19,6 +19,7 @@ export const SegmentControl = ({
   className = '',
 }: SegmentControlProps) => {
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
+  const uid = useId();
 
   return (
     <div className={className}>
@@ -34,8 +35,8 @@ export const SegmentControl = ({
               role="tab"
               type="button"
               aria-selected={isActive}
-              aria-controls={`segment-panel-${index}`}
-              id={`segment-tab-${index}`}
+              aria-controls={`${uid}-segment-panel-${index}`}
+              id={`${uid}-segment-tab-${index}`}
               onClick={() => setActiveIndex(index)}
               className={[
                 'flex flex-1 cursor-pointer items-center justify-center rounded-[var(--radius-small2)] px-[10px] py-[var(--padding-2)] text-[14px] leading-[1.5] transition-all',
@@ -54,8 +55,8 @@ export const SegmentControl = ({
         <div
           key={segment.label}
           role="tabpanel"
-          id={`segment-panel-${index}`}
-          aria-labelledby={`segment-tab-${index}`}
+          id={`${uid}-segment-panel-${index}`}
+          aria-labelledby={`${uid}-segment-tab-${index}`}
           hidden={index !== activeIndex}
         >
           {segment.content}
