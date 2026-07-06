@@ -65,19 +65,19 @@ export const Heading = ({
 // Body
 const bodyStyles: Record<BodySize, { bold: string; regular: string }> = {
   large: {
-    bold: 'text-[20px] font-bold leading-[150%]',
+    bold: 'text-[20px] font-semibold leading-[150%]',
     regular: 'text-[20px] font-normal leading-[150%]',
   },
   medium: {
-    bold: 'text-[16px] font-bold leading-[150%]',
+    bold: 'text-[16px] font-semibold leading-[150%]',
     regular: 'text-[16px] font-normal leading-[150%]',
   },
   small: {
-    bold: 'text-[14px] font-bold leading-[150%]',
+    bold: 'text-[14px] font-semibold leading-[150%]',
     regular: 'text-[14px] font-normal leading-[150%]',
   },
   xsmall: {
-    bold: 'text-[12px] font-bold leading-[150%]',
+    bold: 'text-[12px] font-semibold leading-[150%]',
     regular: 'text-[12px] font-normal leading-[150%]',
   },
 };
