@@ -30,7 +30,7 @@ app/ # Next.js App Router (케밥케이스)
 components/
 commons/ # 공통 컴포넌트 (PascalCase)
 features/ # 기능별 컴포넌트 (폴더 kebab-case, 파일 PascalCase)
-hooks/ # 커스텀 훅 (use+PascalCase.ts)
+hooks/ # 커스텀 훅, 뮤테이션/쿼리 훅 (use+PascalCase.ts)
 libs/ # 인프라성 코드 (apiClient, konva 설정 등)
 services/ # API 호출 함수 (brandService, imageService 등)
 stores/ # Zustand 스토어 (camelCase+Store.ts)

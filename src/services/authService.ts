@@ -8,7 +8,7 @@ import type {
 
 export const authService = {
   signup: (body: SignupRequest) =>
-    apiClient.post<SignupResponse>('/auth/signup', body),
+    apiClient.post<SignupResponse>('/auth/register', body),
 
   login: (body: LoginRequest) =>
     apiClient.post<LoginResponse>('/auth/login', body),
