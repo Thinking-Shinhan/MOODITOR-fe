@@ -33,7 +33,7 @@ export const Input = ({
       {label && (
         <label
           htmlFor={inputId}
-          className="text-text-subtle cursor-pointer text-[14px] leading-normal font-normal"
+          className="text-text-subtle cursor-pointer text-[14px] leading-[150%] font-semibold"
         >
           {label}
           {required && <span className="text-text-danger ml-1">*</span>}
