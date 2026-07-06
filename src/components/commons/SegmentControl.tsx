@@ -24,7 +24,7 @@ export const SegmentControl = ({
     <div className={className}>
       <div
         role="tablist"
-        className="bg-bg-gray-subtler flex gap-2 rounded-(--radius-small2) p-3"
+        className="bg-bg-gray-subtler flex gap-[var(--gap-2)] rounded-[var(--radius-small2)] p-[var(--padding-3)]"
       >
         {segments.map((segment, index) => {
           const isActive = index === activeIndex;
@@ -38,7 +38,7 @@ export const SegmentControl = ({
               id={`segment-tab-${index}`}
               onClick={() => setActiveIndex(index)}
               className={[
-                'flex flex-1 cursor-pointer items-center justify-center rounded-(--radius-small2) px-[10px] py-2 text-[14px] leading-[1.5] transition-all',
+                'flex flex-1 cursor-pointer items-center justify-center rounded-[var(--radius-small2)] px-[10px] py-[var(--padding-2)] text-[14px] leading-[1.5] transition-all',
                 isActive
                   ? 'bg-bg-white text-text-basic shadow-[0px_2px_8px_rgba(0,0,0,0.04)]'
                   : 'text-text-disabled-on',
