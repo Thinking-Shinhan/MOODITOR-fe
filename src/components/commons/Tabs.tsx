@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useId, useState } from 'react';
-import { Heading } from '@/components/commons/Typography';
+import { Body, Heading } from '@/components/commons/Typography';
 
 type TabItem = {
   label: string;
@@ -32,19 +32,20 @@ export const Tabs = ({ tabs, defaultIndex = 0, className = '' }: TabsProps) => {
               aria-controls={`${uid}-tabpanel-${index}`}
               id={`${uid}-tab-${index}`}
               onClick={() => setActiveIndex(index)}
-              className="flex flex-1 cursor-pointer flex-col items-center gap-3"
+              className="flex flex-1 cursor-pointer flex-col items-center gap-[var(--gap-3)]"
             >
-              <Heading
-                size="xsmall"
+              <Body
+                size="small"
+                bold={true}
                 className={
                   isActive ? 'text-text-primary-basic' : 'text-text-disabled-on'
                 }
               >
                 {tab.label}
-              </Heading>
+              </Body>
               <div
                 className={[
-                  'h-1.25 w-full rounded-[var(--radius-xsmall)]',
+                  'h-[4px] w-full rounded-[var(--radius-xsmall)]',
                   isActive
                     ? 'bg-btn-primary-fill'
                     : 'bg-btn-tertiary-fill-hovered',
