@@ -55,6 +55,7 @@ export const Textarea = ({
         id={inputId}
         disabled={disabled}
         maxLength={maxLength}
+        required={required}
         value={value}
         defaultValue={defaultValue}
         onChange={handleChange}

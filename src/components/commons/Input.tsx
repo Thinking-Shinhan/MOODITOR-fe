@@ -45,6 +45,7 @@ export const Input = ({
           id={inputId}
           type={isPassword ? (showPassword ? 'text' : 'password') : type}
           disabled={disabled}
+          required={required}
           className={[
             'w-full rounded-(--radius-medium2) border text-[12px] leading-normal',
             'bg-bg-white text-text-basic placeholder:text-text-subtler',
@@ -65,7 +66,8 @@ export const Input = ({
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              tabIndex={-1}
+              aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 표시'}
+              aria-pressed={showPassword}
               className="text-icon-gray-light hover:text-icon-gray cursor-pointer"
             >
               {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
