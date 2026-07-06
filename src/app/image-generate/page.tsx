@@ -1,3 +1,5 @@
-export default function ImageGeneratePage() {
-  return <div>이미지 만들기</div>;
+import ImageGeneratePage from '@/components/features/image/ImageGeneratePage';
+
+export default function Page() {
+  return <ImageGeneratePage />;
 }
