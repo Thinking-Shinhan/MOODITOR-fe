@@ -56,7 +56,6 @@ utils/ # 유틸 함수
 - 인라인 스타일 사용 금지 (Tailwind 클래스만 사용)
 - 브랜드 컬러값 하드코딩 금지 (반드시 Tailwind 토큰 사용)
 - Pages Router 사용 금지
-- named export 외 default export 금지 (app/ 디렉토리 제외)
 
 ## API 호출 규칙
 

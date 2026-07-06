@@ -10,7 +10,6 @@ interface CheckboxProps extends Omit<
   'size' | 'type'
 > {
   size?: CheckboxSize;
-  label?: string;
 }
 
 const sizeConfig: Record<CheckboxSize, { box: string; iconSize: number }> = {
@@ -20,7 +19,6 @@ const sizeConfig: Record<CheckboxSize, { box: string; iconSize: number }> = {
 
 export const Checkbox = ({
   size = 'large',
-  label,
   checked,
   disabled,
   className = '',
@@ -45,7 +43,7 @@ export const Checkbox = ({
       />
       <span
         className={[
-          'inline-flex shrink-0 items-center justify-center rounded-(--radius-xsmall2) p-(--padding-1) transition-colors',
+          'inline-flex shrink-0 items-center justify-center rounded-[var(--radius-xsmall2)] p-[var(--padding-1)] transition-colors',
           box,
           checked
             ? 'bg-btn-primary-fill'
@@ -60,11 +58,6 @@ export const Checkbox = ({
           />
         )}
       </span>
-      {label && (
-        <span className="text-text-basic text-[14px] leading-[1.5]">
-          {label}
-        </span>
-      )}
     </label>
   );
 };
