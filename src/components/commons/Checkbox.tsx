@@ -7,9 +7,11 @@ type CheckboxSize = 'large' | 'medium';
 
 interface CheckboxProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  'size' | 'type'
+  'size' | 'type' | 'defaultChecked'
 > {
   size?: CheckboxSize;
+  checked: boolean;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 const sizeConfig: Record<CheckboxSize, { box: string; iconSize: number }> = {
@@ -20,6 +22,7 @@ const sizeConfig: Record<CheckboxSize, { box: string; iconSize: number }> = {
 export const Checkbox = ({
   size = 'large',
   checked,
+  onChange,
   disabled,
   className = '',
   ...props
@@ -38,6 +41,7 @@ export const Checkbox = ({
         type="checkbox"
         className="sr-only"
         checked={checked}
+        onChange={onChange}
         disabled={disabled}
         {...props}
       />
