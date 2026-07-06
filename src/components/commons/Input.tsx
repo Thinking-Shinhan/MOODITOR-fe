@@ -1,7 +1,8 @@
 'use client';
 
-import { InputHTMLAttributes, useState } from 'react';
+import { InputHTMLAttributes, useState, useId } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { InputMessage } from '@/components/commons/InputMessage';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -15,29 +16,42 @@ export const Input = ({
   suffix,
   required,
   type,
+  disabled,
+  id: externalId,
   className = '',
   ...props
 }: InputProps) => {
   const isPassword = type === 'password';
   const [showPassword, setShowPassword] = useState(false);
+  const generatedId = useId();
+  const inputId = externalId ?? generatedId;
 
   const hasSuffix = isPassword || !!suffix;
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-[var(--size-height-2)]">
       {label && (
-        <label className="text-text-basic mb-1 flex items-center text-[14px] leading-[1.5] font-medium">
+        <label
+          htmlFor={inputId}
+          className="text-text-subtle cursor-pointer text-[14px] leading-normal font-normal"
+        >
           {label}
           {required && <span className="text-text-danger ml-1">*</span>}
         </label>
       )}
+
       <div className="relative">
         <input
+          id={inputId}
           type={isPassword ? (showPassword ? 'text' : 'password') : type}
+          disabled={disabled}
           className={[
-            'bg-bg-white text-text-basic placeholder:text-text-disabled',
-            'w-full rounded-(--radius-medium1) border px-[var(--padding-4)] py-[var(--size-height-2)] text-[14px] leading-[1.5]',
-            'focus:border-border-primary focus:outline-none',
+            'w-full rounded-(--radius-medium2) border text-[12px] leading-normal',
+            'bg-bg-white text-text-basic placeholder:text-text-subtler',
+            'p-[var(--padding-5)]',
+            'hover:bg-bg-gray-subtler',
+            'focus:border-border-primary focus:bg-bg-white focus:outline-none',
+            'disabled:bg-bg-gray-subtle disabled:text-text-disabled disabled:cursor-not-allowed',
             error ? 'border-border-danger' : 'border-border-subtle',
             hasSuffix ? 'pr-10' : '',
             className,
@@ -63,11 +77,7 @@ export const Input = ({
           </div>
         ) : null}
       </div>
-      {error && (
-        <span className="text-text-danger mt-1 text-[12px] leading-[1.5]">
-          {error}
-        </span>
-      )}
+      {error && <InputMessage state="error" message={error} />}
     </div>
   );
 };
