@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useId, useState } from 'react';
 import { Heading } from '@/components/commons/Typography';
 
 type TabItem = {
@@ -16,6 +16,7 @@ interface TabsProps {
 
 export const Tabs = ({ tabs, defaultIndex = 0, className = '' }: TabsProps) => {
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
+  const uid = useId();
 
   return (
     <div className={className}>
@@ -28,8 +29,8 @@ export const Tabs = ({ tabs, defaultIndex = 0, className = '' }: TabsProps) => {
               role="tab"
               type="button"
               aria-selected={isActive}
-              aria-controls={`tabpanel-${index}`}
-              id={`tab-${index}`}
+              aria-controls={`${uid}-tabpanel-${index}`}
+              id={`${uid}-tab-${index}`}
               onClick={() => setActiveIndex(index)}
               className="flex flex-1 cursor-pointer flex-col items-center gap-3"
             >
@@ -58,8 +59,8 @@ export const Tabs = ({ tabs, defaultIndex = 0, className = '' }: TabsProps) => {
         <div
           key={tab.label}
           role="tabpanel"
-          id={`tabpanel-${index}`}
-          aria-labelledby={`tab-${index}`}
+          id={`${uid}-tabpanel-${index}`}
+          aria-labelledby={`${uid}-tab-${index}`}
           hidden={index !== activeIndex}
         >
           {tab.content}
