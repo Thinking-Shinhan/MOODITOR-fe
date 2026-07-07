@@ -86,6 +86,23 @@ utils/ # 유틸 함수
 - gap: --gap-1 (2px) ~ --gap-12 (80px)
 - padding: --padding-1 (2px) ~ --padding-10 (40px)
 
+### 간격 토큰 사용 규칙
+
+- gap, padding, radius, size-height는 반드시 CSS 변수로 사용
+- 절대 Tailwind 기본 spacing 클래스 사용 금지 (gap-3, p-4, rounded-lg 등)
+
+올바른 예시:
+
+- gap-[var(--gap-3)] ✅
+- p-[var(--padding-5)] ✅
+- rounded-[var(--radius-medium1)] ✅
+
+잘못된 예시:
+
+- gap-3 ❌
+- p-4 ❌
+- rounded-lg ❌
+
 ### 크기 토큰
 
 - 컴포넌트 높이: --size-height-1 (4px) ~ --size-height-13 (80px)

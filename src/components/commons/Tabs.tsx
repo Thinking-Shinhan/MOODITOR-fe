@@ -20,7 +20,7 @@ export const Tabs = ({ tabs, defaultIndex = 0, className = '' }: TabsProps) => {
 
   return (
     <div className={className}>
-      <div role="tablist" className="flex">
+      <div role="tablist" className="mb-[var(--gap-8)] flex">
         {tabs.map((tab, index) => {
           const isActive = index === activeIndex;
           return (
