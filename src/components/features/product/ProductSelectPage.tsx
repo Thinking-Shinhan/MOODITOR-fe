@@ -8,8 +8,7 @@ import { ProductListToolbar } from '@/components/features/product/ProductListToo
 import { Pagination } from '@/components/commons/Pagination';
 import type { ProductGender } from '@/types/product';
 
-// TODO: UI 확인 후 useProducts의 page/totalPages와 연결 예정
-const TEMP_TOTAL_PAGES = 5;
+const PAGE_SIZE = 11;
 
 export const ProductSelectPage = () => {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -21,16 +20,37 @@ export const ProductSelectPage = () => {
 
   const debouncedKeyword = useDebouncedValue(searchKeyword);
 
+  const handleSearchKeywordChange = (value: string) => {
+    setSearchKeyword(value);
+    setCurrentPage(1);
+  };
+
+  const handleCategoryFilterChange = (value: string | null) => {
+    setCategoryFilter(value);
+    setCurrentPage(1);
+  };
+
+  const handleColorFilterChange = (value: string | null) => {
+    setColorFilter(value);
+    setCurrentPage(1);
+  };
+
+  const handleGenderFilterChange = (value: string | null) => {
+    setGenderFilter(value);
+    setCurrentPage(1);
+  };
+
   const { data, isLoading, isError } = useProducts({
     category: categoryFilter ?? undefined,
     color: colorFilter ?? undefined,
     gender: (genderFilter as ProductGender) ?? undefined,
     keyword: debouncedKeyword || undefined,
-    page: 0,
-    size: 20,
+    page: currentPage - 1,
+    size: PAGE_SIZE,
   });
 
   const products = data?.products.content ?? [];
+  const totalPages = data?.products.totalPages ?? 1;
 
   const handleToggle = (id: number) => {
     setSelectedIds((prev) => {
@@ -61,7 +81,7 @@ export const ProductSelectPage = () => {
             selectedCount={selectedIds.size}
             totalCount={data?.products.totalElements ?? 0}
             searchKeyword={searchKeyword}
-            onSearchKeywordChange={setSearchKeyword}
+            onSearchKeywordChange={handleSearchKeywordChange}
           />
           {isLoading && <p>불러오는 중...</p>}
           {isError && <p>상품을 불러오지 못했습니다.</p>}
@@ -72,16 +92,16 @@ export const ProductSelectPage = () => {
               onToggle={handleToggle}
               onToggleAll={handleToggleAll}
               categoryFilter={categoryFilter}
-              onCategoryFilterChange={setCategoryFilter}
+              onCategoryFilterChange={handleCategoryFilterChange}
               colorFilter={colorFilter}
-              onColorFilterChange={setColorFilter}
+              onColorFilterChange={handleColorFilterChange}
               genderFilter={genderFilter}
-              onGenderFilterChange={setGenderFilter}
+              onGenderFilterChange={handleGenderFilterChange}
             />
           )}
           <Pagination
             currentPage={currentPage}
-            totalPages={TEMP_TOTAL_PAGES}
+            totalPages={totalPages}
             onPageChange={setCurrentPage}
             className="justify-center"
           />
