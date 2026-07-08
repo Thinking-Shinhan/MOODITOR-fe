@@ -6,6 +6,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ProductList } from '@/components/features/product/ProductList';
 import { ProductListToolbar } from '@/components/features/product/ProductListToolbar';
 import { ProductSelectHeader } from '@/components/features/product/ProductSelectHeader';
+import { ProductImageUploadPanel } from '@/components/features/product/ProductImageUploadPanel';
 import { Pagination } from '@/components/commons/Pagination';
 import type { ProductGender } from '@/types/product';
 
@@ -113,7 +114,9 @@ export const ProductSelectPage = () => {
       </div>
 
       {/* 이미지 업로드 영역 */}
-      <div className="bg-bg-gray-subtler flex flex-1 items-center justify-center"></div>
+      <div className="bg-bg-gray-subtler flex flex-1 justify-center pt-8">
+        <ProductImageUploadPanel />
+      </div>
     </div>
   );
 };
