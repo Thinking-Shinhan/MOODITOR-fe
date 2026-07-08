@@ -13,7 +13,7 @@ export default function ImageGeneratePage() {
   return (
     <div className="flex h-full">
       {/* 컨트롤 패널 */}
-      <div className="border-border-subtler bg-bg-white flex w-120 shrink-0 flex-col overflow-y-auto border-r px-9 py-7.75">
+      <div className="border-border-subtler bg-bg-white flex w-123 shrink-0 flex-col overflow-y-auto border-r px-9 py-7.75">
         <Tabs tabs={IMAGE_TABS} />
       </div>
 
