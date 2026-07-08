@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useProducts } from '@/hooks/useProducts';
 import { ProductList } from '@/components/features/product/ProductList';
+import { ProductListToolbar } from '@/components/features/product/ProductListToolbar';
 import type { Product } from '@/types/product';
 
 // TODO: 실제 API 연결 후 제거
@@ -71,6 +72,7 @@ export const ProductSelectPage = () => {
   });
 
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   const handleToggle = (id: number) => {
     setSelectedIds((prev) => {
@@ -109,12 +111,20 @@ export const ProductSelectPage = () => {
               ))}
             </ul>
           )}
-          <ProductList
-            products={MOCK_PRODUCTS}
-            selectedIds={selectedIds}
-            onToggle={handleToggle}
-            onToggleAll={handleToggleAll}
-          />
+          <div className="flex flex-col gap-[var(--gap-5)]">
+            <ProductListToolbar
+              selectedCount={selectedIds.size}
+              totalCount={MOCK_PRODUCTS.length}
+              searchKeyword={searchKeyword}
+              onSearchKeywordChange={setSearchKeyword}
+            />
+            <ProductList
+              products={MOCK_PRODUCTS}
+              selectedIds={selectedIds}
+              onToggle={handleToggle}
+              onToggleAll={handleToggleAll}
+            />
+          </div>
         </div>
       </div>
 
