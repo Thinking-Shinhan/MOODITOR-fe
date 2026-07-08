@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useProducts } from '@/hooks/useProducts';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ProductList } from '@/components/features/product/ProductList';
@@ -9,12 +9,19 @@ import { ProductSelectHeader } from '@/components/features/product/ProductSelect
 import { ProductImageUploadPanel } from '@/components/features/product/ProductImageUploadPanel';
 import { ProductImageUploadEmptyState } from '@/components/features/product/ProductImageUploadEmptyState';
 import { Pagination } from '@/components/commons/Pagination';
-import type { ProductGender } from '@/types/product';
+import type { Product, ProductGender } from '@/types/product';
 
 const PAGE_SIZE = 11;
 
 export const ProductSelectPage = () => {
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  // 페이지네이션으로 목록이 바뀌어도 이전에 선택한 상품 데이터를 잃지 않도록 전체 Product를 보관
+  const [selectedProductsMap, setSelectedProductsMap] = useState<
+    Map<number, Product>
+  >(new Map());
+  const selectedIds = useMemo(
+    () => new Set(selectedProductsMap.keys()),
+    [selectedProductsMap],
+  );
   const [searchKeyword, setSearchKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [colorFilter, setColorFilter] = useState<string | null>(null);
@@ -55,24 +62,31 @@ export const ProductSelectPage = () => {
   const products = data?.products.content ?? [];
   const totalPages = data?.products.totalPages ?? 1;
 
-  const handleToggle = (id: number) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
+  const handleToggle = (product: Product) => {
+    setSelectedProductsMap((prev) => {
+      const next = new Map(prev);
+      if (next.has(product.id)) {
+        next.delete(product.id);
       } else {
-        next.add(id);
+        next.set(product.id, product);
       }
       return next;
     });
   };
 
   const handleToggleAll = () => {
-    setSelectedIds((prev) =>
-      products.every((product) => prev.has(product.id))
-        ? new Set()
-        : new Set(products.map((product) => product.id)),
-    );
+    setSelectedProductsMap((prev) => {
+      const allSelected = products.every((product) => prev.has(product.id));
+      const next = new Map(prev);
+      products.forEach((product) => {
+        if (allSelected) {
+          next.delete(product.id);
+        } else {
+          next.set(product.id, product);
+        }
+      });
+      return next;
+    });
   };
 
   return (
@@ -119,7 +133,9 @@ export const ProductSelectPage = () => {
         className={`bg-bg-gray-subtler flex flex-1 justify-center ${selectedIds.size > 0 ? 'pt-8' : ''}`}
       >
         {selectedIds.size > 0 ? (
-          <ProductImageUploadPanel />
+          <ProductImageUploadPanel
+            selectedProducts={Array.from(selectedProductsMap.values())}
+          />
         ) : (
           <ProductImageUploadEmptyState />
         )}

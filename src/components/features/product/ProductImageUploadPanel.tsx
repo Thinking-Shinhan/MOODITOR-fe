@@ -5,13 +5,32 @@ import { useRouter } from 'next/navigation';
 import { Heading, Body } from '@/components/commons/Typography';
 import { Button } from '@/components/commons/Button';
 import { ImageUploadField } from '@/components/commons/ImageUploadField';
+import { useProductSelectionStore } from '@/stores/productSelectionStore';
+import type { Product } from '@/types/product';
 
-export const ProductImageUploadPanel = () => {
+interface ProductImageUploadPanelProps {
+  selectedProducts: Product[];
+}
+
+export const ProductImageUploadPanel = ({
+  selectedProducts,
+}: ProductImageUploadPanelProps) => {
   const router = useRouter();
+  const addProducts = useProductSelectionStore((state) => state.addProducts);
   const [frontImage, setFrontImage] = useState<File | null>(null);
   const [backImage, setBackImage] = useState<File | null>(null);
 
   const isReady = frontImage !== null && backImage !== null;
+
+  const handleGoToImageGenerate = () => {
+    addProducts(
+      selectedProducts.map((product) => ({
+        id: String(product.id),
+        name: product.name,
+      })),
+    );
+    router.push('/image-generate');
+  };
 
   return (
     <div className="flex w-[458px] flex-col gap-[var(--gap-8)]">
@@ -44,8 +63,7 @@ export const ProductImageUploadPanel = () => {
         variant="primary"
         size="medium"
         disabled={!isReady}
-        // TODO: 이미지 저장 후 이미지 생성 화면으로 이동
-        onClick={() => router.push('/image-generate')}
+        onClick={handleGoToImageGenerate}
         className="w-full rounded-[var(--radius-medium1)]!"
       >
         이미지 생성하러 가기
