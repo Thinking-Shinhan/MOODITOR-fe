@@ -5,6 +5,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ProductList } from '@/components/features/product/ProductList';
 import { ProductListToolbar } from '@/components/features/product/ProductListToolbar';
+import { ProductSelectHeader } from '@/components/features/product/ProductSelectHeader';
 import { Pagination } from '@/components/commons/Pagination';
 import type { ProductGender } from '@/types/product';
 
@@ -75,36 +76,39 @@ export const ProductSelectPage = () => {
   return (
     <div className="flex h-full">
       {/* 상품 선택 영역 */}
-      <div className="border-border-subtler bg-bg-white flex w-[842px] shrink-0 flex-col overflow-y-auto border-r px-9 py-7.75">
-        <div className="flex flex-col gap-[var(--gap-5)]">
-          <ProductListToolbar
-            selectedCount={selectedIds.size}
-            totalCount={data?.products.totalElements ?? 0}
-            searchKeyword={searchKeyword}
-            onSearchKeywordChange={handleSearchKeywordChange}
-          />
-          {isLoading && <p>불러오는 중...</p>}
-          {isError && <p>상품을 불러오지 못했습니다.</p>}
-          {!isLoading && !isError && (
-            <ProductList
-              products={products}
-              selectedIds={selectedIds}
-              onToggle={handleToggle}
-              onToggleAll={handleToggleAll}
-              categoryFilter={categoryFilter}
-              onCategoryFilterChange={handleCategoryFilterChange}
-              colorFilter={colorFilter}
-              onColorFilterChange={handleColorFilterChange}
-              genderFilter={genderFilter}
-              onGenderFilterChange={handleGenderFilterChange}
+      <div className="border-border-subtler bg-bg-white flex w-[842px] shrink-0 flex-col overflow-y-auto border-r p-8">
+        <div className="flex flex-col gap-[var(--gap-8)]">
+          <ProductSelectHeader />
+          <div className="flex flex-col gap-[var(--gap-5)]">
+            <ProductListToolbar
+              selectedCount={selectedIds.size}
+              totalCount={data?.products.totalElements ?? 0}
+              searchKeyword={searchKeyword}
+              onSearchKeywordChange={handleSearchKeywordChange}
             />
-          )}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            className="justify-center"
-          />
+            {isLoading && <p>불러오는 중...</p>}
+            {isError && <p>상품을 불러오지 못했습니다.</p>}
+            {!isLoading && !isError && (
+              <ProductList
+                products={products}
+                selectedIds={selectedIds}
+                onToggle={handleToggle}
+                onToggleAll={handleToggleAll}
+                categoryFilter={categoryFilter}
+                onCategoryFilterChange={handleCategoryFilterChange}
+                colorFilter={colorFilter}
+                onColorFilterChange={handleColorFilterChange}
+                genderFilter={genderFilter}
+                onGenderFilterChange={handleGenderFilterChange}
+              />
+            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              className="justify-center"
+            />
+          </div>
         </div>
       </div>
 
