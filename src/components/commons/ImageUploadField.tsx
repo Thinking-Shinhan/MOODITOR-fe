@@ -1,6 +1,13 @@
 'use client';
 
-import { ChangeEvent, useEffect, useMemo, useRef } from 'react';
+import {
+  ChangeEvent,
+  DragEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { CircleX, Trash2, FileUp } from 'lucide-react';
 import { Body } from '@/components/commons/Typography';
 import { Button } from '@/components/commons/Button';
@@ -23,6 +30,7 @@ export const ImageUploadField = ({
   className = '',
 }: ImageUploadFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
   const previewUrl = useMemo(
     () => (file ? URL.createObjectURL(file) : null),
     [file],
@@ -38,6 +46,23 @@ export const ImageUploadField = ({
     const selected = event.target.files?.[0];
     if (selected) onUpload(selected);
     event.target.value = '';
+  };
+
+  const handleDragOver = (event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setIsDragOver(false);
+    const dropped = event.dataTransfer.files?.[0];
+    if (dropped && dropped.type.startsWith('image/')) onUpload(dropped);
   };
 
   return (
@@ -77,7 +102,16 @@ export const ImageUploadField = ({
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="border-btn-outline-border hover:bg-bg-gray-subtle flex h-[280px] w-full cursor-pointer flex-col items-center justify-center gap-[var(--gap-3)] rounded-[var(--radius-large1)] border-[0.8px] border-dashed px-[var(--padding-7)] py-[var(--gap-6)] transition-colors"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={[
+            'flex h-[280px] w-full cursor-pointer flex-col items-center justify-center gap-[var(--gap-3)]',
+            'rounded-[var(--radius-large1)] border-[0.8px] border-dashed px-[var(--padding-7)] py-[var(--gap-6)] transition-colors',
+            isDragOver
+              ? 'bg-bg-gray-subtle'
+              : 'border-btn-outline-border hover:bg-bg-gray-subtle',
+          ].join(' ')}
         >
           <FileUp size={20} className="text-icon-disabled-on" />
           <Body
