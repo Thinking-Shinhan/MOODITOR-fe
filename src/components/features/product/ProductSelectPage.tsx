@@ -73,6 +73,9 @@ export const ProductSelectPage = () => {
 
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [colorFilter, setColorFilter] = useState<string | null>(null);
+  const [genderFilter, setGenderFilter] = useState<string | null>(null);
 
   const handleToggle = (id: number) => {
     setSelectedIds((prev) => {
@@ -123,6 +126,12 @@ export const ProductSelectPage = () => {
               selectedIds={selectedIds}
               onToggle={handleToggle}
               onToggleAll={handleToggleAll}
+              categoryFilter={categoryFilter}
+              onCategoryFilterChange={setCategoryFilter}
+              colorFilter={colorFilter}
+              onColorFilterChange={setColorFilter}
+              genderFilter={genderFilter}
+              onGenderFilterChange={setGenderFilter}
             />
           </div>
         </div>

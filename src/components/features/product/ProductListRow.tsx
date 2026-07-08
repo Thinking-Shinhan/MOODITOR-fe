@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { ImagePlus } from 'lucide-react';
 import { Checkbox } from '@/components/commons/Checkbox';
 import { Body } from '@/components/commons/Typography';
 import { PRODUCT_GENDER_LABEL } from '@/constants/product';
@@ -36,7 +36,7 @@ export const ProductListRow = ({
       />
       <div className="flex shrink-0 items-center gap-[var(--gap-5)]">
         <span className="bg-btn-secondary-fill-pressed flex h-[var(--size-height-6)] w-[var(--size-height-6)] shrink-0 items-center justify-center rounded-[var(--radius-xsmall2)] p-[5px]">
-          <Plus size={14} className="text-icon-primary-basic" />
+          <ImagePlus size={14} className="text-icon-primary-basic" />
         </span>
         <Body size="xsmall" className="text-text-basic w-[200px] truncate">
           {product.name}
