@@ -37,6 +37,7 @@ export const ModelShotContent = () => {
     [selectedProducts],
   );
 
+  // TODO: 폼 데이터 상태를 확인하기 위한 임시 useEffect, 실제 구현 시 제거
   useEffect(() => {
     console.log('모델컷 생성 폼 데이터:', formData);
   }, [formData]);

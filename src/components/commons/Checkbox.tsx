@@ -30,7 +30,7 @@ const sizeConfig: Record<CheckboxSize, { box: string; iconSize: number }> = {
 
 const checkedFillConfig: Record<CheckboxVariant, string> = {
   primary: 'bg-btn-primary-fill',
-  secondary: 'btn-primary-fill-black',
+  secondary: 'bg-btn-primary-fill-black',
 };
 
 export const Checkbox = ({
