@@ -25,7 +25,8 @@ const variantStyles: Record<ChipVariant, VariantConfig> = {
   secondary: {
     default:
       'bg-btn-secondary-fill text-text-border border border-border-border',
-    pressed: 'bg-btn-primary-fill-pressed text-text-border-inverse',
+    pressed:
+      'bg-btn-primary-fill-black text-text-border-inverse border border-btn-secondary-border',
   },
   tertiary: {
     default: 'bg-btn-tertiary-fill text-text-basic',

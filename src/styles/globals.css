@@ -74,7 +74,8 @@
   /* Semantic - Button */
   --color-btn-primary-fill: #ff5e00;
   --color-btn-primary-hovered: #c94a00;
-  --color-btn-primary-fill-pressed: #131416;
+  --color-btn-primary-fill-pressed: #913500;
+  --color-btn-primary-fill-black: #131416;
   --color-btn-disabled-fill: #cdd1d5;
   --color-btn-secondary-fill: #ffffff;
   --color-btn-secondary-fill-hovered: #feeee5;
