@@ -1,18 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProductSelect } from '@/components/features/image/ProductSelect';
 import { ImageSelectSection } from '@/components/features/image/ImageSelectSection';
 import { Heading } from '@/components/commons/Typography';
 import { StepBadge } from '@/components/commons/StepBadge';
+import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import type { SelectedProduct } from '@/types/product';
 
-// TODO: 상품 선택 화면 연동 후 제거
-const MOCK_PRODUCTS: SelectedProduct[] = [
-  { id: '1', name: '상품명' },
-  { id: '2', name: '상품명' },
-];
+// 임시 폼 구조
+interface ModelShotFormData {
+  products: SelectedProduct[];
+}
 
 // TODO: API 연동 후 제거
 const MOCK_MODEL_URL =
@@ -25,21 +25,29 @@ const MOCK_MODELS = Array.from({ length: 8 }, (_, i) => ({
 export const ModelShotContent = () => {
   const router = useRouter();
 
-  const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>(
-    [],
+  const selectedProducts = useProductSelectionStore(
+    (state) => state.selectedProducts,
   );
+  const removeProduct = useProductSelectionStore(
+    (state) => state.removeProduct,
+  );
+
+  const formData = useMemo<ModelShotFormData>(
+    () => ({ products: selectedProducts }),
+    [selectedProducts],
+  );
+
+  // TODO: 폼 데이터 상태를 확인하기 위한 임시 useEffect, 실제 구현 시 제거
+  useEffect(() => {
+    console.log('모델컷 생성 폼 데이터:', formData);
+  }, [formData]);
 
   const handleSelectArea = () => {
     router.push('/products');
   };
 
   const handleAddMore = () => {
-    // TODO: 상품 선택 화면으로 이동
     router.push('/products');
-  };
-
-  const handleRemove = (id: string) => {
-    setSelectedProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
   return (
@@ -56,7 +64,7 @@ export const ModelShotContent = () => {
         <ProductSelect
           selectedProducts={selectedProducts}
           onClickSelectArea={handleSelectArea}
-          onRemoveProduct={handleRemove}
+          onRemoveProduct={removeProduct}
           onAddMore={handleAddMore}
         />
 

@@ -7,7 +7,7 @@ import type { Product } from '@/types/product';
 interface ProductListProps {
   products: Product[];
   selectedIds: Set<number>;
-  onToggle: (id: number) => void;
+  onToggle: (product: Product) => void;
   onToggleAll: () => void;
   categoryFilter: string | null;
   onCategoryFilterChange: (value: string | null) => void;
