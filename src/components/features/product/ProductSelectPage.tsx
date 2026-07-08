@@ -5,7 +5,11 @@ import { useProducts } from '@/hooks/useProducts';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ProductList } from '@/components/features/product/ProductList';
 import { ProductListToolbar } from '@/components/features/product/ProductListToolbar';
+import { Pagination } from '@/components/commons/Pagination';
 import type { ProductGender } from '@/types/product';
+
+// TODO: UI 확인 후 useProducts의 page/totalPages와 연결 예정
+const TEMP_TOTAL_PAGES = 5;
 
 export const ProductSelectPage = () => {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -13,6 +17,7 @@ export const ProductSelectPage = () => {
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [colorFilter, setColorFilter] = useState<string | null>(null);
   const [genderFilter, setGenderFilter] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const debouncedKeyword = useDebouncedValue(searchKeyword);
 
@@ -74,6 +79,12 @@ export const ProductSelectPage = () => {
               onGenderFilterChange={setGenderFilter}
             />
           )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={TEMP_TOTAL_PAGES}
+            onPageChange={setCurrentPage}
+            className="justify-center"
+          />
         </div>
       </div>
 
