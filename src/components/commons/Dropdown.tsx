@@ -51,6 +51,8 @@ export const Dropdown = ({
     <div ref={containerRef} className={`relative shrink-0 ${className}`}>
       <button
         type="button"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex cursor-pointer items-center gap-[var(--gap-1)]"
       >

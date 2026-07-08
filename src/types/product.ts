@@ -40,7 +40,7 @@ export interface ProductPage {
 export interface ProductListResponse {
   category: string | null;
   color: string | null;
-  gender: string | null;
+  gender: ProductGender | null;
   keyword: string | null;
   products: ProductPage;
 }
