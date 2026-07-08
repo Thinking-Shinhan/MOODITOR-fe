@@ -3,24 +3,39 @@
 import { InputHTMLAttributes } from 'react';
 import { Check } from 'lucide-react';
 
-type CheckboxSize = 'large' | 'medium';
+type CheckboxSize = 'large' | 'medium' | 'small';
+type CheckboxVariant = 'primary' | 'secondary';
 
 interface CheckboxProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'size' | 'type' | 'defaultChecked'
 > {
   size?: CheckboxSize;
+  variant?: CheckboxVariant;
   checked: boolean;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
 const sizeConfig: Record<CheckboxSize, { box: string; iconSize: number }> = {
-  large: { box: 'w-6 h-6', iconSize: 20 },
-  medium: { box: 'w-5 h-5', iconSize: 16 },
+  large: {
+    box: 'w-[var(--size-height-6)] h-[var(--size-height-6)]',
+    iconSize: 20,
+  },
+  medium: {
+    box: 'w-[var(--size-height-5)] h-[var(--size-height-5)]',
+    iconSize: 16,
+  },
+  small: { box: 'w-[14px] h-[14px]', iconSize: 12 },
+};
+
+const checkedFillConfig: Record<CheckboxVariant, string> = {
+  primary: 'bg-btn-primary-fill',
+  secondary: 'bg-btn-primary-fill-pressed',
 };
 
 export const Checkbox = ({
   size = 'large',
+  variant = 'primary',
   checked,
   onChange,
   disabled,
@@ -50,7 +65,7 @@ export const Checkbox = ({
           'inline-flex shrink-0 items-center justify-center rounded-[var(--radius-xsmall2)] p-[var(--padding-1)] transition-colors',
           box,
           checked
-            ? 'bg-btn-primary-fill'
+            ? checkedFillConfig[variant]
             : 'bg-btn-secondary-fill border-border-basic border',
         ].join(' ')}
       >

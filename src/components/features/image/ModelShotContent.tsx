@@ -30,8 +30,7 @@ export const ModelShotContent = () => {
   );
 
   const handleSelectArea = () => {
-    // TODO: 상품 선택 화면으로 이동
-    setSelectedProducts(MOCK_PRODUCTS);
+    router.push('/products');
   };
 
   const handleAddMore = () => {

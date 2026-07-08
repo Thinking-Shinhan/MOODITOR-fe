@@ -45,7 +45,7 @@ export const Tabs = ({ tabs, defaultIndex = 0, className = '' }: TabsProps) => {
               </Body>
               <div
                 className={[
-                  'h-[4px] w-full rounded-[var(--radius-xsmall)]',
+                  'h-[4px] w-full',
                   isActive
                     ? 'bg-btn-primary-fill'
                     : 'bg-btn-tertiary-fill-hovered',
