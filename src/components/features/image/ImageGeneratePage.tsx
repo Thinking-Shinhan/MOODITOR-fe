@@ -1,11 +1,13 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Tabs } from '@/components/commons/Tabs';
 import { ModelShotContent } from '@/components/features/image/ModelShotContent';
 import { ProductShotContent } from '@/components/features/image/ProductShotContent';
 import { ImageGenerateEmptyCanvas } from '@/components/features/image/ImageGenerateEmptyCanvas';
 import { ImageGenerateLoadingCanvas } from './ImageGenerateLoadingCanvas';
 import { ImageGenerateResultCanvas } from './ImageGenerateResultCanvas';
+import { useBrandMood } from '@/hooks/useBrandMood';
 
 const IMAGE_TABS = [
   { label: '모델컷', content: <ModelShotContent /> },
@@ -13,6 +15,13 @@ const IMAGE_TABS = [
 ];
 
 export default function ImageGeneratePage() {
+  // TODO: 임시 호출 예시. 실제 브랜드/무드 연동 후 제거
+  const { data: brandMood } = useBrandMood(2, 6);
+
+  useEffect(() => {
+    console.log('브랜드 무드 조회 결과:', brandMood);
+  }, [brandMood]);
+
   return (
     <div className="flex h-full">
       {/* 컨트롤 패널 */}
