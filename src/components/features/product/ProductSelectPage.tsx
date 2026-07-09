@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useProducts } from '@/hooks/useProducts';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ProductList } from '@/components/features/product/ProductList';
@@ -15,14 +15,9 @@ import { Spinner } from '@/components/commons/Spinner';
 const PAGE_SIZE = 11;
 
 export const ProductSelectPage = () => {
-  // 페이지네이션으로 목록이 바뀌어도 이전에 선택한 상품 데이터를 잃지 않도록 전체 Product를 보관
-  const [selectedProductsMap, setSelectedProductsMap] = useState<
-    Map<number, Product>
-  >(new Map());
-  const selectedIds = useMemo(
-    () => new Set(selectedProductsMap.keys()),
-    [selectedProductsMap],
-  );
+  // 상품은 한 번에 하나만 선택 가능
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const selectedIds = new Set(selectedProduct ? [selectedProduct.id] : []);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [colorFilter, setColorFilter] = useState<string | null>(null);
@@ -64,30 +59,7 @@ export const ProductSelectPage = () => {
   const totalPages = data?.products.totalPages ?? 1;
 
   const handleToggle = (product: Product) => {
-    setSelectedProductsMap((prev) => {
-      const next = new Map(prev);
-      if (next.has(product.id)) {
-        next.delete(product.id);
-      } else {
-        next.set(product.id, product);
-      }
-      return next;
-    });
-  };
-
-  const handleToggleAll = () => {
-    setSelectedProductsMap((prev) => {
-      const allSelected = products.every((product) => prev.has(product.id));
-      const next = new Map(prev);
-      products.forEach((product) => {
-        if (allSelected) {
-          next.delete(product.id);
-        } else {
-          next.set(product.id, product);
-        }
-      });
-      return next;
-    });
+    setSelectedProduct((prev) => (prev?.id === product.id ? null : product));
   };
 
   return (
@@ -114,7 +86,6 @@ export const ProductSelectPage = () => {
                 products={products}
                 selectedIds={selectedIds}
                 onToggle={handleToggle}
-                onToggleAll={handleToggleAll}
                 categoryFilter={categoryFilter}
                 onCategoryFilterChange={handleCategoryFilterChange}
                 colorFilter={colorFilter}
@@ -135,11 +106,12 @@ export const ProductSelectPage = () => {
 
       {/* 이미지 업로드 영역 */}
       <div
-        className={`bg-bg-gray-subtler flex flex-1 justify-center ${selectedIds.size > 0 ? 'pt-8' : ''}`}
+        className={`bg-bg-gray-subtler flex flex-1 justify-center ${selectedProduct ? 'p-8' : ''}`}
       >
-        {selectedIds.size > 0 ? (
+        {selectedProduct ? (
           <ProductImageUploadPanel
-            selectedProducts={Array.from(selectedProductsMap.values())}
+            key={selectedProduct.id}
+            selectedProduct={selectedProduct}
           />
         ) : (
           <ProductImageUploadEmptyState />

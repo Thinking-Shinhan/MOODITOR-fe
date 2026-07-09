@@ -4,36 +4,152 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Heading, Body } from '@/components/commons/Typography';
 import { Button } from '@/components/commons/Button';
+import { InputMessage } from '@/components/commons/InputMessage';
 import { ImageUploadField } from '@/components/commons/ImageUploadField';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
+import { useUploadProductImages } from '@/hooks/useUploadProductImages';
+import { useProductImages } from '@/hooks/useProductImages';
+import { useDeleteAsset } from '@/hooks/useDeleteAsset';
+import { useObjectUrl } from '@/hooks/useObjectUrl';
+import { ApiError } from '@/libs/apiClient';
+import { assetService } from '@/services/assetService';
 import type { Product } from '@/types/product';
+import type { UploadProductImagesItem } from '@/services/assetService';
 
 interface ProductImageUploadPanelProps {
-  selectedProducts: Product[];
+  selectedProduct: Product;
 }
 
 export const ProductImageUploadPanel = ({
-  selectedProducts,
+  selectedProduct,
 }: ProductImageUploadPanelProps) => {
   const router = useRouter();
   const addProducts = useProductSelectionStore((state) => state.addProducts);
+  const { mutateAsync: uploadProductImages, isPending } =
+    useUploadProductImages();
+  const { data: existingImages } = useProductImages(selectedProduct.id);
+  const { mutateAsync: deleteAsset } = useDeleteAsset();
+
   const [frontImage, setFrontImage] = useState<File | null>(null);
   const [backImage, setBackImage] = useState<File | null>(null);
+  const [frontRemoved, setFrontRemoved] = useState(false);
+  const [backRemoved, setBackRemoved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const isReady = frontImage !== null && backImage !== null;
+  const existingFrontAsset =
+    existingImages?.find((image) => image.assetRole === 'PRODUCT_FRONT') ??
+    null;
+  const existingBackAsset =
+    existingImages?.find((image) => image.assetRole === 'PRODUCT_BACK') ?? null;
 
-  const handleGoToImageGenerate = () => {
-    addProducts(
-      selectedProducts.map((product) => ({
-        id: String(product.id),
-        name: product.name,
-      })),
-    );
-    router.push('/image-generate');
+  const frontObjectUrl = useObjectUrl(frontImage);
+  const backObjectUrl = useObjectUrl(backImage);
+
+  const frontPreviewUrl =
+    frontObjectUrl ??
+    (frontRemoved ? null : (existingFrontAsset?.imageUrl ?? null));
+  const backPreviewUrl =
+    backObjectUrl ??
+    (backRemoved ? null : (existingBackAsset?.imageUrl ?? null));
+
+  const isReady = frontPreviewUrl !== null && backPreviewUrl !== null;
+
+  const handleUploadFront = (file: File) => {
+    setFrontImage(file);
+    setFrontRemoved(false);
+  };
+
+  const handleRemoveFront = async () => {
+    // 직접 업로드해서 아직 저장 전인 로컬 파일이면 API 호출 없이 그대로 비움
+    if (frontImage) {
+      setFrontImage(null);
+      return;
+    }
+
+    // 상품 이미지 조회로 불러온 기존 이미지면 삭제 API 호출 후 미리보기 제거
+    if (existingFrontAsset) {
+      setErrorMessage(null);
+      try {
+        await deleteAsset(existingFrontAsset.assetId);
+        setFrontRemoved(true);
+      } catch (error) {
+        setErrorMessage(
+          error instanceof ApiError
+            ? error.message
+            : '이미지 삭제에 실패했습니다.',
+        );
+      }
+    }
+  };
+
+  const handleUploadBack = (file: File) => {
+    setBackImage(file);
+    setBackRemoved(false);
+  };
+
+  const handleRemoveBack = async () => {
+    if (backImage) {
+      setBackImage(null);
+      return;
+    }
+
+    if (existingBackAsset) {
+      setErrorMessage(null);
+      try {
+        await deleteAsset(existingBackAsset.assetId);
+        setBackRemoved(true);
+      } catch (error) {
+        setErrorMessage(
+          error instanceof ApiError
+            ? error.message
+            : '이미지 삭제에 실패했습니다.',
+        );
+      }
+    }
+  };
+
+  const handleGoToImageGenerate = async () => {
+    if (!isReady) return;
+
+    setErrorMessage(null);
+    try {
+      const items: UploadProductImagesItem[] = [];
+      if (frontImage) items.push({ file: frontImage, role: 'PRODUCT_FRONT' });
+      if (backImage) items.push({ file: backImage, role: 'PRODUCT_BACK' });
+
+      if (items.length > 0) {
+        await uploadProductImages({ productId: selectedProduct.id, items });
+      }
+
+      // 업로드(POST) 응답의 imageUrl은 서명되지 않은 URL이라 비공개 버킷에서 바로 열리지
+      // 않는다. 조회(GET) API는 서명된 URL을 내려주므로, 업로드 후 다시 조회해서 사용한다.
+      // TODO: 백엔드가 업로드 응답에도 서명된 URL을 내려주게 되면 재조회 없이 바로 써도 됨
+      const latestImages = await assetService.getProductImages(
+        selectedProduct.id,
+      );
+      const frontImageUrl = latestImages.find(
+        (asset) => asset.assetRole === 'PRODUCT_FRONT',
+      )?.imageUrl;
+
+      addProducts([
+        {
+          id: String(selectedProduct.id),
+          name: selectedProduct.name,
+          imageUrl: frontImageUrl,
+        },
+      ]);
+      router.push('/image-generate');
+    } catch (error) {
+      setErrorMessage(
+        error instanceof ApiError
+          ? error.message
+          : '이미지 업로드에 실패했습니다.',
+      );
+    }
   };
 
   return (
-    <div className="flex w-[458px] flex-col gap-[var(--gap-8)]">
+    <div className="flex w-full flex-col gap-[var(--gap-8)]">
       <div className="flex flex-col gap-[var(--gap-2)]">
         <Heading size="small" className="text-text-basic">
           이미지 업로드
@@ -46,27 +162,29 @@ export const ProductImageUploadPanel = ({
       <ImageUploadField
         label="앞면"
         placeholder={'선택한 제품의 앞면\n상세 이미지를 업로드해 주세요.'}
-        file={frontImage}
-        onUpload={setFrontImage}
-        onRemove={() => setFrontImage(null)}
+        previewUrl={frontPreviewUrl}
+        onUpload={handleUploadFront}
+        onRemove={handleRemoveFront}
       />
 
       <ImageUploadField
         label="뒷면"
         placeholder={'선택한 제품의 뒷면\n상세 이미지를 업로드해 주세요.'}
-        file={backImage}
-        onUpload={setBackImage}
-        onRemove={() => setBackImage(null)}
+        previewUrl={backPreviewUrl}
+        onUpload={handleUploadBack}
+        onRemove={handleRemoveBack}
       />
+
+      {errorMessage && <InputMessage state="error" message={errorMessage} />}
 
       <Button
         variant="primary"
         size="medium"
-        disabled={!isReady}
+        disabled={!isReady || isPending}
         onClick={handleGoToImageGenerate}
         className="w-full rounded-[var(--radius-medium1)]!"
       >
-        이미지 생성하러 가기
+        {isPending ? '업로드 중...' : '이미지 생성하러 가기'}
       </Button>
     </div>
   );
