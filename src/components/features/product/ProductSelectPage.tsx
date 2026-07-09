@@ -104,7 +104,9 @@ export const ProductSelectPage = () => {
               onSearchKeywordChange={handleSearchKeywordChange}
             />
             {isLoading && (
-              <Spinner className="mt-12 w-full items-center justify-center" />
+              <div className="mt-12 flex w-full items-center justify-center">
+                <Spinner size="large" />
+              </div>
             )}
             {isError && <p>상품을 불러오지 못했습니다.</p>}
             {!isLoading && !isError && (

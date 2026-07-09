@@ -109,7 +109,7 @@ export const ModelShotContent = () => {
   return (
     <div className="flex flex-col gap-[var(--gap-8)]">
       {/* 1. 이미지 구성 */}
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-[var(--gap-5)]">
         {/* 헤더 */}
         <div className="flex items-center gap-[var(--gap-3)]">
           <StepBadge number={1} />
@@ -117,7 +117,7 @@ export const ModelShotContent = () => {
         </div>
 
         {/* 섹션들 */}
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-[var(--gap-8)]">
           <ProductSelect
             selectedProducts={selectedProducts}
             onClickSelectArea={handleSelectArea}
@@ -160,7 +160,7 @@ export const ModelShotContent = () => {
         </div>
 
         {/* 섹션들 */}
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-[var(--gap-8)]">
           {/* 이미지 색온도 */}
           <div className="flex flex-col gap-[var(--gap-4)]">
             <Body size="medium" bold className="text-text-subtle">

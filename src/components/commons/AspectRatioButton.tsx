@@ -19,10 +19,12 @@ export const AspectRatioButton = ({
     aria-pressed={selected}
     className={[
       'flex w-[59px] shrink-0 flex-col items-center justify-center gap-[var(--gap-3)]',
-      'rounded-[var(--radius-small2)] px-[var(--padding-5)] py-[var(--padding-4)] transition-colors',
+      'rounded-[var(--radius-small2)] border transition-colors',
+      'px-[var(--padding-5)] py-[var(--padding-4)]',
+
       selected
-        ? 'bg-btn-secondary-fill-hovered border-btn-secondary-border-pressed border'
-        : 'bg-btn-tertiary-fill hover:bg-btn-tertiary-fill-hovered',
+        ? 'bg-btn-secondary-fill-hovered border-btn-secondary-border-pressed'
+        : 'bg-btn-tertiary-fill hover:bg-btn-tertiary-fill-hovered border-transparent',
     ].join(' ')}
   >
     <span
