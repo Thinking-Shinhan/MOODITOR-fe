@@ -25,11 +25,24 @@ export default function ImageGeneratePage() {
         {/* <ImageGenerateEmptyCanvas /> */}
         {/* <ImageGenerateLoadingCanvas /> */}
         <ImageGenerateResultCanvas
+          aspectRatio="3:4"
           images={[
-            'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
-            'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
-            'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
-            'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
+            {
+              id: '1',
+              url: 'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
+            },
+            {
+              id: '2',
+              url: 'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
+            },
+            {
+              id: '3',
+              url: 'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
+            },
+            {
+              id: '4',
+              url: 'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
+            },
           ]}
         />
       </div>

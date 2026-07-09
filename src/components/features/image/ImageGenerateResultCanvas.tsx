@@ -1,18 +1,52 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight } from 'lucide-react';
 import { Body } from '@/components/commons/Typography';
 import { TextButton } from '@/components/commons/TextButton';
+import { GeneratedImageCard } from '@/components/features/image/GeneratedImageCard';
+import type { ImageAspectRatio } from '@/types/image';
+
+interface GeneratedImage {
+  id: string;
+  url: string;
+}
 
 interface ImageGenerateResultCanvasProps {
-  images: string[];
+  images: GeneratedImage[];
+  aspectRatio: ImageAspectRatio;
 }
+
+const ASPECT_RATIO_CLASS: Record<ImageAspectRatio, string> = {
+  '1:1': 'w-[160px] h-[160px]',
+  '2:3': 'w-[160px] h-[240px]',
+  '3:4': 'w-[160px] h-[215px]',
+  '4:5': 'w-[160px] h-[200px]',
+  '9:16': 'w-[160px] h-[284px]',
+  '16:9': 'w-[332px] h-[186px]',
+};
 
 export const ImageGenerateResultCanvas = ({
   images,
+  aspectRatio,
 }: ImageGenerateResultCanvasProps) => {
   const router = useRouter();
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+
+  const handleToggleLike = (id: string) => {
+    setLikedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const isWideLayout = aspectRatio === '16:9';
 
   return (
     <div className="flex size-full flex-col items-center justify-center gap-[var(--gap-7)]">
@@ -30,18 +64,21 @@ export const ImageGenerateResultCanvas = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-[var(--gap-4)]">
-        {images.map((imageUrl, index) => (
-          <div
-            key={imageUrl}
-            className="h-[215px] w-[160px] shrink-0 overflow-hidden rounded-[var(--radius-small1)]"
-          >
-            <img
-              src={imageUrl}
-              alt={`생성된 이미지 ${index + 1}`}
-              className="size-full object-cover"
-            />
-          </div>
+      <div
+        className={
+          isWideLayout
+            ? 'grid w-[676px] grid-cols-2 gap-[var(--gap-4)]'
+            : 'flex flex-wrap items-center justify-center gap-[var(--gap-4)]'
+        }
+      >
+        {images.map((image) => (
+          <GeneratedImageCard
+            key={image.id}
+            url={image.url}
+            liked={likedIds.has(image.id)}
+            onToggleLike={() => handleToggleLike(image.id)}
+            className={ASPECT_RATIO_CLASS[aspectRatio]}
+          />
         ))}
       </div>
 
