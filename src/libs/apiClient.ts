@@ -19,10 +19,13 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const isFormData = options.body instanceof FormData;
+
   const response = await fetch(`${env.apiBaseUrl}${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      // FormData 요청은 브라우저가 boundary를 포함한 Content-Type을 직접 설정해야 하므로 생략
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...options.headers,
     },
     credentials: 'include',
@@ -52,6 +55,9 @@ export const apiClient = {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+
+  postForm: <T>(path: string, formData: FormData, options?: RequestInit) =>
+    request<T>(path, { ...options, method: 'POST', body: formData }),
 
   put: <T>(path: string, body: unknown, options?: RequestInit) =>
     request<T>(path, { ...options, method: 'PUT', body: JSON.stringify(body) }),

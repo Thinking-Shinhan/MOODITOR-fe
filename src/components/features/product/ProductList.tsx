@@ -8,7 +8,6 @@ interface ProductListProps {
   products: Product[];
   selectedIds: Set<number>;
   onToggle: (product: Product) => void;
-  onToggleAll: () => void;
   categoryFilter: string | null;
   onCategoryFilterChange: (value: string | null) => void;
   colorFilter: string | null;
@@ -21,7 +20,6 @@ export const ProductList = ({
   products,
   selectedIds,
   onToggle,
-  onToggleAll,
   categoryFilter,
   onCategoryFilterChange,
   colorFilter,
@@ -29,15 +27,9 @@ export const ProductList = ({
   genderFilter,
   onGenderFilterChange,
 }: ProductListProps) => {
-  const allSelected =
-    products.length > 0 &&
-    products.every((product) => selectedIds.has(product.id));
-
   return (
     <div className="bg-bg-white flex w-full flex-col overflow-hidden rounded-[var(--radius-large2)]">
       <ProductListHeader
-        allSelected={allSelected}
-        onToggleAll={onToggleAll}
         categoryFilter={categoryFilter}
         onCategoryFilterChange={onCategoryFilterChange}
         colorFilter={colorFilter}
