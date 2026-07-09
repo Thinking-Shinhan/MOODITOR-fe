@@ -33,7 +33,7 @@ export const ProductImageUploadPanel = ({
   };
 
   return (
-    <div className="flex w-[458px] flex-col gap-[var(--gap-8)]">
+    <div className="flex w-full flex-col gap-[var(--gap-8)]">
       <div className="flex flex-col gap-[var(--gap-2)]">
         <Heading size="small" className="text-text-basic">
           이미지 업로드

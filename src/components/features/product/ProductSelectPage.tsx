@@ -135,7 +135,7 @@ export const ProductSelectPage = () => {
 
       {/* 이미지 업로드 영역 */}
       <div
-        className={`bg-bg-gray-subtler flex flex-1 justify-center ${selectedIds.size > 0 ? 'pt-8' : ''}`}
+        className={`bg-bg-gray-subtler flex flex-1 justify-center ${selectedIds.size > 0 ? 'p-8' : ''}`}
       >
         {selectedIds.size > 0 ? (
           <ProductImageUploadPanel
