@@ -13,11 +13,12 @@ export const useProductSelectionStore = create<ProductSelectionStore>(
     selectedProducts: [],
     addProducts: (products) =>
       set((state) => {
-        const existingIds = new Set(state.selectedProducts.map((p) => p.id));
-        const newProducts = products.filter((p) => !existingIds.has(p.id));
-        return {
-          selectedProducts: [...state.selectedProducts, ...newProducts],
-        };
+        // id가 같으면 최신 데이터(예: 새로 업로드한 imageUrl)로 덮어쓴다
+        const productsById = new Map(
+          state.selectedProducts.map((p) => [p.id, p]),
+        );
+        products.forEach((p) => productsById.set(p.id, p));
+        return { selectedProducts: Array.from(productsById.values()) };
       }),
     removeProduct: (id) =>
       set((state) => ({
