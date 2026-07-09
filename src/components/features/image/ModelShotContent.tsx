@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProductSelect } from '@/components/features/image/ProductSelect';
 import { ImageSelectSection } from '@/components/features/image/ImageSelectSection';
@@ -127,9 +127,24 @@ export const ModelShotContent = () => {
   const showProductError = submitAttempted && selectedProducts.length === 0;
   const showModelError = submitAttempted && modelReferenceAssetId === null;
 
+  const productSectionRef = useRef<HTMLDivElement>(null);
+  const modelSectionRef = useRef<HTMLDivElement>(null);
+
   const handleSubmit = () => {
     setSubmitAttempted(true);
-    if (selectedProducts.length === 0 || modelReferenceAssetId === null) {
+
+    if (selectedProducts.length === 0) {
+      productSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      return;
+    }
+    if (modelReferenceAssetId === null) {
+      modelSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
       return;
     }
     // TODO: 완료 동작(제출/API 연동)은 스펙 확정 후 구현
@@ -167,27 +182,31 @@ export const ModelShotContent = () => {
 
         {/* 섹션들 */}
         <div className="flex flex-col gap-[var(--gap-8)]">
-          <ProductSelect
-            selectedProducts={selectedProducts}
-            showError={showProductError}
-            onClickSelectArea={handleSelectArea}
-            onRemoveProduct={removeProduct}
-            onAddMore={handleAddMore}
-          />
-          <ImageSelectSection
-            label="모델 선택"
-            errorMessage="모델을 선택해 주세요."
-            showError={showModelError}
-            onSelect={handleSelectModel}
-            segments={[
-              { label: '추천 모델', images: modelImages },
-              {
-                label: '내 모델',
-                showUpload: true,
-                warningMessage: '누끼컷을 업로드하면 정확도가 높아져요.',
-              },
-            ]}
-          />
+          <div ref={productSectionRef}>
+            <ProductSelect
+              selectedProducts={selectedProducts}
+              showError={showProductError}
+              onClickSelectArea={handleSelectArea}
+              onRemoveProduct={removeProduct}
+              onAddMore={handleAddMore}
+            />
+          </div>
+          <div ref={modelSectionRef}>
+            <ImageSelectSection
+              label="모델 선택"
+              errorMessage="모델을 선택해 주세요."
+              showError={showModelError}
+              onSelect={handleSelectModel}
+              segments={[
+                { label: '추천 모델', images: modelImages },
+                {
+                  label: '내 모델',
+                  showUpload: true,
+                  warningMessage: '누끼컷을 업로드하면 정확도가 높아져요.',
+                },
+              ]}
+            />
+          </div>
           <ImageSelectSection
             label="배경 선택"
             onSelect={handleSelectBackground}
