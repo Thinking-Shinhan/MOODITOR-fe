@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProductSelect } from '@/components/features/image/ProductSelect';
 import { ImageSelectSection } from '@/components/features/image/ImageSelectSection';
@@ -11,25 +11,21 @@ import { AspectRatioButton } from '@/components/commons/AspectRatioButton';
 import { Textarea } from '@/components/commons/Textarea';
 import { Button } from '@/components/commons/Button';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
+import { useReferenceAssets } from '@/hooks/useReferenceAssets';
 import type { SelectedProduct } from '@/types/product';
 
 // 임시 폼 구조
 interface ModelShotFormData {
   products: SelectedProduct[];
+  modelReferenceAssetId: number | null;
+  backgroundReferenceAssetId: number | null;
+  poseReferenceAssetId: number | null;
   colorTone: string | null;
   cameraAngle: string | null;
   composition: string | null;
   prompt: string;
   aspectRatio: string | null;
 }
-
-// TODO: API 연동 후 제거
-const MOCK_MODEL_URL =
-  'https://i.pinimg.com/736x/d0/7d/e1/d07de1899b5187379f4063e2894579bc.jpg';
-const MOCK_MODELS = Array.from({ length: 8 }, (_, i) => ({
-  id: `model-${i + 1}`,
-  url: MOCK_MODEL_URL,
-}));
 
 const COLOR_TONE_OPTIONS = ['웜톤', '뉴트럴톤', '쿨톤'];
 const CAMERA_ANGLE_OPTIONS = ['정면', '좌측 사선', '우측 사선', '후면'];
@@ -67,9 +63,42 @@ export const ModelShotContent = () => {
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState<string | null>(null);
 
+  const [modelReferenceAssetId, setModelReferenceAssetId] = useState<
+    number | null
+  >(null);
+  const [backgroundReferenceAssetId, setBackgroundReferenceAssetId] = useState<
+    number | null
+  >(null);
+  const [poseReferenceAssetId, setPoseReferenceAssetId] = useState<
+    number | null
+  >(null);
+
+  const { data: modelAssets } = useReferenceAssets('MODEL');
+  const { data: backgroundAssets } = useReferenceAssets('BACKGROUND');
+  const { data: poseAssets } = useReferenceAssets('POSE');
+
+  const modelImages =
+    modelAssets?.referenceAssets.map((asset) => ({
+      id: String(asset.referenceAssetId),
+      url: asset.imageUrl,
+    })) ?? [];
+  const backgroundImages =
+    backgroundAssets?.referenceAssets.map((asset) => ({
+      id: String(asset.referenceAssetId),
+      url: asset.imageUrl,
+    })) ?? [];
+  const poseImages =
+    poseAssets?.referenceAssets.map((asset) => ({
+      id: String(asset.referenceAssetId),
+      url: asset.imageUrl,
+    })) ?? [];
+
   const formData = useMemo<ModelShotFormData>(
     () => ({
       products: selectedProducts,
+      modelReferenceAssetId,
+      backgroundReferenceAssetId,
+      poseReferenceAssetId,
       colorTone,
       cameraAngle,
       composition,
@@ -78,6 +107,9 @@ export const ModelShotContent = () => {
     }),
     [
       selectedProducts,
+      modelReferenceAssetId,
+      backgroundReferenceAssetId,
+      poseReferenceAssetId,
       colorTone,
       cameraAngle,
       composition,
@@ -91,12 +123,32 @@ export const ModelShotContent = () => {
     console.log('모델컷 생성 폼 데이터:', formData);
   }, [formData]);
 
-  const isComplete =
-    selectedProducts.length > 0 &&
-    colorTone !== null &&
-    cameraAngle !== null &&
-    composition !== null &&
-    aspectRatio !== null;
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const showProductError = submitAttempted && selectedProducts.length === 0;
+  const showModelError = submitAttempted && modelReferenceAssetId === null;
+
+  const productSectionRef = useRef<HTMLDivElement>(null);
+  const modelSectionRef = useRef<HTMLDivElement>(null);
+
+  const handleSubmit = () => {
+    setSubmitAttempted(true);
+
+    if (selectedProducts.length === 0) {
+      productSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      return;
+    }
+    if (modelReferenceAssetId === null) {
+      modelSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      return;
+    }
+    // TODO: 완료 동작(제출/API 연동)은 스펙 확정 후 구현
+  };
 
   const handleSelectArea = () => {
     router.push('/products');
@@ -104,6 +156,18 @@ export const ModelShotContent = () => {
 
   const handleAddMore = () => {
     router.push('/products');
+  };
+
+  const handleSelectModel = (id: string | null) => {
+    setModelReferenceAssetId(id ? Number(id) : null);
+  };
+
+  const handleSelectBackground = (id: string | null) => {
+    setBackgroundReferenceAssetId(id ? Number(id) : null);
+  };
+
+  const handleSelectPose = (id: string | null) => {
+    setPoseReferenceAssetId(id ? Number(id) : null);
   };
 
   return (
@@ -118,34 +182,46 @@ export const ModelShotContent = () => {
 
         {/* 섹션들 */}
         <div className="flex flex-col gap-[var(--gap-8)]">
-          <ProductSelect
-            selectedProducts={selectedProducts}
-            onClickSelectArea={handleSelectArea}
-            onRemoveProduct={removeProduct}
-            onAddMore={handleAddMore}
-          />
-          <ImageSelectSection
-            label="모델 선택"
-            errorMessage="모델을 선택해 주세요."
-            segments={[
-              { label: '추천 모델', images: MOCK_MODELS },
-              {
-                label: '내 모델',
-                showUpload: true,
-                warningMessage: '누끼컷을 업로드하면 정확도가 높아져요.',
-              },
-            ]}
-          />
+          <div ref={productSectionRef}>
+            <ProductSelect
+              selectedProducts={selectedProducts}
+              showError={showProductError}
+              onClickSelectArea={handleSelectArea}
+              onRemoveProduct={removeProduct}
+              onAddMore={handleAddMore}
+            />
+          </div>
+          <div ref={modelSectionRef}>
+            <ImageSelectSection
+              label="모델 선택"
+              errorMessage="모델을 선택해 주세요."
+              showError={showModelError}
+              onSelect={handleSelectModel}
+              segments={[
+                { label: '추천 모델', images: modelImages },
+                {
+                  label: '내 모델',
+                  showUpload: true,
+                  warningMessage: '누끼컷을 업로드하면 정확도가 높아져요.',
+                },
+              ]}
+            />
+          </div>
           <ImageSelectSection
             label="배경 선택"
+            onSelect={handleSelectBackground}
             segments={[
-              { label: '추천 배경' },
+              { label: '추천 배경', images: backgroundImages },
               { label: '내 배경', showUpload: true },
             ]}
           />
 
           {/* 포즈 선택 */}
-          <ImageSelectSection label="포즈 선택" />
+          <ImageSelectSection
+            label="포즈 선택"
+            images={poseImages}
+            onSelect={handleSelectPose}
+          />
         </div>
       </div>
 
@@ -262,11 +338,10 @@ export const ModelShotContent = () => {
         </div>
       </div>
 
-      {/* TODO: 완료 동작(제출/API 연동)은 스펙 확정 후 구현 */}
       <Button
         variant="primary"
         size="large"
-        disabled={!isComplete}
+        onClick={handleSubmit}
         className="w-full"
       >
         완료
