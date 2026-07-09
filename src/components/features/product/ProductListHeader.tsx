@@ -1,6 +1,5 @@
 'use client';
 
-import { Checkbox } from '@/components/commons/Checkbox';
 import { Dropdown } from '@/components/commons/Dropdown';
 import { Body } from '@/components/commons/Typography';
 import {
@@ -10,8 +9,6 @@ import {
 } from '@/constants/product';
 
 interface ProductListHeaderProps {
-  allSelected: boolean;
-  onToggleAll: () => void;
   categoryFilter: string | null;
   onCategoryFilterChange: (value: string | null) => void;
   colorFilter: string | null;
@@ -21,8 +18,6 @@ interface ProductListHeaderProps {
 }
 
 export const ProductListHeader = ({
-  allSelected,
-  onToggleAll,
   categoryFilter,
   onCategoryFilterChange,
   colorFilter,
@@ -38,12 +33,8 @@ export const ProductListHeader = ({
         'py-[var(--padding-6)] pr-[var(--padding-4)] pl-[var(--padding-7)]',
       ].join(' ')}
     >
-      <Checkbox
-        size="small"
-        variant="primary"
-        checked={allSelected}
-        onChange={onToggleAll}
-      />
+      {/* 단일 선택 구조라 전체 선택 체크박스는 제거하고, 행 체크박스와 열을 맞추기 위한 자리만 유지 */}
+      <div className="h-[14px] w-[14px] shrink-0" />
       <Body size="xsmall" className="w-[240px] text-[#000]">
         상품명
       </Body>
