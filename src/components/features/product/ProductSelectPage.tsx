@@ -10,6 +10,7 @@ import { ProductImageUploadPanel } from '@/components/features/product/ProductIm
 import { ProductImageUploadEmptyState } from '@/components/features/product/ProductImageUploadEmptyState';
 import { Pagination } from '@/components/commons/Pagination';
 import type { Product, ProductGender } from '@/types/product';
+import { Spinner } from '@/components/commons/Spinner';
 
 const PAGE_SIZE = 11;
 
@@ -102,7 +103,11 @@ export const ProductSelectPage = () => {
               searchKeyword={searchKeyword}
               onSearchKeywordChange={handleSearchKeywordChange}
             />
-            {isLoading && <p>불러오는 중...</p>}
+            {isLoading && (
+              <div className="mt-12 flex w-full items-center justify-center">
+                <Spinner size="large" />
+              </div>
+            )}
             {isError && <p>상품을 불러오지 못했습니다.</p>}
             {!isLoading && !isError && (
               <ProductList
@@ -122,7 +127,7 @@ export const ProductSelectPage = () => {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
-              className="justify-center"
+              className="mt-12 justify-center"
             />
           </div>
         </div>
