@@ -2,7 +2,7 @@ import { apiClient } from '@/libs/apiClient';
 import type {
   ReferenceAssetsResponse,
   ReferenceAssetType,
-} from '@/types/imageGeneration';
+} from '@/types/image';
 
 export const imageGenerationService = {
   getReferenceAssets: (assetType?: ReferenceAssetType) => {

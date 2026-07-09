@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { imageGenerationService } from '@/services/imageGenerationService';
-import type { ReferenceAssetType } from '@/types/imageGeneration';
+import type { ReferenceAssetType } from '@/types/image';
 
 export const useReferenceAssets = (assetType?: ReferenceAssetType) => {
   return useQuery({
