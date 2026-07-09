@@ -3,6 +3,8 @@
 import { Tabs } from '@/components/commons/Tabs';
 import { ModelShotContent } from '@/components/features/image/ModelShotContent';
 import { ProductShotContent } from '@/components/features/image/ProductShotContent';
+import { ImageGenerateEmptyCanvas } from '@/components/features/image/ImageGenerateEmptyCanvas';
+import { ImageGenerateLoadingCanvas } from './ImageGenerateLoadingCanvas';
 
 const IMAGE_TABS = [
   { label: '모델컷', content: <ModelShotContent /> },
@@ -19,7 +21,8 @@ export default function ImageGeneratePage() {
 
       {/* 캔버스 영역 */}
       <div className="bg-bg-gray-subtler flex flex-1 items-center justify-center">
-        <span className="text-text-disabled text-[14px]">캔버스 영역</span>
+        <ImageGenerateEmptyCanvas />
+        {/* <ImageGenerateLoadingCanvas /> */}
       </div>
     </div>
   );

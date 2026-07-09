@@ -122,7 +122,7 @@ export const ProductSelectPage = () => {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
-              className="justify-center"
+              className="mt-12 justify-center"
             />
           </div>
         </div>
