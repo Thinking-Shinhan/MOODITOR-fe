@@ -123,13 +123,17 @@ export const ModelShotContent = () => {
     console.log('모델컷 생성 폼 데이터:', formData);
   }, [formData]);
 
-  const isComplete =
-    selectedProducts.length > 0 &&
-    modelReferenceAssetId !== null &&
-    colorTone !== null &&
-    cameraAngle !== null &&
-    composition !== null &&
-    aspectRatio !== null;
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const showProductError = submitAttempted && selectedProducts.length === 0;
+  const showModelError = submitAttempted && modelReferenceAssetId === null;
+
+  const handleSubmit = () => {
+    setSubmitAttempted(true);
+    if (selectedProducts.length === 0 || modelReferenceAssetId === null) {
+      return;
+    }
+    // TODO: 완료 동작(제출/API 연동)은 스펙 확정 후 구현
+  };
 
   const handleSelectArea = () => {
     router.push('/products');
@@ -165,6 +169,7 @@ export const ModelShotContent = () => {
         <div className="flex flex-col gap-[var(--gap-8)]">
           <ProductSelect
             selectedProducts={selectedProducts}
+            showError={showProductError}
             onClickSelectArea={handleSelectArea}
             onRemoveProduct={removeProduct}
             onAddMore={handleAddMore}
@@ -172,6 +177,7 @@ export const ModelShotContent = () => {
           <ImageSelectSection
             label="모델 선택"
             errorMessage="모델을 선택해 주세요."
+            showError={showModelError}
             onSelect={handleSelectModel}
             segments={[
               { label: '추천 모델', images: modelImages },
@@ -313,11 +319,10 @@ export const ModelShotContent = () => {
         </div>
       </div>
 
-      {/* TODO: 완료 동작(제출/API 연동)은 스펙 확정 후 구현 */}
       <Button
         variant="primary"
         size="large"
-        disabled={!isComplete}
+        onClick={handleSubmit}
         className="w-full"
       >
         완료
