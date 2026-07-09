@@ -11,25 +11,21 @@ import { AspectRatioButton } from '@/components/commons/AspectRatioButton';
 import { Textarea } from '@/components/commons/Textarea';
 import { Button } from '@/components/commons/Button';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
+import { useReferenceAssets } from '@/hooks/useReferenceAssets';
 import type { SelectedProduct } from '@/types/product';
 
 // 임시 폼 구조
 interface ModelShotFormData {
   products: SelectedProduct[];
+  modelReferenceAssetId: number | null;
+  backgroundReferenceAssetId: number | null;
+  poseReferenceAssetId: number | null;
   colorTone: string | null;
   cameraAngle: string | null;
   composition: string | null;
   prompt: string;
   aspectRatio: string | null;
 }
-
-// TODO: API 연동 후 제거
-const MOCK_MODEL_URL =
-  'https://i.pinimg.com/736x/d0/7d/e1/d07de1899b5187379f4063e2894579bc.jpg';
-const MOCK_MODELS = Array.from({ length: 8 }, (_, i) => ({
-  id: `model-${i + 1}`,
-  url: MOCK_MODEL_URL,
-}));
 
 const COLOR_TONE_OPTIONS = ['웜톤', '뉴트럴톤', '쿨톤'];
 const CAMERA_ANGLE_OPTIONS = ['정면', '좌측 사선', '우측 사선', '후면'];
@@ -67,9 +63,42 @@ export const ModelShotContent = () => {
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState<string | null>(null);
 
+  const [modelReferenceAssetId, setModelReferenceAssetId] = useState<
+    number | null
+  >(null);
+  const [backgroundReferenceAssetId, setBackgroundReferenceAssetId] = useState<
+    number | null
+  >(null);
+  const [poseReferenceAssetId, setPoseReferenceAssetId] = useState<
+    number | null
+  >(null);
+
+  const { data: modelAssets } = useReferenceAssets('MODEL');
+  const { data: backgroundAssets } = useReferenceAssets('BACKGROUND');
+  const { data: poseAssets } = useReferenceAssets('POSE');
+
+  const modelImages =
+    modelAssets?.referenceAssets.map((asset) => ({
+      id: String(asset.referenceAssetId),
+      url: asset.imageUrl,
+    })) ?? [];
+  const backgroundImages =
+    backgroundAssets?.referenceAssets.map((asset) => ({
+      id: String(asset.referenceAssetId),
+      url: asset.imageUrl,
+    })) ?? [];
+  const poseImages =
+    poseAssets?.referenceAssets.map((asset) => ({
+      id: String(asset.referenceAssetId),
+      url: asset.imageUrl,
+    })) ?? [];
+
   const formData = useMemo<ModelShotFormData>(
     () => ({
       products: selectedProducts,
+      modelReferenceAssetId,
+      backgroundReferenceAssetId,
+      poseReferenceAssetId,
       colorTone,
       cameraAngle,
       composition,
@@ -78,6 +107,9 @@ export const ModelShotContent = () => {
     }),
     [
       selectedProducts,
+      modelReferenceAssetId,
+      backgroundReferenceAssetId,
+      poseReferenceAssetId,
       colorTone,
       cameraAngle,
       composition,
@@ -93,6 +125,7 @@ export const ModelShotContent = () => {
 
   const isComplete =
     selectedProducts.length > 0 &&
+    modelReferenceAssetId !== null &&
     colorTone !== null &&
     cameraAngle !== null &&
     composition !== null &&
@@ -104,6 +137,18 @@ export const ModelShotContent = () => {
 
   const handleAddMore = () => {
     router.push('/products');
+  };
+
+  const handleSelectModel = (id: string | null) => {
+    setModelReferenceAssetId(id ? Number(id) : null);
+  };
+
+  const handleSelectBackground = (id: string | null) => {
+    setBackgroundReferenceAssetId(id ? Number(id) : null);
+  };
+
+  const handleSelectPose = (id: string | null) => {
+    setPoseReferenceAssetId(id ? Number(id) : null);
   };
 
   return (
@@ -127,8 +172,9 @@ export const ModelShotContent = () => {
           <ImageSelectSection
             label="모델 선택"
             errorMessage="모델을 선택해 주세요."
+            onSelect={handleSelectModel}
             segments={[
-              { label: '추천 모델', images: MOCK_MODELS },
+              { label: '추천 모델', images: modelImages },
               {
                 label: '내 모델',
                 showUpload: true,
@@ -138,14 +184,19 @@ export const ModelShotContent = () => {
           />
           <ImageSelectSection
             label="배경 선택"
+            onSelect={handleSelectBackground}
             segments={[
-              { label: '추천 배경' },
+              { label: '추천 배경', images: backgroundImages },
               { label: '내 배경', showUpload: true },
             ]}
           />
 
           {/* 포즈 선택 */}
-          <ImageSelectSection label="포즈 선택" />
+          <ImageSelectSection
+            label="포즈 선택"
+            images={poseImages}
+            onSelect={handleSelectPose}
+          />
         </div>
       </div>
 
