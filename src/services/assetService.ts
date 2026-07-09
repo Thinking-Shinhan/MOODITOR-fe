@@ -22,4 +22,10 @@ export const assetService = {
       formData,
     );
   },
+
+  getProductImages: (productId: number) =>
+    apiClient.get<ProductImageAsset[]>(`/assets/products/${productId}/images`),
+
+  deleteAsset: (assetId: number) =>
+    apiClient.delete<void>(`/assets/${assetId}`),
 };

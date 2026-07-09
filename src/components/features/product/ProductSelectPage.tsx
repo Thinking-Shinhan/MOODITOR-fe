@@ -109,7 +109,10 @@ export const ProductSelectPage = () => {
         className={`bg-bg-gray-subtler flex flex-1 justify-center ${selectedProduct ? 'p-8' : ''}`}
       >
         {selectedProduct ? (
-          <ProductImageUploadPanel selectedProduct={selectedProduct} />
+          <ProductImageUploadPanel
+            key={selectedProduct.id}
+            selectedProduct={selectedProduct}
+          />
         ) : (
           <ProductImageUploadEmptyState />
         )}
