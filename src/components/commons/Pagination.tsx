@@ -63,8 +63,8 @@ export const Pagination = ({
               'h-[34px]! w-[34px]! gap-0! rounded-[var(--radius-xsmall2)]! p-0!',
               isActive
                 ? [
-                    'bg-btn-primary-fill-black! text-text-border-inverse! border-transparent!',
-                    'hover:bg-btn-primary-fill-black! active:bg-btn-primary-fill-black!',
+                    'bg-icon-gray! text-text-border-inverse! border-transparent!',
+                    'hover:bg-icon-gray! active:bg-icon-gray!',
                   ].join(' ')
                 : 'border-btn-outline-border! bg-bg-white! text-text-subtler! border!',
             ].join(' ')}
