@@ -34,24 +34,24 @@ export const ProductListRow = ({
         checked={selected}
         onChange={() => onToggle(product)}
       />
-      <div className="flex shrink-0 items-center gap-[var(--gap-5)]">
+      <div className="flex w-[210px] shrink-0 items-center gap-[var(--gap-3)]">
         <span className="bg-btn-secondary-fill-pressed flex h-[var(--size-height-6)] w-[var(--size-height-6)] shrink-0 items-center justify-center rounded-[var(--radius-xsmall2)] p-[5px]">
           <ImagePlus size={14} className="text-icon-primary-basic" />
         </span>
-        <Body size="xsmall" className="text-text-basic w-[200px] truncate">
+        <Body size="xsmall" className="text-text-basic min-w-0 flex-1 truncate">
           {product.name}
         </Body>
       </div>
-      <Body size="xsmall" className="text-text-basic w-[120px] truncate">
+      <Body size="xsmall" className="text-text-basic w-[180px] truncate">
         {product.code}
       </Body>
-      <Body size="xsmall" className="text-text-basic w-[65px] truncate">
+      <Body size="xsmall" className="text-text-basic w-[110px] truncate">
         {product.category}
       </Body>
-      <Body size="xsmall" className="text-text-basic w-[80px] truncate">
+      <Body size="xsmall" className="text-text-basic w-[110px] truncate">
         {product.color}
       </Body>
-      <Body size="xsmall" className="text-text-basic w-[60px] truncate">
+      <Body size="xsmall" className="text-text-basic w-[110px] truncate">
         {PRODUCT_GENDER_LABEL[product.gender]}
       </Body>
     </div>

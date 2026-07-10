@@ -9,6 +9,7 @@ import type { SelectedProduct } from '@/types/product';
 interface ProductSelectProps {
   showError?: boolean;
   selectedProducts?: SelectedProduct[];
+  maxSelected?: number;
   onClickSelectArea: () => void;
   onRemoveProduct?: (id: string) => void;
   onAddMore?: () => void;
@@ -17,14 +18,20 @@ interface ProductSelectProps {
 export const ProductSelect = ({
   showError = false,
   selectedProducts = [],
+  maxSelected,
   onClickSelectArea,
   onRemoveProduct,
   onAddMore,
 }: ProductSelectProps) => {
-  const hasSelected = selectedProducts.length > 0;
+  const displayedProducts = maxSelected
+    ? selectedProducts.slice(0, maxSelected)
+    : selectedProducts;
+  const hasSelected = displayedProducts.length > 0;
+  const canAddMore =
+    maxSelected === undefined || displayedProducts.length < maxSelected;
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full flex-col gap-[var(--gap-4)]">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <Body size="medium" bold className="text-text-subtle">
@@ -37,13 +44,13 @@ export const ProductSelect = ({
 
       {hasSelected ? (
         /* 선택된 상태 */
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-[var(--gap-4)]">
           {/* 상품 목록 */}
-          <div className="flex flex-col gap-3">
-            {selectedProducts.map((product) => (
+          <div className="flex flex-col gap-[var(--gap-3)]">
+            {displayedProducts.map((product) => (
               <div
                 key={product.id}
-                className="bg-bg-gray-subtler flex items-center justify-between overflow-hidden rounded-(--radius-small2) py-[var(--padding-3)] pr-[var(--padding-4)] pl-[var(--padding-3)]"
+                className="bg-bg-gray-subtler flex items-center justify-between overflow-hidden rounded-[var(--radius-small2)] py-[var(--padding-3)] pr-[var(--padding-4)] pl-[var(--padding-3)]"
               >
                 <div className="flex min-w-0 items-center gap-[var(--gap-3)]">
                   {product.imageUrl ? (
@@ -72,15 +79,17 @@ export const ProductSelect = ({
           </div>
 
           {/* 코디 상품 추가 버튼 */}
-          <Button
-            variant="secondary"
-            size="small"
-            leftIcon={<Plus size={16} />}
-            onClick={onAddMore}
-            className="w-full"
-          >
-            코디 상품 추가하기
-          </Button>
+          {canAddMore && (
+            <Button
+              variant="secondary"
+              size="small"
+              leftIcon={<Plus size={16} />}
+              onClick={onAddMore}
+              className="w-full"
+            >
+              코디 상품 추가하기
+            </Button>
+          )}
         </div>
       ) : (
         /* 빈 상태 */

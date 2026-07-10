@@ -35,10 +35,10 @@ export const ProductListHeader = ({
     >
       {/* 단일 선택 구조라 전체 선택 체크박스는 제거하고, 행 체크박스와 열을 맞추기 위한 자리만 유지 */}
       <div className="h-[14px] w-[14px] shrink-0" />
-      <Body size="xsmall" className="w-[240px] text-[#000]">
+      <Body size="xsmall" className="w-[210px] text-[#000]">
         상품명
       </Body>
-      <Body size="xsmall" className="w-[120px] text-[#000]">
+      <Body size="xsmall" className="w-[180px] text-[#000]">
         상품코드
       </Body>
       <Dropdown
@@ -47,7 +47,7 @@ export const ProductListHeader = ({
         value={categoryFilter}
         onChange={onCategoryFilterChange}
         panelWidthClassName="w-[120px]"
-        className="w-[65px]"
+        className="w-[110px]"
       />
       <Dropdown
         label="색상"
@@ -55,7 +55,7 @@ export const ProductListHeader = ({
         value={colorFilter}
         onChange={onColorFilterChange}
         panelWidthClassName="w-[120px]"
-        className="w-[80px]"
+        className="w-[110px]"
       />
       <Dropdown
         label="대상"
@@ -63,7 +63,7 @@ export const ProductListHeader = ({
         value={genderFilter}
         onChange={onGenderFilterChange}
         panelWidthClassName="w-[79px]"
-        className="w-[60px]"
+        className="w-[110px]"
       />
     </div>
   );
