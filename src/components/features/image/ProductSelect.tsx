@@ -31,7 +31,7 @@ export const ProductSelect = ({
     maxSelected === undefined || displayedProducts.length < maxSelected;
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full flex-col gap-[var(--gap-4)]">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <Body size="medium" bold className="text-text-subtle">
@@ -44,13 +44,13 @@ export const ProductSelect = ({
 
       {hasSelected ? (
         /* 선택된 상태 */
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-[var(--gap-4)]">
           {/* 상품 목록 */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-[var(--gap-3)]">
             {displayedProducts.map((product) => (
               <div
                 key={product.id}
-                className="bg-bg-gray-subtler flex items-center justify-between overflow-hidden rounded-(--radius-small2) py-[var(--padding-3)] pr-[var(--padding-4)] pl-[var(--padding-3)]"
+                className="bg-bg-gray-subtler flex items-center justify-between overflow-hidden rounded-[var(--radius-small2)] py-[var(--padding-3)] pr-[var(--padding-4)] pl-[var(--padding-3)]"
               >
                 <div className="flex min-w-0 items-center gap-[var(--gap-3)]">
                   {product.imageUrl ? (
