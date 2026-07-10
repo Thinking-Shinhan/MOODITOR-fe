@@ -18,7 +18,7 @@ export const GeneratedImageCard = ({
   return (
     <div
       className={[
-        'group relative shrink-0 overflow-hidden rounded-[var(--radius-small1)] border transition-colors',
+        'group relative overflow-hidden rounded-[var(--radius-small1)] border transition-colors',
         liked
           ? 'border-border-border'
           : 'hover:border-border-subtle border-transparent',

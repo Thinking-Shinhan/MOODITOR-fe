@@ -4,14 +4,12 @@ import { SearchField } from '@/components/commons/SearchField';
 import { Body } from '@/components/commons/Typography';
 
 interface ProductListToolbarProps {
-  selectedCount: number;
   totalCount: number;
   searchKeyword: string;
   onSearchKeywordChange: (value: string) => void;
 }
 
 export const ProductListToolbar = ({
-  selectedCount,
   totalCount,
   searchKeyword,
   onSearchKeywordChange,
@@ -23,12 +21,6 @@ export const ProductListToolbar = ({
           전체 상품
         </Body>
         <div className="flex items-center gap-[var(--gap-2)]">
-          <Body size="small" bold className="text-text-primary-basic">
-            {selectedCount}
-          </Body>
-          <Body size="small" className="text-text-subtler">
-            /
-          </Body>
           <Body size="small" className="text-text-subtler">
             {totalCount}
           </Body>

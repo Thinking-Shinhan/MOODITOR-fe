@@ -4,11 +4,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProductSelect } from '@/components/features/image/ProductSelect';
 import { ImageSelectSection } from '@/components/features/image/ImageSelectSection';
-import { Heading, Body } from '@/components/commons/Typography';
-import { StepBadge } from '@/components/commons/StepBadge';
+import { ColorToneSelect } from '@/components/features/image/ColorToneSelect';
+import { AspectRatioSelect } from '@/components/features/image/AspectRatioSelect';
+import { PromptInput } from '@/components/features/image/PromptInput';
+import { StepSectionHeader } from '@/components/commons/StepSectionHeader';
+import { Body } from '@/components/commons/Typography';
 import { OptionButton } from '@/components/commons/OptionButton';
-import { AspectRatioButton } from '@/components/commons/AspectRatioButton';
-import { Textarea } from '@/components/commons/Textarea';
 import { Button } from '@/components/commons/Button';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import { useReferenceAssets } from '@/hooks/useReferenceAssets';
@@ -27,7 +28,6 @@ interface ModelShotFormData {
   aspectRatio: string | null;
 }
 
-const COLOR_TONE_OPTIONS = ['웜톤', '뉴트럴톤', '쿨톤'];
 const CAMERA_ANGLE_OPTIONS = ['정면', '좌측 사선', '우측 사선', '후면'];
 const COMPOSITION_OPTIONS = [
   '전신',
@@ -35,16 +35,6 @@ const COMPOSITION_OPTIONS = [
   '반신',
   '클로즈업',
   '여백 강조',
-];
-const PROMPT_MAX_LENGTH = 500;
-
-const ASPECT_RATIO_OPTIONS = [
-  { label: '1:1', iconClassName: 'w-[24px] h-[24px]' },
-  { label: '2:3', iconClassName: 'w-[16px] h-[24px]' },
-  { label: '3:4', iconClassName: 'w-[18px] h-[24px]' },
-  { label: '4:5', iconClassName: 'w-[20px] h-[24px]' },
-  { label: '16:9', iconClassName: 'w-[24px] h-[14px]' },
-  { label: '9:16', iconClassName: 'w-[14px] h-[24px]' },
 ];
 
 export const ModelShotContent = () => {
@@ -174,11 +164,7 @@ export const ModelShotContent = () => {
     <div className="flex flex-col gap-[var(--gap-8)]">
       {/* 1. 이미지 구성 */}
       <div className="flex flex-col gap-[var(--gap-5)]">
-        {/* 헤더 */}
-        <div className="flex items-center gap-[var(--gap-3)]">
-          <StepBadge number={1} />
-          <Heading size="xsmall">이미지 구성</Heading>
-        </div>
+        <StepSectionHeader number={1} title="이미지 구성" />
 
         {/* 섹션들 */}
         <div className="flex flex-col gap-[var(--gap-8)]">
@@ -229,32 +215,11 @@ export const ModelShotContent = () => {
 
       {/* 2. 이미지 스타일 */}
       <div className="flex flex-col gap-[var(--gap-6)]">
-        {/* 헤더 */}
-        <div className="flex items-center gap-[var(--gap-3)]">
-          <StepBadge number={2} />
-          <Heading size="xsmall">이미지 스타일</Heading>
-        </div>
+        <StepSectionHeader number={2} title="이미지 스타일" />
 
         {/* 섹션들 */}
         <div className="flex flex-col gap-[var(--gap-8)]">
-          {/* 이미지 색온도 */}
-          <div className="flex flex-col gap-[var(--gap-4)]">
-            <Body size="medium" bold className="text-text-subtle">
-              이미지 색온도
-            </Body>
-            <div className="flex gap-[var(--gap-4)]">
-              {COLOR_TONE_OPTIONS.map((option) => (
-                <OptionButton
-                  key={option}
-                  selected={colorTone === option}
-                  onClick={() => setColorTone(option)}
-                  className="flex-1"
-                >
-                  {option}
-                </OptionButton>
-              ))}
-            </div>
-          </div>
+          <ColorToneSelect value={colorTone} onChange={setColorTone} />
           {/* 카메라 각도 */}
           <div className="flex flex-col gap-[var(--gap-4)]">
             <Body size="medium" bold className="text-text-subtle">
@@ -298,43 +263,12 @@ export const ModelShotContent = () => {
 
       {/* 3. 출력 설정 */}
       <div className="flex flex-col gap-[var(--gap-6)]">
-        {/* 헤더 */}
-        <div className="flex items-center gap-[var(--gap-3)]">
-          <StepBadge number={3} />
-          <Heading size="xsmall">출력 설정</Heading>
-        </div>
+        <StepSectionHeader number={3} title="출력 설정" />
 
         {/* 섹션들 */}
         <div className="flex flex-col gap-[var(--gap-7)]">
-          {/* 프롬프트 */}
-          <div className="flex flex-col gap-[var(--gap-4)]">
-            <Body size="medium" bold className="text-text-subtle">
-              프롬프트
-            </Body>
-            <Textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              maxLength={PROMPT_MAX_LENGTH}
-              placeholder="편집하고 싶은 내용을 작성해주세요."
-            />
-          </div>
-          {/* 이미지 비율 */}
-          <div className="flex flex-col gap-[var(--gap-4)]">
-            <Body size="medium" bold className="text-text-subtle">
-              이미지 비율
-            </Body>
-            <div className="flex gap-[var(--gap-4)]">
-              {ASPECT_RATIO_OPTIONS.map((option) => (
-                <AspectRatioButton
-                  key={option.label}
-                  label={option.label}
-                  iconClassName={option.iconClassName}
-                  selected={aspectRatio === option.label}
-                  onClick={() => setAspectRatio(option.label)}
-                />
-              ))}
-            </div>
-          </div>
+          <PromptInput value={prompt} onChange={setPrompt} />
+          <AspectRatioSelect value={aspectRatio} onChange={setAspectRatio} />
         </div>
       </div>
 
