@@ -1,3 +1,5 @@
-export default function DetailEditPage() {
-  return <div>상세페이지 편집</div>;
+import DetailEditPage from '@/components/features/detail/DetailEditPage';
+
+export default function Page() {
+  return <DetailEditPage />;
 }
