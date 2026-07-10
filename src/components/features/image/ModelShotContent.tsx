@@ -11,9 +11,24 @@ import { StepSectionHeader } from '@/components/commons/StepSectionHeader';
 import { Body } from '@/components/commons/Typography';
 import { OptionButton } from '@/components/commons/OptionButton';
 import { Button } from '@/components/commons/Button';
+import { InputMessage } from '@/components/commons/InputMessage';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import { useReferenceAssets } from '@/hooks/useReferenceAssets';
+import { useCreateImageGenerationJob } from '@/hooks/useCreateImageGenerationJob';
+import { useImageGenerationResultStore } from '@/stores/imageGenerationResultStore';
+import { ApiError } from '@/libs/apiClient';
+import {
+  COLOR_TEMPERATURE_MAP,
+  CAMERA_ANGLE_MAP,
+  FRAMING_MAP,
+  REQUEST_ASPECT_RATIO_MAP,
+} from '@/constants/image-generation';
 import type { SelectedProduct } from '@/types/product';
+import type { ImageAspectRatio } from '@/types/image';
+import type {
+  CreateImageGenerationJobRequest,
+  OutfitItem,
+} from '@/types/imageGenerationJob';
 
 // 임시 폼 구조
 interface ModelShotFormData {
@@ -114,13 +129,26 @@ export const ModelShotContent = () => {
   }, [formData]);
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const showProductError = submitAttempted && selectedProducts.length === 0;
   const showModelError = submitAttempted && modelReferenceAssetId === null;
 
   const productSectionRef = useRef<HTMLDivElement>(null);
   const modelSectionRef = useRef<HTMLDivElement>(null);
 
-  const handleSubmit = () => {
+  const { mutateAsync: createJob, isPending: isGenerating } =
+    useCreateImageGenerationJob();
+  const startGenerating = useImageGenerationResultStore(
+    (state) => state.startGenerating,
+  );
+  const setGenerationResult = useImageGenerationResultStore(
+    (state) => state.setResult,
+  );
+  const resetGenerationResult = useImageGenerationResultStore(
+    (state) => state.reset,
+  );
+
+  const handleSubmit = async () => {
     setSubmitAttempted(true);
 
     if (selectedProducts.length === 0) {
@@ -137,7 +165,59 @@ export const ModelShotContent = () => {
       });
       return;
     }
-    // TODO: 완료 동작(제출/API 연동)은 스펙 확정 후 구현
+
+    setSubmitError(null);
+    startGenerating();
+
+    const outfitItems: OutfitItem[] = selectedProducts.map(
+      (product, index) => ({
+        role: index === 0 ? 'PRIMARY' : 'STYLING',
+        productId: Number(product.id),
+        assetIds: product.assetIds,
+      }),
+    );
+
+    const request: CreateImageGenerationJobRequest = {
+      productId: Number(selectedProducts[0].id),
+      cutType: 'MODEL_CUT',
+      generationMode: 'PARALLEL',
+      requestedCount: 4,
+      // 프롬프트가 공백이면 요청이 거부되어, 미입력 시 공백 문자 하나를 대신 보낸다
+      prompt: prompt.trim().length > 0 ? prompt : '_',
+      userOptionsJson: JSON.stringify({
+        colorTemperature: colorTone ? COLOR_TEMPERATURE_MAP[colorTone] : null,
+        cameraAngle: cameraAngle ? CAMERA_ANGLE_MAP[cameraAngle] : null,
+        framing: composition ? FRAMING_MAP[composition] : null,
+        aspectRatio: aspectRatio ? REQUEST_ASPECT_RATIO_MAP[aspectRatio] : null,
+      }),
+      referenceJson: JSON.stringify({
+        outfitItems,
+        modelReferenceId: modelReferenceAssetId,
+        poseReferenceId: poseReferenceAssetId,
+        backgroundReferenceId: backgroundReferenceAssetId,
+      }),
+    };
+
+    try {
+      const job = await createJob(request);
+      const images = job.results
+        .filter(
+          (result): result is typeof result & { imageUrl: string } =>
+            !!result.imageUrl,
+        )
+        .map((result) => ({
+          id: String(result.resultId),
+          url: result.imageUrl,
+        }));
+      setGenerationResult(images, (aspectRatio as ImageAspectRatio) ?? '3:4');
+    } catch (error) {
+      resetGenerationResult();
+      setSubmitError(
+        error instanceof ApiError
+          ? error.message
+          : '이미지 생성에 실패했습니다.',
+      );
+    }
   };
 
   const handleSelectArea = () => {
@@ -272,13 +352,16 @@ export const ModelShotContent = () => {
         </div>
       </div>
 
+      {submitError && <InputMessage state="error" message={submitError} />}
+
       <Button
         variant="primary"
         size="large"
         onClick={handleSubmit}
+        disabled={isGenerating}
         className="w-full"
       >
-        완료
+        {isGenerating ? '생성 중...' : '완료'}
       </Button>
     </div>
   );

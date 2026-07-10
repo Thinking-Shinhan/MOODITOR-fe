@@ -5,8 +5,9 @@ import { Tabs } from '@/components/commons/Tabs';
 import { ModelShotContent } from '@/components/features/image/ModelShotContent';
 import { ProductShotContent } from '@/components/features/image/ProductShotContent';
 import { ImageGenerateEmptyCanvas } from '@/components/features/image/ImageGenerateEmptyCanvas';
-import { ImageGenerateLoadingCanvas } from './ImageGenerateLoadingCanvas';
-import { ImageGenerateResultCanvas } from './ImageGenerateResultCanvas';
+import { ImageGenerateLoadingCanvas } from '@/components/features/image/ImageGenerateLoadingCanvas';
+import { ImageGenerateResultCanvas } from '@/components/features/image/ImageGenerateResultCanvas';
+import { useImageGenerationResultStore } from '@/stores/imageGenerationResultStore';
 import { useCurrentBrandMood } from '@/hooks/useCurrentBrandMood';
 
 const IMAGE_TABS = [
@@ -15,6 +16,12 @@ const IMAGE_TABS = [
 ];
 
 export default function ImageGeneratePage() {
+  const status = useImageGenerationResultStore((state) => state.status);
+  const images = useImageGenerationResultStore((state) => state.images);
+  const aspectRatio = useImageGenerationResultStore(
+    (state) => state.aspectRatio,
+  );
+
   // TODO: 임시 호출 예시. 실제 브랜드/무드 연동 후 제거
   const { data: brandMood } = useCurrentBrandMood();
 
@@ -31,29 +38,14 @@ export default function ImageGeneratePage() {
 
       {/* 캔버스 영역 */}
       <div className="bg-bg-gray-subtler flex flex-1 items-center justify-center">
-        {/* <ImageGenerateEmptyCanvas /> */}
-        {/* <ImageGenerateLoadingCanvas /> */}
-        <ImageGenerateResultCanvas
-          aspectRatio="3:4"
-          images={[
-            {
-              id: '1',
-              url: 'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
-            },
-            {
-              id: '2',
-              url: 'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
-            },
-            {
-              id: '3',
-              url: 'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
-            },
-            {
-              id: '4',
-              url: 'https://i.pinimg.com/736x/96/91/51/9691510a2aae7a086a84824efd63d17a.jpg',
-            },
-          ]}
-        />
+        {status === 'loading' && <ImageGenerateLoadingCanvas />}
+        {status === 'success' && (
+          <ImageGenerateResultCanvas
+            images={images}
+            aspectRatio={aspectRatio}
+          />
+        )}
+        {status === 'idle' && <ImageGenerateEmptyCanvas />}
       </div>
     </div>
   );
