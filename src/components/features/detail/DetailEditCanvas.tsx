@@ -5,8 +5,8 @@ import { Stage, Layer } from 'react-konva';
 import { DetailTemplateGroup } from '@/components/features/detail/DetailTemplateGroup';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
 
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 600;
+const CANVAS_WIDTH = 879;
+const CANVAS_HEIGHT = 1180;
 
 interface PlacedTemplate {
   id: string;

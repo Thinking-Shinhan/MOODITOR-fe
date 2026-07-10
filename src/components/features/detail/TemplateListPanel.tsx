@@ -21,7 +21,7 @@ const handleDragStart = (
 
 export const TemplateListPanel = () => {
   return (
-    <div className="border-border-subtler bg-bg-white flex w-60 shrink-0 flex-col gap-[var(--gap-5)] overflow-y-auto border-r p-[var(--padding-6)]">
+    <div className="border-border-subtler bg-bg-white flex w-[360px] shrink-0 flex-col gap-[var(--gap-5)] overflow-y-auto border-r p-[var(--padding-6)]">
       <Body size="medium" bold className="text-text-subtle">
         템플릿
       </Body>
