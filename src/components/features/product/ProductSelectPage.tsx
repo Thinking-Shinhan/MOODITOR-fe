@@ -65,12 +65,11 @@ export const ProductSelectPage = () => {
   return (
     <div className="flex h-full">
       {/* 상품 선택 영역 */}
-      <div className="border-border-subtler bg-bg-white flex w-[842px] shrink-0 flex-col overflow-y-auto border-r p-8">
+      <div className="border-border-subtler bg-bg-white flex w-[999px] shrink-0 flex-col overflow-y-auto border-r p-8">
         <div className="flex flex-col gap-[var(--gap-8)]">
           <ProductSelectHeader />
           <div className="flex flex-col gap-[var(--gap-5)]">
             <ProductListToolbar
-              selectedCount={selectedIds.size}
               totalCount={data?.products.totalElements ?? 0}
               searchKeyword={searchKeyword}
               onSearchKeywordChange={handleSearchKeywordChange}
