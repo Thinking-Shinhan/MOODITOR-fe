@@ -19,12 +19,12 @@ interface ImageGenerateResultCanvasProps {
 }
 
 const ASPECT_RATIO_CLASS: Record<ImageAspectRatio, string> = {
-  '1:1': 'w-[160px] h-[160px]',
-  '2:3': 'w-[160px] h-[240px]',
-  '3:4': 'w-[160px] h-[215px]',
-  '4:5': 'w-[160px] h-[200px]',
-  '9:16': 'w-[160px] h-[284px]',
-  '16:9': 'w-[332px] h-[186px]',
+  '1:1': 'aspect-square',
+  '2:3': 'aspect-[2/3]',
+  '3:4': 'aspect-[3/4]',
+  '4:5': 'aspect-[4/5]',
+  '9:16': 'aspect-[9/16]',
+  '16:9': 'aspect-[16/9]',
 };
 
 export const ImageGenerateResultCanvas = ({
@@ -47,9 +47,12 @@ export const ImageGenerateResultCanvas = ({
   };
 
   const isWideLayout = aspectRatio === '16:9';
+  const cardClassName = isWideLayout
+    ? `${ASPECT_RATIO_CLASS[aspectRatio]} w-full`
+    : `${ASPECT_RATIO_CLASS[aspectRatio]} min-w-0 flex-1`;
 
   return (
-    <div className="flex size-full flex-col items-center justify-center gap-[var(--gap-7)]">
+    <div className="flex size-full flex-col items-center justify-center gap-[var(--gap-7)] px-[33px]">
       <div className="flex flex-col items-center gap-[var(--size-height-4)]">
         <div className="bg-icon-primary-basic flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-max)]">
           <Check size={18} className="text-icon-inverse" />
@@ -67,8 +70,8 @@ export const ImageGenerateResultCanvas = ({
       <div
         className={
           isWideLayout
-            ? 'grid w-[676px] grid-cols-2 gap-[var(--gap-4)]'
-            : 'flex flex-wrap items-center justify-center gap-[var(--gap-4)]'
+            ? 'grid w-full grid-cols-2 gap-[var(--gap-4)]'
+            : 'flex w-full items-start gap-[var(--gap-4)]'
         }
       >
         {images.map((image) => (
@@ -77,7 +80,7 @@ export const ImageGenerateResultCanvas = ({
             url={image.url}
             liked={likedIds.has(image.id)}
             onToggleLike={() => handleToggleLike(image.id)}
-            className={ASPECT_RATIO_CLASS[aspectRatio]}
+            className={cardClassName}
           />
         ))}
       </div>
