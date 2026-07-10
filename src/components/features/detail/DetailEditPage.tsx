@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { TemplateListPanel } from '@/components/features/detail/TemplateListPanel';
 
 const DetailEditCanvas = dynamic(
   () =>
@@ -12,8 +13,11 @@ const DetailEditCanvas = dynamic(
 
 export default function DetailEditPage() {
   return (
-    <div className="bg-bg-gray-subtler flex h-full items-center justify-center">
-      <DetailEditCanvas />
+    <div className="flex h-full">
+      <TemplateListPanel />
+      <div className="bg-bg-gray-subtler flex flex-1 items-center justify-center overflow-auto">
+        <DetailEditCanvas />
+      </div>
     </div>
   );
 }
