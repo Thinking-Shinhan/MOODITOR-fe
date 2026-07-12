@@ -3,16 +3,15 @@
 import { DragEvent, useState } from 'react';
 import { Stage, Layer } from 'react-konva';
 import { DetailTemplateGroup } from '@/components/features/detail/DetailTemplateGroup';
+import { DETAIL_TEMPLATE_HEIGHTS } from '@/constants/detail-template';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
 
 const CANVAS_WIDTH = 879;
-const CANVAS_HEIGHT = 1180;
+const CANVAS_MIN_HEIGHT = 1180;
 
 interface PlacedTemplate {
   id: string;
   type: DetailTemplateType;
-  x: number;
-  y: number;
 }
 
 export const DetailEditCanvas = () => {
@@ -36,30 +35,42 @@ export const DetailEditCanvas = () => {
       return;
     }
 
-    const containerRect = event.currentTarget.getBoundingClientRect();
-    const x = event.clientX - containerRect.left;
-    const y = event.clientY - containerRect.top;
-
+    // 드롭 위치와 무관하게 항상 맨 아래에 순서대로 쌓는다
     setPlacedTemplates((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), type: template.type, x, y },
+      { id: crypto.randomUUID(), type: template.type },
     ]);
   };
+
+  const positionedTemplates = placedTemplates.reduce<
+    Array<PlacedTemplate & { y: number }>
+  >((acc, placed) => {
+    const previousBottom = acc.length > 0 ? acc[acc.length - 1].y : 0;
+    const previousHeight =
+      acc.length > 0 ? DETAIL_TEMPLATE_HEIGHTS[acc[acc.length - 1].type] : 0;
+    return [...acc, { ...placed, y: previousBottom + previousHeight }];
+  }, []);
+  const totalHeight = positionedTemplates.reduce(
+    (sum, placed) => sum + DETAIL_TEMPLATE_HEIGHTS[placed.type],
+    0,
+  );
+  const stageHeight = Math.max(totalHeight, CANVAS_MIN_HEIGHT);
 
   return (
     <div
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      className="bg-bg-white border-border-subtler inline-block border"
+      className="inline-block"
     >
-      <Stage width={CANVAS_WIDTH} height={CANVAS_HEIGHT}>
+      <Stage width={CANVAS_WIDTH} height={stageHeight}>
         <Layer>
-          {placedTemplates.map((placed) => (
+          {positionedTemplates.map((placed) => (
             <DetailTemplateGroup
               key={placed.id}
               type={placed.type}
-              x={placed.x}
+              x={0}
               y={placed.y}
+              width={CANVAS_WIDTH}
             />
           ))}
         </Layer>
