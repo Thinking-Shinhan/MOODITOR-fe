@@ -27,6 +27,15 @@ const ASPECT_RATIO_CLASS: Record<ImageAspectRatio, string> = {
   '16:9': 'aspect-[16/9]',
 };
 
+const MAX_HEIGHT_CAP_CLASS: Record<ImageAspectRatio, string> = {
+  '1:1': 'max-w-[625px]',
+  '2:3': 'max-w-[416.67px]',
+  '3:4': 'max-w-[468.75px]',
+  '4:5': 'max-w-[500px]',
+  '9:16': 'max-w-[351.56px]',
+  '16:9': 'max-w-[1111.11px]',
+};
+
 export const ImageGenerateResultCanvas = ({
   images,
   aspectRatio,
@@ -48,8 +57,8 @@ export const ImageGenerateResultCanvas = ({
 
   const isWideLayout = aspectRatio === '16:9';
   const cardClassName = isWideLayout
-    ? `${ASPECT_RATIO_CLASS[aspectRatio]} w-full`
-    : `${ASPECT_RATIO_CLASS[aspectRatio]} min-w-0 flex-1`;
+    ? `${ASPECT_RATIO_CLASS[aspectRatio]} ${MAX_HEIGHT_CAP_CLASS[aspectRatio]} mx-auto w-full`
+    : `${ASPECT_RATIO_CLASS[aspectRatio]} ${MAX_HEIGHT_CAP_CLASS[aspectRatio]} min-w-0 flex-1`;
 
   return (
     <div className="flex size-full flex-col items-center justify-center gap-[var(--gap-7)] px-[33px]">
@@ -71,7 +80,7 @@ export const ImageGenerateResultCanvas = ({
         className={
           isWideLayout
             ? 'grid w-full grid-cols-2 gap-[var(--gap-4)]'
-            : 'flex w-full items-start gap-[var(--gap-4)]'
+            : 'flex w-full items-start justify-center gap-[var(--gap-4)]'
         }
       >
         {images.map((image) => (
