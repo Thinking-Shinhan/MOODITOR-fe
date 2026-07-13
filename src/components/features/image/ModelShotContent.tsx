@@ -15,7 +15,7 @@ import { InputMessage } from '@/components/commons/InputMessage';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import { useReferenceAssets } from '@/hooks/useReferenceAssets';
 import { useCreateImageGenerationJob } from '@/hooks/useCreateImageGenerationJob';
-import { useImageGenerationResultStore } from '@/stores/imageGenerationResultStore';
+import { useModelCutResultStore } from '@/stores/imageGenerationResultStore';
 import { ApiError } from '@/libs/apiClient';
 import {
   COLOR_TEMPERATURE_MAP,
@@ -138,15 +138,13 @@ export const ModelShotContent = () => {
 
   const { mutateAsync: createJob, isPending: isGenerating } =
     useCreateImageGenerationJob();
-  const startGenerating = useImageGenerationResultStore(
+  const startGenerating = useModelCutResultStore(
     (state) => state.startGenerating,
   );
-  const setGenerationResult = useImageGenerationResultStore(
+  const setGenerationResult = useModelCutResultStore(
     (state) => state.setResult,
   );
-  const resetGenerationResult = useImageGenerationResultStore(
-    (state) => state.reset,
-  );
+  const resetGenerationResult = useModelCutResultStore((state) => state.reset);
 
   const handleSubmit = async () => {
     setSubmitAttempted(true);

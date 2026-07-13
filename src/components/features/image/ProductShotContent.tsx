@@ -14,7 +14,7 @@ import { InputMessage } from '@/components/commons/InputMessage';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import { useReferenceAssets } from '@/hooks/useReferenceAssets';
 import { useCreateImageGenerationJob } from '@/hooks/useCreateImageGenerationJob';
-import { useImageGenerationResultStore } from '@/stores/imageGenerationResultStore';
+import { useProductCutResultStore } from '@/stores/imageGenerationResultStore';
 import { ApiError } from '@/libs/apiClient';
 import {
   COLOR_TEMPERATURE_MAP,
@@ -101,13 +101,13 @@ export const ProductShotContent = () => {
 
   const { mutateAsync: createJob, isPending: isGenerating } =
     useCreateImageGenerationJob();
-  const startGenerating = useImageGenerationResultStore(
+  const startGenerating = useProductCutResultStore(
     (state) => state.startGenerating,
   );
-  const setGenerationResult = useImageGenerationResultStore(
+  const setGenerationResult = useProductCutResultStore(
     (state) => state.setResult,
   );
-  const resetGenerationResult = useImageGenerationResultStore(
+  const resetGenerationResult = useProductCutResultStore(
     (state) => state.reset,
   );
 
