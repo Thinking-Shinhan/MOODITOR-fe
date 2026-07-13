@@ -18,7 +18,7 @@ export const SUBTITLE_COLOR = '#6d7882'; // --color-text-subtler
 export const SUBTITLE_TEXT = '부제목 텍스트를 입력하세요.';
 export const TITLE_TEXT = '제목 텍스트를 입력하세요.';
 export const DESCRIPTION_TEXT =
-  '설명 텍스트를 입력하세요. 설명 텍스트를 입력하세요.설명 텍스트를 입력하세요.설명 텍스트를 입력하세요.설명 텍스트를 입력하세요.설명 텍스트를 입력하세요.설명 텍스트를 입력하세';
+  '설명 텍스트를 입력하세요. 설명 텍스트를 입력하세요.설명 텍스트를 입력하세요.설명 텍스트 를 입력하세요.설명 텍스트를 입력하세요.설명 텍스트를 입력하세요.설명 텍스트를 입력하세';
 
 export const SUBTITLE_FONT_SIZE = 32;
 export const TITLE_FONT_SIZE = 44;
