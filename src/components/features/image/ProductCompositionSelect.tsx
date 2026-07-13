@@ -8,22 +8,29 @@ import { CompositionOptionCard } from '@/components/features/image/CompositionOp
 import { useReferenceAssets } from '@/hooks/useReferenceAssets';
 import type { ReferenceAsset } from '@/types/image';
 
+const MAX_SELECTED_COMPOSITIONS = 4;
+
 interface ProductCompositionSelectProps {
   showError?: boolean;
-  onSelect?: (referenceAssetId: string | null) => void;
+  onSelect?: (referenceAssetIds: string[]) => void;
 }
 
 export const ProductCompositionSelect = ({
   showError = false,
   onSelect,
 }: ProductCompositionSelectProps) => {
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const { data: shotTemplateAssets } = useReferenceAssets('SHOT_TEMPLATE');
   const compositionOptions = shotTemplateAssets?.referenceAssets ?? [];
 
   const handleSelect = (referenceAssetId: string) => {
-    const next = selected === referenceAssetId ? null : referenceAssetId;
+    const isSelected = selected.includes(referenceAssetId);
+    if (!isSelected && selected.length >= MAX_SELECTED_COMPOSITIONS) return;
+
+    const next = isSelected
+      ? selected.filter((id) => id !== referenceAssetId)
+      : [...selected, referenceAssetId];
     setSelected(next);
     onSelect?.(next);
   };
@@ -32,12 +39,16 @@ export const ProductCompositionSelect = ({
     <div className="mt-4 grid grid-cols-4 gap-[var(--gap-3)]">
       {options.map((asset) => {
         const id = String(asset.referenceAssetId);
+        const isSelected = selected.includes(id);
         return (
           <CompositionOptionCard
             key={id}
             label={asset.label}
             imageUrl={asset.imageUrl}
-            selected={selected === id}
+            selected={isSelected}
+            disabled={
+              !isSelected && selected.length >= MAX_SELECTED_COMPOSITIONS
+            }
             onClick={() => handleSelect(id)}
           />
         );

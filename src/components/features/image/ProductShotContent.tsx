@@ -33,7 +33,7 @@ const MAX_SELECTED_PRODUCTS = 1;
 // 임시 폼 구조
 interface ProductShotFormData {
   products: SelectedProduct[];
-  compositionReferenceAssetId: number | null;
+  compositionReferenceAssetIds: number[];
   backgroundReferenceAssetId: number | null;
   colorTone: string | null;
   prompt: string;
@@ -50,8 +50,8 @@ export const ProductShotContent = () => {
     (state) => state.removeProduct,
   );
 
-  const [compositionReferenceAssetId, setCompositionReferenceAssetId] =
-    useState<number | null>(null);
+  const [compositionReferenceAssetIds, setCompositionReferenceAssetIds] =
+    useState<number[]>([]);
   const [backgroundReferenceAssetId, setBackgroundReferenceAssetId] = useState<
     number | null
   >(null);
@@ -69,7 +69,7 @@ export const ProductShotContent = () => {
   const formData = useMemo<ProductShotFormData>(
     () => ({
       products: selectedProducts,
-      compositionReferenceAssetId,
+      compositionReferenceAssetIds,
       backgroundReferenceAssetId,
       colorTone,
       prompt,
@@ -77,7 +77,7 @@ export const ProductShotContent = () => {
     }),
     [
       selectedProducts,
-      compositionReferenceAssetId,
+      compositionReferenceAssetIds,
       backgroundReferenceAssetId,
       colorTone,
       prompt,
@@ -94,7 +94,7 @@ export const ProductShotContent = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const showProductError = submitAttempted && selectedProducts.length === 0;
   const showCompositionError =
-    submitAttempted && compositionReferenceAssetId === null;
+    submitAttempted && compositionReferenceAssetIds.length === 0;
 
   const productSectionRef = useRef<HTMLDivElement>(null);
   const compositionSectionRef = useRef<HTMLDivElement>(null);
@@ -121,7 +121,7 @@ export const ProductShotContent = () => {
       });
       return;
     }
-    if (compositionReferenceAssetId === null) {
+    if (compositionReferenceAssetIds.length === 0) {
       compositionSectionRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
@@ -135,15 +135,14 @@ export const ProductShotContent = () => {
     const referenceJson: ProductCutReference = {
       productImages: selectedProducts[0].assetIds,
       backgroundReferenceId: backgroundReferenceAssetId,
-      shotReferenceId: compositionReferenceAssetId,
+      shotReferenceIds: compositionReferenceAssetIds,
     };
 
     const request: CreateImageGenerationJobRequest = {
       productId: Number(selectedProducts[0].id),
       cutType: 'PRODUCT_CUT',
       generationMode: 'PARALLEL',
-      requestedCount: 1,
-      // 프롬프트가 공백이면 요청이 거부되어, 미입력 시 공백 문자 하나를 대신 보낸다
+      requestedCount: compositionReferenceAssetIds.length,
       prompt: prompt.trim().length > 0 ? prompt : '_',
       userOptionsJson: JSON.stringify({
         colorTemperature: colorTone ? COLOR_TEMPERATURE_MAP[colorTone] : null,
@@ -182,8 +181,8 @@ export const ProductShotContent = () => {
     setBackgroundReferenceAssetId(id ? Number(id) : null);
   };
 
-  const handleSelectComposition = (id: string | null) => {
-    setCompositionReferenceAssetId(id ? Number(id) : null);
+  const handleSelectComposition = (ids: string[]) => {
+    setCompositionReferenceAssetIds(ids.map(Number));
   };
 
   return (

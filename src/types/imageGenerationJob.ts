@@ -41,7 +41,7 @@ export interface ModelCutReference {
 export interface ProductCutReference {
   productImages: number[];
   backgroundReferenceId: number | null;
-  shotReferenceId: number | null;
+  shotReferenceIds: number[];
 }
 
 export interface CreateImageGenerationJobRequest {
