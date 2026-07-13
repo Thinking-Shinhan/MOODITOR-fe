@@ -11,12 +11,23 @@ type TabItem = {
 interface TabsProps {
   tabs: TabItem[];
   defaultIndex?: number;
+  onTabChange?: (index: number) => void;
   className?: string;
 }
 
-export const Tabs = ({ tabs, defaultIndex = 0, className = '' }: TabsProps) => {
+export const Tabs = ({
+  tabs,
+  defaultIndex = 0,
+  onTabChange,
+  className = '',
+}: TabsProps) => {
   const [activeIndex, setActiveIndex] = useState(defaultIndex);
   const uid = useId();
+
+  const handleTabClick = (index: number) => {
+    setActiveIndex(index);
+    onTabChange?.(index);
+  };
 
   return (
     <div className={className}>
@@ -31,7 +42,7 @@ export const Tabs = ({ tabs, defaultIndex = 0, className = '' }: TabsProps) => {
               aria-selected={isActive}
               aria-controls={`${uid}-tabpanel-${index}`}
               id={`${uid}-tab-${index}`}
-              onClick={() => setActiveIndex(index)}
+              onClick={() => handleTabClick(index)}
               className="flex flex-1 cursor-pointer flex-col items-center gap-[var(--gap-3)]"
             >
               <Body
