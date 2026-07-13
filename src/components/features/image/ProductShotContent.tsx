@@ -20,7 +20,7 @@ const MAX_SELECTED_PRODUCTS = 1;
 // 임시 폼 구조
 interface ProductShotFormData {
   products: SelectedProduct[];
-  composition: string | null;
+  compositionReferenceAssetId: number | null;
   backgroundReferenceAssetId: number | null;
   colorTone: string | null;
   prompt: string;
@@ -37,7 +37,8 @@ export const ProductShotContent = () => {
     (state) => state.removeProduct,
   );
 
-  const [composition, setComposition] = useState<string | null>(null);
+  const [compositionReferenceAssetId, setCompositionReferenceAssetId] =
+    useState<number | null>(null);
   const [backgroundReferenceAssetId, setBackgroundReferenceAssetId] = useState<
     number | null
   >(null);
@@ -45,7 +46,7 @@ export const ProductShotContent = () => {
   const [prompt, setPrompt] = useState('');
   const [aspectRatio, setAspectRatio] = useState<string | null>(null);
 
-  const { data: backgroundAssets } = useReferenceAssets('BACKGROUND');
+  const { data: backgroundAssets } = useReferenceAssets('SHOT_REFERENCE');
   const backgroundImages =
     backgroundAssets?.referenceAssets.map((asset) => ({
       id: String(asset.referenceAssetId),
@@ -55,7 +56,7 @@ export const ProductShotContent = () => {
   const formData = useMemo<ProductShotFormData>(
     () => ({
       products: selectedProducts,
-      composition,
+      compositionReferenceAssetId,
       backgroundReferenceAssetId,
       colorTone,
       prompt,
@@ -63,7 +64,7 @@ export const ProductShotContent = () => {
     }),
     [
       selectedProducts,
-      composition,
+      compositionReferenceAssetId,
       backgroundReferenceAssetId,
       colorTone,
       prompt,
@@ -78,7 +79,8 @@ export const ProductShotContent = () => {
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const showProductError = submitAttempted && selectedProducts.length === 0;
-  const showCompositionError = submitAttempted && composition === null;
+  const showCompositionError =
+    submitAttempted && compositionReferenceAssetId === null;
 
   const productSectionRef = useRef<HTMLDivElement>(null);
   const compositionSectionRef = useRef<HTMLDivElement>(null);
@@ -93,7 +95,7 @@ export const ProductShotContent = () => {
       });
       return;
     }
-    if (composition === null) {
+    if (compositionReferenceAssetId === null) {
       compositionSectionRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
@@ -109,6 +111,10 @@ export const ProductShotContent = () => {
 
   const handleSelectBackground = (id: string | null) => {
     setBackgroundReferenceAssetId(id ? Number(id) : null);
+  };
+
+  const handleSelectComposition = (id: string | null) => {
+    setCompositionReferenceAssetId(id ? Number(id) : null);
   };
 
   return (
@@ -131,7 +137,7 @@ export const ProductShotContent = () => {
           <div ref={compositionSectionRef}>
             <ProductCompositionSelect
               showError={showCompositionError}
-              onSelect={setComposition}
+              onSelect={handleSelectComposition}
             />
           </div>
           <ImageSelectSection
