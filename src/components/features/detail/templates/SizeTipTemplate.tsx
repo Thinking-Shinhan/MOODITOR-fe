@@ -3,7 +3,6 @@
 import { Group, Rect, Text } from 'react-konva';
 import {
   CANVAS_BG_FILL,
-  SLOT_STROKE,
   SLOT_TEXT_FILL,
   TEXT_SLOT_FILL,
   TEXT_SLOT_PLACEHOLDER,
@@ -49,6 +48,7 @@ export const SizeTipTemplate = ({ templateId }: SizeTipTemplateProps) => {
             text={TEXT_SLOT_PLACEHOLDER}
             align="center"
             verticalAlign="middle"
+            wrap="char"
             fontSize={14}
             fill={SLOT_TEXT_FILL}
             listening={false}

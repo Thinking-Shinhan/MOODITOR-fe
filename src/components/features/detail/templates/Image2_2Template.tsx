@@ -59,6 +59,7 @@ export const Image2_2Template = ({ templateId }: Image2_2TemplateProps) => {
             text={IMAGE_SLOT_PLACEHOLDER}
             align="center"
             verticalAlign="middle"
+            wrap="char"
             fontSize={14}
             fill={SLOT_TEXT_FILL}
             listening={false}

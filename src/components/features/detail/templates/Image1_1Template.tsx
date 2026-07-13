@@ -51,6 +51,7 @@ export const Image1_1Template = ({ templateId }: Image1_1TemplateProps) => {
             text={IMAGE_SLOT_PLACEHOLDER}
             align="center"
             verticalAlign="middle"
+            wrap="char"
             fontSize={14}
             fill={SLOT_TEXT_FILL}
             listening={false}

@@ -5,7 +5,6 @@ import {
   CANVAS_BG_FILL,
   IMAGE_SLOT_FILL,
   IMAGE_SLOT_PLACEHOLDER,
-  SLOT_STROKE,
   SLOT_TEXT_FILL,
   TEXT_SLOT_FILL,
   TEXT_SLOT_PLACEHOLDER,
@@ -71,6 +70,7 @@ export const SizeInfoTemplate = ({ templateId }: SizeInfoTemplateProps) => {
             }
             align="center"
             verticalAlign="middle"
+            wrap="char"
             fontSize={14}
             fill={SLOT_TEXT_FILL}
             listening={false}

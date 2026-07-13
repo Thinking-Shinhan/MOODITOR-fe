@@ -5,7 +5,6 @@ import {
   CANVAS_BG_FILL,
   IMAGE_SLOT_FILL,
   IMAGE_SLOT_PLACEHOLDER,
-  SLOT_STROKE,
   SLOT_TEXT_FILL,
 } from '@/components/features/detail/templates/templateConstants';
 
@@ -42,6 +41,7 @@ export const Image1_2Template = ({ templateId }: Image1_2TemplateProps) => {
             text={IMAGE_SLOT_PLACEHOLDER}
             align="center"
             verticalAlign="middle"
+            wrap="char"
             fontSize={14}
             fill={SLOT_TEXT_FILL}
             listening={false}

@@ -1,13 +1,14 @@
 'use client';
 
-import { Group, Rect, Text } from 'react-konva';
+import { useState } from 'react';
+import { Group, Rect } from 'react-konva';
+import { EditableTemplateText } from '@/components/features/detail/templates/EditableTemplateText';
 import {
   CANVAS_BG_FILL,
   DESCRIPTION_FONT_SIZE,
   DESCRIPTION_START_Y,
   DESCRIPTION_TEXT,
   LINE_HEIGHT,
-  SLOT_STROKE,
   SUBTITLE_COLOR,
   SUBTITLE_FONT_SIZE,
   SUBTITLE_TEXT,
@@ -28,6 +29,10 @@ export const TEMPLATE_HEIGHT = 362;
 const SLOT = { id: 'slot-1', x: 80, y: 80, width: 719, height: 202 };
 
 export const Text2Template = ({ templateId }: Text2TemplateProps) => {
+  const [subtitle, setSubtitle] = useState(SUBTITLE_TEXT);
+  const [title, setTitle] = useState(TITLE_TEXT);
+  const [description, setDescription] = useState(DESCRIPTION_TEXT);
+
   return (
     <Group>
       <Rect
@@ -42,32 +47,32 @@ export const Text2Template = ({ templateId }: Text2TemplateProps) => {
           height={SLOT.height}
           fill={TEXT_SLOT_FILL}
         />
-        <Text
+        <EditableTemplateText
           width={SLOT.width}
-          text={SUBTITLE_TEXT}
+          text={subtitle}
+          onChange={setSubtitle}
           fontSize={SUBTITLE_FONT_SIZE}
           lineHeight={LINE_HEIGHT}
           fill={SUBTITLE_COLOR}
-          listening={false}
         />
-        <Text
+        <EditableTemplateText
           y={TITLE_Y}
           width={SLOT.width}
-          text={TITLE_TEXT}
+          text={title}
+          onChange={setTitle}
           fontSize={TITLE_FONT_SIZE}
           lineHeight={LINE_HEIGHT}
           fontStyle="bold"
           fill={TITLE_COLOR}
-          listening={false}
         />
-        <Text
+        <EditableTemplateText
           y={DESCRIPTION_START_Y}
           width={SLOT.width}
-          text={DESCRIPTION_TEXT}
+          text={description}
+          onChange={setDescription}
           fontSize={DESCRIPTION_FONT_SIZE}
           lineHeight={LINE_HEIGHT}
           fill={SUBTITLE_COLOR}
-          listening={false}
         />
       </Group>
     </Group>

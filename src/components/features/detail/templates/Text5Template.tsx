@@ -1,6 +1,8 @@
 'use client';
 
-import { Group, Rect, Text } from 'react-konva';
+import { useState } from 'react';
+import { Group, Rect } from 'react-konva';
+import { EditableTemplateText } from '@/components/features/detail/templates/EditableTemplateText';
 import {
   CANVAS_BG_FILL,
   DESCRIPTION_FONT_SIZE,
@@ -9,7 +11,6 @@ import {
   DESCRIPTION_START_Y,
   DESCRIPTION_TEXT,
   LINE_HEIGHT,
-  SLOT_STROKE,
   SUBTITLE_COLOR,
   SUBTITLE_FONT_SIZE,
   SUBTITLE_TEXT,
@@ -31,6 +32,18 @@ const SLOT = { id: 'slot-1', x: 80, y: 80, width: 719, height: 430 };
 const PARAGRAPH_COUNT = 4;
 
 export const Text5Template = ({ templateId }: Text5TemplateProps) => {
+  const [subtitle, setSubtitle] = useState(SUBTITLE_TEXT);
+  const [title, setTitle] = useState(TITLE_TEXT);
+  const [descriptions, setDescriptions] = useState<string[]>(
+    Array.from({ length: PARAGRAPH_COUNT }, () => DESCRIPTION_TEXT),
+  );
+
+  const handleDescriptionChange = (index: number, value: string) => {
+    setDescriptions((prev) =>
+      prev.map((description, i) => (i === index ? value : description)),
+    );
+  };
+
   return (
     <Group>
       <Rect
@@ -45,37 +58,37 @@ export const Text5Template = ({ templateId }: Text5TemplateProps) => {
           height={SLOT.height}
           fill={TEXT_SLOT_FILL}
         />
-        <Text
+        <EditableTemplateText
           width={SLOT.width}
-          text={SUBTITLE_TEXT}
+          text={subtitle}
+          onChange={setSubtitle}
           fontSize={SUBTITLE_FONT_SIZE}
           lineHeight={LINE_HEIGHT}
           fill={SUBTITLE_COLOR}
-          listening={false}
         />
-        <Text
+        <EditableTemplateText
           y={TITLE_Y}
           width={SLOT.width}
-          text={TITLE_TEXT}
+          text={title}
+          onChange={setTitle}
           fontSize={TITLE_FONT_SIZE}
           lineHeight={LINE_HEIGHT}
           fontStyle="bold"
           fill={TITLE_COLOR}
-          listening={false}
         />
-        {Array.from({ length: PARAGRAPH_COUNT }, (_, index) => (
-          <Text
+        {descriptions.map((description, index) => (
+          <EditableTemplateText
             key={index}
             y={
               DESCRIPTION_START_Y +
               index * (DESCRIPTION_PARAGRAPH_HEIGHT + DESCRIPTION_PARAGRAPH_GAP)
             }
             width={SLOT.width}
-            text={DESCRIPTION_TEXT}
+            text={description}
+            onChange={(value) => handleDescriptionChange(index, value)}
             fontSize={DESCRIPTION_FONT_SIZE}
             lineHeight={LINE_HEIGHT}
             fill={SUBTITLE_COLOR}
-            listening={false}
           />
         ))}
       </Group>
