@@ -10,9 +10,22 @@ import { AspectRatioSelect } from '@/components/features/image/AspectRatioSelect
 import { PromptInput } from '@/components/features/image/PromptInput';
 import { StepSectionHeader } from '@/components/commons/StepSectionHeader';
 import { Button } from '@/components/commons/Button';
+import { InputMessage } from '@/components/commons/InputMessage';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import { useReferenceAssets } from '@/hooks/useReferenceAssets';
+import { useCreateImageGenerationJob } from '@/hooks/useCreateImageGenerationJob';
+import { useImageGenerationResultStore } from '@/stores/imageGenerationResultStore';
+import { ApiError } from '@/libs/apiClient';
+import {
+  COLOR_TEMPERATURE_MAP,
+  REQUEST_ASPECT_RATIO_MAP,
+} from '@/constants/image-generation';
 import type { SelectedProduct } from '@/types/product';
+import type { ImageAspectRatio } from '@/types/image';
+import type {
+  CreateImageGenerationJobRequest,
+  ProductCutReference,
+} from '@/types/imageGenerationJob';
 
 // 제품컷은 상품을 하나만 선택할 수 있음
 const MAX_SELECTED_PRODUCTS = 1;
@@ -78,6 +91,7 @@ export const ProductShotContent = () => {
   }, [formData]);
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const showProductError = submitAttempted && selectedProducts.length === 0;
   const showCompositionError =
     submitAttempted && compositionReferenceAssetId === null;
@@ -85,7 +99,19 @@ export const ProductShotContent = () => {
   const productSectionRef = useRef<HTMLDivElement>(null);
   const compositionSectionRef = useRef<HTMLDivElement>(null);
 
-  const handleSubmit = () => {
+  const { mutateAsync: createJob, isPending: isGenerating } =
+    useCreateImageGenerationJob();
+  const startGenerating = useImageGenerationResultStore(
+    (state) => state.startGenerating,
+  );
+  const setGenerationResult = useImageGenerationResultStore(
+    (state) => state.setResult,
+  );
+  const resetGenerationResult = useImageGenerationResultStore(
+    (state) => state.reset,
+  );
+
+  const handleSubmit = async () => {
     setSubmitAttempted(true);
 
     if (selectedProducts.length === 0) {
@@ -102,7 +128,50 @@ export const ProductShotContent = () => {
       });
       return;
     }
-    // TODO: 완료 동작(제출/API 연동)은 스펙 확정 후 구현
+
+    setSubmitError(null);
+    startGenerating();
+
+    const referenceJson: ProductCutReference = {
+      productImages: selectedProducts[0].assetIds,
+      backgroundReferenceId: backgroundReferenceAssetId,
+      shotReferenceId: compositionReferenceAssetId,
+    };
+
+    const request: CreateImageGenerationJobRequest = {
+      productId: Number(selectedProducts[0].id),
+      cutType: 'PRODUCT_CUT',
+      generationMode: 'PARALLEL',
+      requestedCount: 1,
+      // 프롬프트가 공백이면 요청이 거부되어, 미입력 시 공백 문자 하나를 대신 보낸다
+      prompt: prompt.trim().length > 0 ? prompt : '_',
+      userOptionsJson: JSON.stringify({
+        colorTemperature: colorTone ? COLOR_TEMPERATURE_MAP[colorTone] : null,
+        aspectRatio: aspectRatio ? REQUEST_ASPECT_RATIO_MAP[aspectRatio] : null,
+      }),
+      referenceJson: JSON.stringify(referenceJson),
+    };
+
+    try {
+      const job = await createJob(request);
+      const images = job.results
+        .filter(
+          (result): result is typeof result & { imageUrl: string } =>
+            !!result.imageUrl,
+        )
+        .map((result) => ({
+          id: String(result.resultId),
+          url: result.imageUrl,
+        }));
+      setGenerationResult(images, (aspectRatio as ImageAspectRatio) ?? '3:4');
+    } catch (error) {
+      resetGenerationResult();
+      setSubmitError(
+        error instanceof ApiError
+          ? error.message
+          : '이미지 생성에 실패했습니다.',
+      );
+    }
   };
 
   const handleSelectArea = () => {
@@ -172,13 +241,16 @@ export const ProductShotContent = () => {
         </div>
       </div>
 
+      {submitError && <InputMessage state="error" message={submitError} />}
+
       <Button
         variant="primary"
         size="large"
         onClick={handleSubmit}
+        disabled={isGenerating}
         className="w-full"
       >
-        완료
+        {isGenerating ? '생성 중...' : '완료'}
       </Button>
     </div>
   );

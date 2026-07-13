@@ -38,6 +38,12 @@ export interface ModelCutReference {
   backgroundReferenceId: number | null;
 }
 
+export interface ProductCutReference {
+  productImages: number[];
+  backgroundReferenceId: number | null;
+  shotReferenceId: number | null;
+}
+
 export interface CreateImageGenerationJobRequest {
   productId: number;
   cutType: CutType;
