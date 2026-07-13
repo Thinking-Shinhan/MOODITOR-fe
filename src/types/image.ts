@@ -1,6 +1,7 @@
 export type ImageAspectRatio = '1:1' | '2:3' | '3:4' | '4:5' | '16:9' | '9:16';
 
-export type ReferenceAssetType = 'MODEL' | 'POSE' | 'BACKGROUND';
+export type ReferenceAssetType =
+  'MODEL' | 'POSE' | 'BACKGROUND' | 'SHOT_TEMPLATE' | 'SHOT_REFERENCE';
 
 export interface ReferenceAsset {
   referenceAssetId: number;
@@ -9,6 +10,8 @@ export interface ReferenceAsset {
   label: string;
   description: string;
   imageUrl: string;
+  cutType?: string;
+  promptText?: string;
 }
 
 export interface ReferenceAssetsResponse {

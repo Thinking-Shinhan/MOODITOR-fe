@@ -3,6 +3,10 @@ import type {
   ReferenceAssetsResponse,
   ReferenceAssetType,
 } from '@/types/image';
+import type {
+  CreateImageGenerationJobRequest,
+  ImageGenerationJob,
+} from '@/types/imageGenerationJob';
 
 export const imageGenerationService = {
   getReferenceAssets: (assetType?: ReferenceAssetType) => {
@@ -11,4 +15,7 @@ export const imageGenerationService = {
       `/image-generation/reference-assets${query}`,
     );
   },
+
+  createJob: (payload: CreateImageGenerationJobRequest) =>
+    apiClient.post<ImageGenerationJob>('/image-generation/jobs', payload),
 };

@@ -127,15 +127,23 @@ export const ProductImageUploadPanel = ({
       const latestImages = await assetService.getProductImages(
         selectedProduct.id,
       );
-      const frontImageUrl = latestImages.find(
+      const latestFrontAsset = latestImages.find(
         (asset) => asset.assetRole === 'PRODUCT_FRONT',
-      )?.imageUrl;
+      );
+      const latestBackAsset = latestImages.find(
+        (asset) => asset.assetRole === 'PRODUCT_BACK',
+      );
+      const assetIds = [
+        latestFrontAsset?.assetId,
+        latestBackAsset?.assetId,
+      ].filter((id): id is number => id !== undefined);
 
       addProducts([
         {
           id: String(selectedProduct.id),
           name: selectedProduct.name,
-          imageUrl: frontImageUrl,
+          imageUrl: latestFrontAsset?.imageUrl,
+          assetIds,
         },
       ]);
       router.push('/image-generate');
