@@ -1,10 +1,12 @@
 'use client';
 
+import { useRef } from 'react';
 import { Group, Rect, Text } from 'react-konva';
+import type Konva from 'konva';
+import { ImageSlot } from '@/components/features/detail/templates/ImageSlot';
+import { useImageSlotDrop } from '@/components/features/detail/templates/useImageSlotDrop';
 import {
   CANVAS_BG_FILL,
-  IMAGE_SLOT_FILL,
-  IMAGE_SLOT_PLACEHOLDER,
   SLOT_TEXT_FILL,
   TEXT_SLOT_FILL,
   TEXT_SLOT_PLACEHOLDER,
@@ -45,38 +47,50 @@ const SLOTS = [
 ];
 
 export const SizeInfoTemplate = ({ templateId }: SizeInfoTemplateProps) => {
+  const rootRef = useRef<Konva.Group>(null);
+  const images = useImageSlotDrop(rootRef, templateId, SLOTS);
+
   return (
-    <Group>
+    <Group ref={rootRef}>
       <Rect
         width={TEMPLATE_WIDTH}
         height={TEMPLATE_HEIGHT}
         fill={CANVAS_BG_FILL}
       />
-      {SLOTS.map((slot) => (
-        <Group key={slot.id} x={slot.x} y={slot.y}>
-          <Rect
-            name={`slot-${templateId}-${slot.id}`}
+      {SLOTS.map((slot) =>
+        slot.type === 'image' ? (
+          <ImageSlot
+            key={slot.id}
+            templateId={templateId}
+            id={slot.id}
+            x={slot.x}
+            y={slot.y}
             width={slot.width}
             height={slot.height}
-            fill={slot.type === 'image' ? IMAGE_SLOT_FILL : TEXT_SLOT_FILL}
+            imageSrc={images[slot.id] ?? null}
           />
-          <Text
-            width={slot.width}
-            height={slot.height}
-            text={
-              slot.type === 'image'
-                ? IMAGE_SLOT_PLACEHOLDER
-                : TEXT_SLOT_PLACEHOLDER
-            }
-            align="center"
-            verticalAlign="middle"
-            wrap="char"
-            fontSize={14}
-            fill={SLOT_TEXT_FILL}
-            listening={false}
-          />
-        </Group>
-      ))}
+        ) : (
+          <Group key={slot.id} x={slot.x} y={slot.y}>
+            <Rect
+              name={`slot-${templateId}-${slot.id}`}
+              width={slot.width}
+              height={slot.height}
+              fill={TEXT_SLOT_FILL}
+            />
+            <Text
+              width={slot.width}
+              height={slot.height}
+              text={TEXT_SLOT_PLACEHOLDER}
+              align="center"
+              verticalAlign="middle"
+              wrap="char"
+              fontSize={14}
+              fill={SLOT_TEXT_FILL}
+              listening={false}
+            />
+          </Group>
+        ),
+      )}
     </Group>
   );
 };

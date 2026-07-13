@@ -1,13 +1,11 @@
 'use client';
 
-import { Group, Rect, Text } from 'react-konva';
-import {
-  CANVAS_BG_FILL,
-  IMAGE_SLOT_FILL,
-  IMAGE_SLOT_PLACEHOLDER,
-  SLOT_STROKE,
-  SLOT_TEXT_FILL,
-} from '@/components/features/detail/templates/templateConstants';
+import { useRef } from 'react';
+import { Group, Rect } from 'react-konva';
+import type Konva from 'konva';
+import { ImageSlot } from '@/components/features/detail/templates/ImageSlot';
+import { useImageSlotDrop } from '@/components/features/detail/templates/useImageSlotDrop';
+import { CANVAS_BG_FILL } from '@/components/features/detail/templates/templateConstants';
 
 interface Image1_1TemplateProps {
   templateId: string;
@@ -28,35 +26,27 @@ const SLOTS = [
 ];
 
 export const Image1_1Template = ({ templateId }: Image1_1TemplateProps) => {
+  const rootRef = useRef<Konva.Group>(null);
+  const images = useImageSlotDrop(rootRef, templateId, SLOTS);
+
   return (
-    <Group>
+    <Group ref={rootRef}>
       <Rect
         width={TEMPLATE_WIDTH}
         height={TEMPLATE_HEIGHT}
         fill={CANVAS_BG_FILL}
       />
       {SLOTS.map((slot) => (
-        <Group key={slot.id} x={slot.x} y={slot.y}>
-          <Rect
-            name={`slot-${templateId}-${slot.id}`}
-            width={slot.width}
-            height={slot.height}
-            fill={IMAGE_SLOT_FILL}
-            stroke={SLOT_STROKE}
-            strokeWidth={1}
-          />
-          <Text
-            width={slot.width}
-            height={slot.height}
-            text={IMAGE_SLOT_PLACEHOLDER}
-            align="center"
-            verticalAlign="middle"
-            wrap="char"
-            fontSize={14}
-            fill={SLOT_TEXT_FILL}
-            listening={false}
-          />
-        </Group>
+        <ImageSlot
+          key={slot.id}
+          templateId={templateId}
+          id={slot.id}
+          x={slot.x}
+          y={slot.y}
+          width={slot.width}
+          height={slot.height}
+          imageSrc={images[slot.id] ?? null}
+        />
       ))}
     </Group>
   );
