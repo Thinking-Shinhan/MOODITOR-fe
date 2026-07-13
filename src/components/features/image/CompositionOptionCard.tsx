@@ -6,6 +6,7 @@ interface CompositionOptionCardProps {
   label: string;
   imageUrl: string;
   selected: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }
 
@@ -13,13 +14,18 @@ export const CompositionOptionCard = ({
   label,
   imageUrl,
   selected,
+  disabled = false,
   onClick,
 }: CompositionOptionCardProps) => (
   <button
     type="button"
     onClick={onClick}
+    disabled={disabled}
     aria-pressed={selected}
-    className="flex w-full cursor-pointer flex-col items-center gap-[var(--gap-3)]"
+    className={[
+      'flex w-full flex-col items-center gap-[var(--gap-3)]',
+      disabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer',
+    ].join(' ')}
   >
     <div
       className={[

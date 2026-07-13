@@ -3,6 +3,8 @@ export type SelectedProduct = {
   id: string;
   name: string;
   imageUrl?: string;
+  // 업로드된 앞/뒷면 이미지 asset ID (이미지 생성 요청의 referenceJson.outfitItems에 사용)
+  assetIds: number[];
 };
 
 export type ProductGender = 'F' | 'M' | 'U';
