@@ -28,6 +28,35 @@ const PLACEHOLDER_TEXT_HEIGHT =
 const PLACEHOLDER_BLOCK_HEIGHT =
   PLACEHOLDER_ICON_SIZE + PLACEHOLDER_ICON_TEXT_GAP + PLACEHOLDER_TEXT_HEIGHT;
 
+// object-fit: cover와 동일하게, 슬롯 비율과 다른 이미지는 비율을 유지한 채
+// 넘치는 부분만 잘라서(crop) 채운다 (늘리거나 줄여서 찌그러뜨리지 않는다)
+const getCoverCrop = (
+  image: HTMLImageElement,
+  boxWidth: number,
+  boxHeight: number,
+) => {
+  const imageRatio = image.naturalWidth / image.naturalHeight;
+  const boxRatio = boxWidth / boxHeight;
+
+  if (imageRatio > boxRatio) {
+    const cropWidth = image.naturalHeight * boxRatio;
+    return {
+      x: (image.naturalWidth - cropWidth) / 2,
+      y: 0,
+      width: cropWidth,
+      height: image.naturalHeight,
+    };
+  }
+
+  const cropHeight = image.naturalWidth / boxRatio;
+  return {
+    x: 0,
+    y: (image.naturalHeight - cropHeight) / 2,
+    width: image.naturalWidth,
+    height: cropHeight,
+  };
+};
+
 export const ImageSlot = ({
   templateId,
   id,
@@ -53,6 +82,7 @@ export const ImageSlot = ({
           image={image}
           width={width}
           height={height}
+          crop={getCoverCrop(image, width, height)}
           listening={false}
         />
       ) : (
