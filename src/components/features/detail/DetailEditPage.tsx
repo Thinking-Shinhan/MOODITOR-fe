@@ -15,8 +15,9 @@ export default function DetailEditPage() {
   return (
     <div className="flex h-full">
       <TemplateListPanel />
-      <div className="bg-bg-gray-subtler flex flex-1 justify-center overflow-auto px-[60px] pt-[104px]">
+      <div className="bg-bg-gray-subtler flex flex-1 flex-col items-center overflow-auto px-[60px] pt-[104px]">
         <DetailEditCanvas />
+        <div className="h-[240px] w-full shrink-0" />
       </div>
     </div>
   );
