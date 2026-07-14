@@ -1,7 +1,8 @@
 'use client';
 
-import { DragEvent } from 'react';
-import { Body } from '@/components/commons/Typography';
+import { DragEvent, Fragment, useState } from 'react';
+import { Dropdown } from '@/components/commons/Dropdown';
+import { Body, Heading } from '@/components/commons/Typography';
 import { TemplateThumbnailCard } from '@/components/features/detail/TemplateThumbnailCard';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
 
@@ -24,7 +25,6 @@ const TEMPLATE_LABELS: Record<DetailTemplateType, string> = {
   SIZE_INFO: '사이즈 인포메이션',
 };
 
-// TODO: 실제 템플릿 목록 API 연동 후 제거
 const TEMPLATE_GROUPS: { label: string; types: DetailTemplateType[] }[] = [
   {
     label: '이미지 템플릿',
@@ -53,6 +53,11 @@ const TEMPLATE_GROUPS: { label: string; types: DetailTemplateType[] }[] = [
   },
 ];
 
+const FILTER_OPTIONS = TEMPLATE_GROUPS.map((group) => ({
+  label: group.label,
+  value: group.label,
+}));
+
 const handleDragStart = (
   event: DragEvent<HTMLDivElement>,
   template: DetailTemplate,
@@ -62,35 +67,63 @@ const handleDragStart = (
 };
 
 export const TemplateListPanel = () => {
+  const [groupFilter, setGroupFilter] = useState<string | null>(null);
+
+  const visibleGroups = groupFilter
+    ? TEMPLATE_GROUPS.filter((group) => group.label === groupFilter)
+    : TEMPLATE_GROUPS;
+
   return (
-    <div className="border-border-subtler bg-bg-white flex w-[360px] shrink-0 flex-col gap-[var(--gap-8)] overflow-y-auto border-r p-[var(--padding-6)]">
-      <Body size="medium" bold className="text-text-subtle">
-        템플릿
-      </Body>
-      {TEMPLATE_GROUPS.map((group) => (
-        <div key={group.label} className="flex flex-col gap-[var(--gap-4)]">
-          <Body size="medium" bold className="text-text-subtle">
-            {group.label}
+    <div className="border-border-subtler bg-bg-white flex w-[360px] shrink-0 flex-col gap-[var(--gap-8)] overflow-y-auto border-r p-[var(--padding-9)]">
+      <div className="flex flex-col gap-[var(--gap-5)]">
+        <div className="flex flex-col gap-[var(--gap-2)]">
+          <Heading size="xsmall" className="text-text-subtle">
+            템플릿 구성
+          </Heading>
+          <Body size="xsmall" className="text-text-subtler">
+            상세페이지에 사용할 템플릿을 선택해주세요.
           </Body>
-          <div className="flex flex-col gap-[var(--gap-5)]">
-            {group.types.map((type) => {
-              const template: DetailTemplate = {
-                id: type,
-                type,
-                label: TEMPLATE_LABELS[type],
-              };
-              return (
-                <TemplateThumbnailCard
-                  key={type}
-                  type={type}
-                  label={template.label}
-                  draggable
-                  onDragStart={(event) => handleDragStart(event, template)}
-                />
-              );
-            })}
-          </div>
         </div>
+        <Dropdown
+          label={groupFilter ?? '모든 템플릿'}
+          options={FILTER_OPTIONS}
+          value={groupFilter}
+          onChange={setGroupFilter}
+          className="w-full"
+          panelWidthClassName="w-full"
+          panelGapClassName="mt-[var(--gap-3)]"
+          triggerClassName="bg-btn-tertiary-fill w-full justify-between rounded-[var(--radius-xsmall2)] px-[var(--padding-4)] py-[var(--size-height-2)]"
+          labelClassName="text-text-subtler"
+          labelBold
+        />
+      </div>
+      {visibleGroups.map((group, index) => (
+        <Fragment key={group.label}>
+          {index > 0 && <div className="border-border-subtler border-t" />}
+          <div className="flex flex-col gap-[var(--gap-4)]">
+            <Body size="medium" bold className="text-text-subtle">
+              {group.label}
+            </Body>
+            <div className="flex flex-col gap-[var(--gap-5)]">
+              {group.types.map((type) => {
+                const template: DetailTemplate = {
+                  id: type,
+                  type,
+                  label: TEMPLATE_LABELS[type],
+                };
+                return (
+                  <TemplateThumbnailCard
+                    key={type}
+                    type={type}
+                    label={template.label}
+                    draggable
+                    onDragStart={(event) => handleDragStart(event, template)}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </Fragment>
       ))}
     </div>
   );
