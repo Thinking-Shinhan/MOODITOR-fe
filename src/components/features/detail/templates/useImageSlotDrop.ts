@@ -1,7 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, type RefObject } from 'react';
 import type Konva from 'konva';
+import {
+  getSlotImageKey,
+  useImagePlacementStore,
+} from '@/stores/imagePlacementStore';
 
 interface DroppableSlot {
   id: string;
@@ -12,17 +16,31 @@ interface DroppableSlot {
 // Konva Stage는 캔버스 하나로 렌더링돼서 슬롯마다 별도의 네이티브 드롭
 // 타겟을 둘 수 없어, 스테이지 컨테이너에 리스너를 걸고 드롭 좌표로
 // getIntersection을 이용해 어느 슬롯인지 찾는다.
+// 이미지 배치 패널에서 선택한 이미지도 같은 슬롯에 들어가야 해서,
+// 슬롯 이미지는 컴포넌트 로컬 상태가 아니라 전역 store(imagePlacementStore)에 둔다.
 export const useImageSlotDrop = <T extends DroppableSlot>(
   rootRef: RefObject<Konva.Group | null>,
   templateId: string,
   slots: readonly T[],
 ) => {
-  const [images, setImages] = useState<Record<string, string>>({});
+  const allImages = useImagePlacementStore((state) => state.images);
+  const setStoreImage = useImagePlacementStore((state) => state.setImage);
   const activeUrlsRef = useRef<Set<string>>(new Set());
+
+  const images = useMemo(() => {
+    const result: Record<string, string> = {};
+    slots.forEach((slot) => {
+      const src = allImages[getSlotImageKey(templateId, slot.id)];
+      if (src) result[slot.id] = src;
+    });
+    return result;
+  }, [allImages, templateId, slots]);
 
   useEffect(() => {
     const prev = activeUrlsRef.current;
-    const next = new Set(Object.values(images));
+    const next = new Set(
+      Object.values(images).filter((url) => url.startsWith('blob:')),
+    );
 
     prev.forEach((url) => {
       if (!next.has(url)) URL.revokeObjectURL(url);
@@ -67,7 +85,7 @@ export const useImageSlotDrop = <T extends DroppableSlot>(
       if (!slot) return;
 
       const objectUrl = URL.createObjectURL(file);
-      setImages((prev) => ({ ...prev, [slot.id]: objectUrl }));
+      setStoreImage(templateId, slot.id, objectUrl);
     };
 
     container.addEventListener('dragover', handleDragOver);
@@ -77,7 +95,7 @@ export const useImageSlotDrop = <T extends DroppableSlot>(
       container.removeEventListener('dragover', handleDragOver);
       container.removeEventListener('drop', handleDrop);
     };
-  }, [rootRef, templateId, slots]);
+  }, [rootRef, templateId, slots, setStoreImage]);
 
   return images;
 };

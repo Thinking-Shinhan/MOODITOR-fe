@@ -4,65 +4,31 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Dropdown } from '@/components/commons/Dropdown';
 import { Body, Heading } from '@/components/commons/Typography';
+import { useImageFolderAssets } from '@/hooks/useImageFolderAssets';
+
+// TODO: 상품 선택 기능이 생기면 상위에서 실제 상품 ID를 받도록 변경
+const TEMP_PRODUCT_ID = 14;
+
+const MODEL_SHOT_CATEGORY = '모델컷 이미지';
+const PRODUCT_SHOT_CATEGORY = '제품컷 이미지';
+
+const MODEL_SHOT_ROLES = new Set([
+  'FULL_BODY',
+  'THREE_QUARTER_BODY',
+  'HALF_BODY',
+  'CLOSE_UP',
+  'WIDE_MARGIN',
+  'GENERATED_IMAGE',
+]);
+
+const getImageCategory = (assetRole: string) =>
+  MODEL_SHOT_ROLES.has(assetRole) ? MODEL_SHOT_CATEGORY : PRODUCT_SHOT_CATEGORY;
 
 interface SavedImage {
   id: string;
   category: string;
   url: string;
 }
-
-const createMockImageUrl = (color: string, label: string) =>
-  `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="142" height="200"><rect width="142" height="200" fill="${color}"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#ffffff">${label}</text></svg>`,
-  )}`;
-
-// TODO: 실제 저장된 이미지 목록 API 연동 후 목업 데이터 제거
-const MOCK_SAVED_IMAGES: SavedImage[] = [
-  {
-    id: 'saved-1',
-    category: '모델컷 이미지',
-    url: createMockImageUrl('#FF9B61', '모델 1'),
-  },
-  {
-    id: 'saved-2',
-    category: '모델컷 이미지',
-    url: createMockImageUrl('#FFBD96', '모델 2'),
-  },
-  {
-    id: 'saved-3',
-    category: '제품컷 이미지',
-    url: createMockImageUrl('#5FB5F7', '제품 1'),
-  },
-  {
-    id: 'saved-4',
-    category: '제품컷 이미지',
-    url: createMockImageUrl('#9ED2FA', '제품 2'),
-  },
-  {
-    id: 'saved-5',
-    category: '모델컷 이미지',
-    url: createMockImageUrl('#F48771', '모델 3'),
-  },
-  {
-    id: 'saved-6',
-    category: '제품컷 이미지',
-    url: createMockImageUrl('#2098F3', '제품 3'),
-  },
-  {
-    id: 'saved-7',
-    category: '모델컷 이미지',
-    url: createMockImageUrl('#FF6D18', '모델 4'),
-  },
-  {
-    id: 'saved-8',
-    category: '제품컷 이미지',
-    url: createMockImageUrl('#0B78CB', '제품 4'),
-  },
-];
-
-const CATEGORY_OPTIONS = Array.from(
-  new Set(MOCK_SAVED_IMAGES.map((image) => image.category)),
-).map((category) => ({ label: category, value: category }));
 
 interface ImagePlacementPanelProps {
   onClose: () => void;
@@ -76,9 +42,22 @@ export const ImagePlacementPanel = ({
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
+  const { data, isLoading, isError } = useImageFolderAssets(TEMP_PRODUCT_ID);
+
+  const savedImages: SavedImage[] =
+    data?.assets.map((asset) => ({
+      id: String(asset.assetId),
+      category: getImageCategory(asset.assetRole),
+      url: asset.imageUrl,
+    })) ?? [];
+
+  const categoryOptions = Array.from(
+    new Set(savedImages.map((image) => image.category)),
+  ).map((category) => ({ label: category, value: category }));
+
   const visibleImages = categoryFilter
-    ? MOCK_SAVED_IMAGES.filter((image) => image.category === categoryFilter)
-    : MOCK_SAVED_IMAGES;
+    ? savedImages.filter((image) => image.category === categoryFilter)
+    : savedImages;
 
   const handleSelect = (image: SavedImage) => {
     setSelectedId(image.id);
@@ -86,7 +65,7 @@ export const ImagePlacementPanel = ({
   };
 
   return (
-    <div className="border-border-subtler bg-bg-white flex w-[364px] shrink-0 flex-col gap-[var(--gap-8)] overflow-y-auto border-r p-[32px]">
+    <div className="border-border-subtler bg-bg-white flex w-[380px] shrink-0 flex-col gap-[var(--gap-8)] overflow-y-auto border-r p-[32px]">
       <div className="flex flex-col gap-[var(--gap-5)]">
         <div className="flex flex-col gap-[var(--gap-2)]">
           <div className="flex items-center justify-between">
@@ -107,7 +86,7 @@ export const ImagePlacementPanel = ({
         </div>
         <Dropdown
           label={categoryFilter ?? '모든 이미지'}
-          options={CATEGORY_OPTIONS}
+          options={categoryOptions}
           value={categoryFilter}
           onChange={setCategoryFilter}
           className="w-full"
@@ -122,6 +101,21 @@ export const ImagePlacementPanel = ({
         <Body size="medium" bold className="text-text-subtle">
           저장된 이미지
         </Body>
+        {isLoading && (
+          <Body size="xsmall" className="text-text-subtler">
+            이미지를 불러오는 중이에요.
+          </Body>
+        )}
+        {isError && (
+          <Body size="xsmall" className="text-icon-danger">
+            이미지를 불러오지 못했어요.
+          </Body>
+        )}
+        {!isLoading && !isError && visibleImages.length === 0 && (
+          <Body size="xsmall" className="text-text-subtler">
+            저장된 이미지가 없어요.
+          </Body>
+        )}
         <div className="flex w-full flex-wrap gap-[var(--gap-4)]">
           {visibleImages.map((image) => (
             <button

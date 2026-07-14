@@ -74,7 +74,7 @@ export const TemplateListPanel = () => {
     : TEMPLATE_GROUPS;
 
   return (
-    <div className="border-border-subtler bg-bg-white flex w-[360px] shrink-0 flex-col gap-[var(--gap-8)] overflow-y-auto border-r p-[var(--padding-9)]">
+    <div className="border-border-subtler bg-bg-white flex w-[380px] shrink-0 flex-col gap-[var(--gap-8)] overflow-y-auto border-r p-[var(--padding-9)]">
       <div className="flex flex-col gap-[var(--gap-5)]">
         <div className="flex flex-col gap-[var(--gap-2)]">
           <Heading size="xsmall" className="text-text-subtle">
