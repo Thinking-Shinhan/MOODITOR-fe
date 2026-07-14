@@ -1,4 +1,3 @@
-import { X } from 'lucide-react';
 import { Body } from '@/components/commons/Typography';
 
 type TooltipPlacement = 'right' | 'top';
@@ -14,8 +13,6 @@ interface TooltipProps {
 export const Tooltip = ({
   text,
   placement = 'right',
-  dismissible = false,
-  onDismiss,
   className = '',
 }: TooltipProps) => {
   const bubble = (
@@ -26,15 +23,6 @@ export const Tooltip = ({
       >
         {text}
       </Body>
-      {dismissible && (
-        <button
-          type="button"
-          onClick={onDismiss}
-          className="flex size-[14px] shrink-0 cursor-pointer items-center justify-center"
-        >
-          <X size={14} className="text-icon-inverse" />
-        </button>
-      )}
     </div>
   );
 
