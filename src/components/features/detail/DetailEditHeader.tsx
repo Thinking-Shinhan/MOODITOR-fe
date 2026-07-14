@@ -28,10 +28,17 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         >
           <button
             type="button"
-            className="bg-btn-secondary-fill border-border-subtle flex items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border px-[var(--padding-5)] py-[var(--padding-3)]"
+            className="bg-btn-secondary-fill border-border-border hover:border-border-subtle disabled:border-border-subtle group flex cursor-pointer items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border px-[var(--padding-5)] py-[var(--padding-3)] disabled:cursor-not-allowed"
           >
-            <WandSparkles size={16} className="text-icon-gray-light" />
-            <Body size="small" bold className="text-text-subtler">
+            <WandSparkles
+              size={16}
+              className="text-icon-gray group-hover:text-icon-gray-light group-disabled:text-icon-disabled"
+            />
+            <Body
+              size="small"
+              bold
+              className="text-text-border group-hover:text-text-subtler group-disabled:text-text-disabled"
+            >
               AI 자동 배치
             </Body>
           </button>
