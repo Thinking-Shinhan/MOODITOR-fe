@@ -8,7 +8,7 @@ export const TEXT_SLOT_FILL = '#ffffff';
 export const SLOT_STROKE = '#cdd1d5'; // --color-border-subtle
 export const SLOT_TEXT_FILL = '#84949e'; // --color-text-disabled-on
 
-export const IMAGE_SLOT_PLACEHOLDER = '라이브러리에서 사진을 선택하세요.';
+export const IMAGE_SLOT_PLACEHOLDER = '라이브러리에서\n사진을 선택해주세요.';
 export const TEXT_SLOT_PLACEHOLDER = '텍스트를 입력하세요.';
 
 // 텍스트 템플릿(TEXT_1~5) 전용 - 부제목/제목/설명 문단
