@@ -5,12 +5,20 @@ import { Body } from '@/components/commons/Typography';
 
 interface DetailTemplateHeaderProps {
   pageNumber: number;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  moveUpDisabled: boolean;
+  moveDownDisabled: boolean;
 }
 
-// AI 수정하기 버튼, 순서 변경 화살표, 삭제 버튼은 지금은 UI만 구현돼 있고
-// 클릭 동작(실제 순서 변경/삭제/AI 수정)은 이후 작업에서 연결한다
+// AI 수정하기 버튼, 삭제 버튼은 지금은 UI만 구현돼 있고
+// 클릭 동작(실제 삭제/AI 수정)은 이후 작업에서 연결한다
 export const DetailTemplateHeader = ({
   pageNumber,
+  onMoveUp,
+  onMoveDown,
+  moveUpDisabled,
+  moveDownDisabled,
 }: DetailTemplateHeaderProps) => {
   return (
     <div className="flex w-full items-center justify-between py-[var(--padding-3)]">
@@ -33,19 +41,25 @@ export const DetailTemplateHeader = ({
         </div>
         <button
           type="button"
-          className="flex size-[20px] items-center justify-center"
+          onClick={onMoveUp}
+          disabled={moveUpDisabled}
+          onPointerDown={(event) => event.stopPropagation()}
+          className="flex size-[20px] cursor-pointer items-center justify-center disabled:cursor-not-allowed disabled:opacity-40"
         >
           <ChevronUp size={20} className="text-icon-gray-light" />
         </button>
         <button
           type="button"
-          className="flex size-[20px] items-center justify-center"
+          onClick={onMoveDown}
+          disabled={moveDownDisabled}
+          onPointerDown={(event) => event.stopPropagation()}
+          className="flex size-[20px] cursor-pointer items-center justify-center disabled:cursor-not-allowed disabled:opacity-40"
         >
           <ChevronDown size={20} className="text-icon-gray-light" />
         </button>
         <button
           type="button"
-          className="flex size-[20px] items-center justify-center"
+          className="flex size-[20px] cursor-pointer items-center justify-center"
         >
           <Trash2 size={20} className="text-icon-gray-light" />
         </button>

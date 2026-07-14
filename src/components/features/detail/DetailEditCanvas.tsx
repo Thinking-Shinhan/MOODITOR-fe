@@ -66,6 +66,18 @@ export const DetailEditCanvas = () => {
     });
   };
 
+  const handleMoveUp = (index: number) => {
+    if (index === 0) return;
+    setPlacedTemplates((prev) => arrayMove(prev, index, index - 1));
+  };
+
+  const handleMoveDown = (index: number) => {
+    setPlacedTemplates((prev) => {
+      if (index === prev.length - 1) return prev;
+      return arrayMove(prev, index, index + 1);
+    });
+  };
+
   return (
     <div
       onDragOver={handleDragOver}
@@ -95,6 +107,10 @@ export const DetailEditCanvas = () => {
                   id={placed.id}
                   type={placed.type}
                   pageNumber={index + 1}
+                  onMoveUp={() => handleMoveUp(index)}
+                  onMoveDown={() => handleMoveDown(index)}
+                  moveUpDisabled={index === 0}
+                  moveDownDisabled={index === placedTemplates.length - 1}
                 />
               ))}
             </div>

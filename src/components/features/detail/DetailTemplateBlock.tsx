@@ -27,6 +27,10 @@ interface DetailTemplateBlockProps {
   id: string;
   type: DetailTemplateType;
   pageNumber: number;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  moveUpDisabled: boolean;
+  moveDownDisabled: boolean;
 }
 
 const CANVAS_WIDTH = 879;
@@ -54,6 +58,10 @@ export const DetailTemplateBlock = ({
   id,
   type,
   pageNumber,
+  onMoveUp,
+  onMoveDown,
+  moveUpDisabled,
+  moveDownDisabled,
 }: DetailTemplateBlockProps) => {
   const {
     attributes,
@@ -77,7 +85,13 @@ export const DetailTemplateBlock = ({
       {...listeners}
       className="flex cursor-grab flex-col gap-[var(--gap-2)] active:cursor-grabbing"
     >
-      <DetailTemplateHeader pageNumber={pageNumber} />
+      <DetailTemplateHeader
+        pageNumber={pageNumber}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
+        moveUpDisabled={moveUpDisabled}
+        moveDownDisabled={moveDownDisabled}
+      />
       <Stage width={CANVAS_WIDTH} height={height}>
         <Layer>
           <DetailTemplateGroup templateId={id} type={type} />
