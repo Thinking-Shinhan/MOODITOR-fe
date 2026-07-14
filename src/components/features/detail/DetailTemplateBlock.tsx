@@ -31,6 +31,7 @@ interface DetailTemplateBlockProps {
   onMoveDown: () => void;
   moveUpDisabled: boolean;
   moveDownDisabled: boolean;
+  onDelete: () => void;
 }
 
 const CANVAS_WIDTH = 879;
@@ -62,6 +63,7 @@ export const DetailTemplateBlock = ({
   onMoveDown,
   moveUpDisabled,
   moveDownDisabled,
+  onDelete,
 }: DetailTemplateBlockProps) => {
   const {
     attributes,
@@ -91,6 +93,7 @@ export const DetailTemplateBlock = ({
         onMoveDown={onMoveDown}
         moveUpDisabled={moveUpDisabled}
         moveDownDisabled={moveDownDisabled}
+        onDelete={onDelete}
       />
       <Stage width={CANVAS_WIDTH} height={height}>
         <Layer>

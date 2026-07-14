@@ -9,16 +9,16 @@ interface DetailTemplateHeaderProps {
   onMoveDown: () => void;
   moveUpDisabled: boolean;
   moveDownDisabled: boolean;
+  onDelete: () => void;
 }
 
-// AI 수정하기 버튼, 삭제 버튼은 지금은 UI만 구현돼 있고
-// 클릭 동작(실제 삭제/AI 수정)은 이후 작업에서 연결한다
 export const DetailTemplateHeader = ({
   pageNumber,
   onMoveUp,
   onMoveDown,
   moveUpDisabled,
   moveDownDisabled,
+  onDelete,
 }: DetailTemplateHeaderProps) => {
   return (
     <div className="flex w-full items-center justify-between py-[var(--padding-3)]">
@@ -59,6 +59,8 @@ export const DetailTemplateHeader = ({
         </button>
         <button
           type="button"
+          onClick={onDelete}
+          onPointerDown={(event) => event.stopPropagation()}
           className="flex size-[20px] cursor-pointer items-center justify-center"
         >
           <Trash2 size={20} className="text-icon-gray-light" />

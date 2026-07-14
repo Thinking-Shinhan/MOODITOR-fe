@@ -78,6 +78,10 @@ export const DetailEditCanvas = () => {
     });
   };
 
+  const handleDelete = (id: string) => {
+    setPlacedTemplates((prev) => prev.filter((item) => item.id !== id));
+  };
+
   return (
     <div
       onDragOver={handleDragOver}
@@ -111,6 +115,7 @@ export const DetailEditCanvas = () => {
                   onMoveDown={() => handleMoveDown(index)}
                   moveUpDisabled={index === 0}
                   moveDownDisabled={index === placedTemplates.length - 1}
+                  onDelete={() => handleDelete(placed.id)}
                 />
               ))}
             </div>
