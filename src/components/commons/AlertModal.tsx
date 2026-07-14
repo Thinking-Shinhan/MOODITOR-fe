@@ -18,8 +18,6 @@ interface AlertModalProps {
 
 const noopSubscribe = () => () => {};
 
-// document.body가 없는 서버 렌더링 시점엔 포탈을 그릴 수 없으므로,
-// 클라이언트에서 마운트된 이후에만 true를 반환한다 (effect 안 setState 없이)
 const useIsClient = () =>
   useSyncExternalStore(
     noopSubscribe,
@@ -27,7 +25,6 @@ const useIsClient = () =>
     () => false,
   );
 
-// cancelText + onCancel이 모두 있으면 취소/확인 2버튼, 없으면 확인 1버튼 레이아웃
 export const AlertModal = ({
   open,
   title,
@@ -44,10 +41,12 @@ export const AlertModal = ({
 
   const showCancel = Boolean(cancelText && onCancel);
 
+  const handleBackdropClick = onCancel ?? onConfirm;
+
   return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-gray-100)]/40"
-      onClick={onCancel}
+      onClick={handleBackdropClick}
     >
       <div
         onClick={(event) => event.stopPropagation()}
