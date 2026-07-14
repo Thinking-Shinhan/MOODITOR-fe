@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import type Konva from 'konva';
 
 interface DroppableSlot {
@@ -18,13 +18,30 @@ export const useImageSlotDrop = <T extends DroppableSlot>(
   slots: T[],
 ) => {
   const [images, setImages] = useState<Record<string, string>>({});
+  const activeUrlsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const prev = activeUrlsRef.current;
+    const next = new Set(Object.values(images));
+
+    prev.forEach((url) => {
+      if (!next.has(url)) URL.revokeObjectURL(url);
+    });
+
+    activeUrlsRef.current = next;
+  }, [images]);
+
+  useEffect(() => {
+    return () => {
+      activeUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
 
   useEffect(() => {
     const container = rootRef.current?.getStage()?.container();
     if (!container) return;
 
     const imageSlots = slots.filter((slot) => slot.type === 'image');
-
     const handleDragOver = (event: DragEvent) => {
       event.preventDefault();
     };
