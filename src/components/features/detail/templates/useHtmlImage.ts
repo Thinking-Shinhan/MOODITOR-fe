@@ -8,10 +8,7 @@ export const useHtmlImage = (src: string | null) => {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    if (!src) {
-      setImage(null);
-      return;
-    }
+    if (!src) return;
 
     let canceled = false;
     const img = new window.Image();
@@ -30,5 +27,5 @@ export const useHtmlImage = (src: string | null) => {
     };
   }, [src]);
 
-  return image;
+  return src ? image : null;
 };
