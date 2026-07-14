@@ -136,11 +136,6 @@ export const DetailEditCanvas = () => {
               ))}
             </div>
           </SortableContext>
-          {/* verticalListSortingStrategy는 드래그 중인 항목 자체를 목록 안에서
-              옮기는 방식이라, 크기가 서로 다른 블록 사이를 지나갈 때 드래그 중인
-              블록이 원래 그 자리에 있던 블록 크기로 늘어나 보이는 문제가 있다.
-              DragOverlay로 드래그 중 보이는 미리보기를 별도로 띄우면
-              (목록 안의 원본은 반투명 상태로 제자리 크기를 유지) 이 왜곡이 없어진다. */}
           <DragOverlay>
             {activeTemplate && (
               <DetailTemplateBlockContent
