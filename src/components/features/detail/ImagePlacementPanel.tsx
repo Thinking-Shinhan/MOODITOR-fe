@@ -35,9 +35,6 @@ interface ImagePlacementPanelProps {
   onClose: () => void;
 }
 
-// 이 패널은 캔버스 어느 템플릿의 이미지 슬롯에든 이미지를 드래그앤드롭으로
-// 넣을 수 있는 팔레트 역할이라, 카드를 클릭해서 특정 슬롯에 바로 배치하지는 않는다.
-// X 버튼을 눌러야만 닫힌다(다른 슬롯을 클릭해도 유지됨).
 export const ImagePlacementPanel = ({ onClose }: ImagePlacementPanelProps) => {
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -120,14 +117,14 @@ export const ImagePlacementPanel = ({ onClose }: ImagePlacementPanelProps) => {
             저장된 이미지가 없어요.
           </Body>
         )}
-        <div className="flex w-full flex-wrap gap-[var(--gap-4)]">
+        <div className="columns-2 gap-[var(--gap-4)]">
           {visibleImages.map((image) => (
             <div
               key={image.id}
               draggable
               onDragStart={(event) => handleDragStart(event, image)}
               onDragEnd={() => setDraggingId(null)}
-              className={`bg-bg-gray-subtle relative h-[200px] w-[142px] shrink-0 cursor-grab overflow-hidden rounded-[var(--radius-small1)] active:cursor-grabbing ${
+              className={`bg-bg-gray-subtle mb-[var(--gap-4)] block cursor-grab break-inside-avoid overflow-hidden rounded-[var(--radius-small1)] active:cursor-grabbing ${
                 draggingId === image.id
                   ? 'border-border-basic border-[1.5px]'
                   : ''
@@ -136,7 +133,7 @@ export const ImagePlacementPanel = ({ onClose }: ImagePlacementPanelProps) => {
               <img
                 src={image.url}
                 alt=""
-                className="pointer-events-none absolute inset-0 size-full object-cover"
+                className="pointer-events-none block h-auto w-full"
               />
             </div>
           ))}
