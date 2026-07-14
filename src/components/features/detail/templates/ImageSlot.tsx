@@ -74,7 +74,7 @@ export const ImageSlot = ({
 }: ImageSlotProps) => {
   const image = useHtmlImage(imageSrc);
   const placeholderIcon = useHtmlImage(image ? null : PLACEHOLDER_ICON_SRC);
-  const openSlot = useImagePlacementStore((state) => state.openSlot);
+  const openPanel = useImagePlacementStore((state) => state.openPanel);
   const [isHovered, setIsHovered] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
 
@@ -90,7 +90,7 @@ export const ImageSlot = ({
         width={width}
         height={height}
         fill={isHovered || isPressed ? IMAGE_SLOT_ACTIVE_FILL : IMAGE_SLOT_FILL}
-        onClick={() => openSlot(templateId, id)}
+        onClick={() => openPanel()}
         onMouseEnter={(event) => {
           setIsHovered(true);
           setCursor(event.target, 'pointer');

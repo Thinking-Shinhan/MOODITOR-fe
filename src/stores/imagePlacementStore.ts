@@ -1,16 +1,11 @@
 import { create } from 'zustand';
 
-interface ActiveSlot {
-  templateId: string;
-  slotId: string;
-}
-
 interface ImagePlacementStore {
   // key: `${templateId}:${slotId}`
   images: Record<string, string>;
-  activeSlot: ActiveSlot | null;
-  openSlot: (templateId: string, slotId: string) => void;
-  closeSlot: () => void;
+  isPanelOpen: boolean;
+  openPanel: () => void;
+  closePanel: () => void;
   setImage: (templateId: string, slotId: string, src: string) => void;
 }
 
@@ -19,9 +14,9 @@ export const getSlotImageKey = (templateId: string, slotId: string) =>
 
 export const useImagePlacementStore = create<ImagePlacementStore>((set) => ({
   images: {},
-  activeSlot: null,
-  openSlot: (templateId, slotId) => set({ activeSlot: { templateId, slotId } }),
-  closeSlot: () => set({ activeSlot: null }),
+  isPanelOpen: false,
+  openPanel: () => set({ isPanelOpen: true }),
+  closePanel: () => set({ isPanelOpen: false }),
   setImage: (templateId, slotId, src) =>
     set((state) => ({
       images: {

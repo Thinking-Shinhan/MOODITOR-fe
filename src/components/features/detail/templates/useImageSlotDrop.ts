@@ -12,11 +12,17 @@ interface DroppableSlot {
   type: 'image' | 'text';
 }
 
-// 이미지 슬롯 위에 파일을 드래그앤드롭하면 해당 슬롯에 이미지를 채운다.
+// ImagePlacementPanel의 저장된 이미지 카드가 드래그를 시작할 때 이 타입으로
+// dataTransfer에 이미지 URL을 담는다. 템플릿 패널 카드 드래그(application/json)와
+// OS 파일 드래그(dataTransfer.files)와 겹치지 않도록 별도 타입을 쓴다.
+export const SAVED_IMAGE_DRAG_TYPE = 'application/x-aven-saved-image';
+
+// 이미지 슬롯 위에 파일(OS 드래그) 또는 저장된 이미지(패널 드래그)를 놓으면
+// 해당 슬롯에 이미지를 채운다.
 // Konva Stage는 캔버스 하나로 렌더링돼서 슬롯마다 별도의 네이티브 드롭
 // 타겟을 둘 수 없어, 스테이지 컨테이너에 리스너를 걸고 드롭 좌표로
 // getIntersection을 이용해 어느 슬롯인지 찾는다.
-// 이미지 배치 패널에서 선택한 이미지도 같은 슬롯에 들어가야 해서,
+// 이미지 배치 패널에서 놓은 이미지도 같은 슬롯에 들어가야 해서,
 // 슬롯 이미지는 컴포넌트 로컬 상태가 아니라 전역 store(imagePlacementStore)에 둔다.
 export const useImageSlotDrop = <T extends DroppableSlot>(
   rootRef: RefObject<Konva.Group | null>,
@@ -67,8 +73,9 @@ export const useImageSlotDrop = <T extends DroppableSlot>(
     const handleDrop = (event: DragEvent) => {
       event.preventDefault();
 
+      const savedImageUrl = event.dataTransfer?.getData(SAVED_IMAGE_DRAG_TYPE);
       const file = event.dataTransfer?.files?.[0];
-      if (!file || !file.type.startsWith('image/')) return;
+      if (!savedImageUrl && (!file || !file.type.startsWith('image/'))) return;
 
       const stage = rootRef.current?.getStage();
       if (!stage) return;
@@ -84,8 +91,8 @@ export const useImageSlotDrop = <T extends DroppableSlot>(
       );
       if (!slot) return;
 
-      const objectUrl = URL.createObjectURL(file);
-      setStoreImage(templateId, slot.id, objectUrl);
+      const src = savedImageUrl || URL.createObjectURL(file as File);
+      setStoreImage(templateId, slot.id, src);
     };
 
     container.addEventListener('dragover', handleDragOver);

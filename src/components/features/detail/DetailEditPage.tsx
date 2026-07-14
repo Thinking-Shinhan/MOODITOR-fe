@@ -15,20 +15,13 @@ const DetailEditCanvas = dynamic(
 );
 
 export default function DetailEditPage() {
-  const activeSlot = useImagePlacementStore((state) => state.activeSlot);
-  const closeSlot = useImagePlacementStore((state) => state.closeSlot);
-  const setImage = useImagePlacementStore((state) => state.setImage);
+  const isPanelOpen = useImagePlacementStore((state) => state.isPanelOpen);
+  const closePanel = useImagePlacementStore((state) => state.closePanel);
 
   return (
     <div className="flex h-full">
-      {activeSlot ? (
-        <ImagePlacementPanel
-          onClose={closeSlot}
-          onSelectImage={(image) => {
-            setImage(activeSlot.templateId, activeSlot.slotId, image.url);
-            closeSlot();
-          }}
-        />
+      {isPanelOpen ? (
+        <ImagePlacementPanel onClose={closePanel} />
       ) : (
         <TemplateListPanel />
       )}
