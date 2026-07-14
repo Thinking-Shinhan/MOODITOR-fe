@@ -18,8 +18,45 @@ interface ImageSlotProps {
   imageSrc: string | null;
 }
 
-// 이미지 슬롯: 이미지가 드롭되기 전에는 placeholder를,
-// 드롭된 후에는 실제 이미지를 슬롯 크기에 맞춰 렌더링한다
+const PLACEHOLDER_ICON_SRC = '/assets/icons/image-placeholder.svg';
+const PLACEHOLDER_ICON_SIZE = 40;
+const PLACEHOLDER_ICON_TEXT_GAP = 16;
+const PLACEHOLDER_FONT_SIZE = 16;
+const PLACEHOLDER_LINE_HEIGHT = 1.5;
+const PLACEHOLDER_TEXT_HEIGHT =
+  PLACEHOLDER_FONT_SIZE * PLACEHOLDER_LINE_HEIGHT * 2; // 2줄
+const PLACEHOLDER_BLOCK_HEIGHT =
+  PLACEHOLDER_ICON_SIZE + PLACEHOLDER_ICON_TEXT_GAP + PLACEHOLDER_TEXT_HEIGHT;
+
+// object-fit: cover와 동일하게, 슬롯 비율과 다른 이미지는 비율을 유지한 채
+// 넘치는 부분만 잘라서(crop) 채운다 (늘리거나 줄여서 찌그러뜨리지 않는다)
+const getCoverCrop = (
+  image: HTMLImageElement,
+  boxWidth: number,
+  boxHeight: number,
+) => {
+  const imageRatio = image.naturalWidth / image.naturalHeight;
+  const boxRatio = boxWidth / boxHeight;
+
+  if (imageRatio > boxRatio) {
+    const cropWidth = image.naturalHeight * boxRatio;
+    return {
+      x: (image.naturalWidth - cropWidth) / 2,
+      y: 0,
+      width: cropWidth,
+      height: image.naturalHeight,
+    };
+  }
+
+  const cropHeight = image.naturalWidth / boxRatio;
+  return {
+    x: 0,
+    y: (image.naturalHeight - cropHeight) / 2,
+    width: image.naturalWidth,
+    height: cropHeight,
+  };
+};
+
 export const ImageSlot = ({
   templateId,
   id,
@@ -30,6 +67,7 @@ export const ImageSlot = ({
   imageSrc,
 }: ImageSlotProps) => {
   const image = useHtmlImage(imageSrc);
+  const placeholderIcon = useHtmlImage(image ? null : PLACEHOLDER_ICON_SRC);
 
   return (
     <Group x={x} y={y}>
@@ -44,20 +82,35 @@ export const ImageSlot = ({
           image={image}
           width={width}
           height={height}
+          crop={getCoverCrop(image, width, height)}
           listening={false}
         />
       ) : (
-        <Text
-          width={width}
-          height={height}
-          text={IMAGE_SLOT_PLACEHOLDER}
-          align="center"
-          verticalAlign="middle"
-          wrap="char"
-          fontSize={14}
-          fill={SLOT_TEXT_FILL}
-          listening={false}
-        />
+        <Group x={width / 2} y={(height - PLACEHOLDER_BLOCK_HEIGHT) / 2}>
+          {placeholderIcon && (
+            <KonvaImage
+              image={placeholderIcon}
+              x={-PLACEHOLDER_ICON_SIZE / 2}
+              y={0}
+              width={PLACEHOLDER_ICON_SIZE}
+              height={PLACEHOLDER_ICON_SIZE}
+              listening={false}
+            />
+          )}
+          <Text
+            x={-width / 2}
+            y={PLACEHOLDER_ICON_SIZE + PLACEHOLDER_ICON_TEXT_GAP}
+            width={width}
+            text={IMAGE_SLOT_PLACEHOLDER}
+            align="center"
+            wrap="char"
+            fontSize={PLACEHOLDER_FONT_SIZE}
+            fontStyle="400"
+            lineHeight={PLACEHOLDER_LINE_HEIGHT}
+            fill={SLOT_TEXT_FILL}
+            listening={false}
+          />
+        </Group>
       )}
     </Group>
   );

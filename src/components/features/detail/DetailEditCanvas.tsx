@@ -3,11 +3,13 @@
 import { DragEvent, useState } from 'react';
 import {
   DndContext,
+  DragOverlay,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -15,6 +17,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { DetailTemplateBlock } from '@/components/features/detail/DetailTemplateBlock';
+import { DetailTemplateBlockContent } from '@/components/features/detail/DetailTemplateBlockContent';
 import { Body } from '@/components/commons/Typography';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
 
@@ -23,8 +26,11 @@ interface PlacedTemplate {
   type: DetailTemplateType;
 }
 
+const noop = () => {};
+
 export const DetailEditCanvas = () => {
   const [placedTemplates, setPlacedTemplates] = useState<PlacedTemplate[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
@@ -55,7 +61,13 @@ export const DetailEditCanvas = () => {
     ]);
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(String(event.active.id));
+  };
+
   const handleReorder = (event: DragEndEvent) => {
+    setActiveId(null);
+
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
@@ -65,6 +77,25 @@ export const DetailEditCanvas = () => {
       return arrayMove(prev, oldIndex, newIndex);
     });
   };
+
+  const handleMoveUp = (index: number) => {
+    if (index === 0) return;
+    setPlacedTemplates((prev) => arrayMove(prev, index, index - 1));
+  };
+
+  const handleMoveDown = (index: number) => {
+    setPlacedTemplates((prev) => {
+      if (index === prev.length - 1) return prev;
+      return arrayMove(prev, index, index + 1);
+    });
+  };
+
+  const handleDelete = (id: string) => {
+    setPlacedTemplates((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const activeIndex = placedTemplates.findIndex((item) => item.id === activeId);
+  const activeTemplate = activeIndex >= 0 ? placedTemplates[activeIndex] : null;
 
   return (
     <div
@@ -82,22 +113,43 @@ export const DetailEditCanvas = () => {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
           onDragEnd={handleReorder}
         >
           <SortableContext
             items={placedTemplates.map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
-            <div className="flex flex-col">
-              {placedTemplates.map((placed) => (
+            <div className="flex flex-col gap-[var(--gap-7)]">
+              {placedTemplates.map((placed, index) => (
                 <DetailTemplateBlock
                   key={placed.id}
                   id={placed.id}
                   type={placed.type}
+                  pageNumber={index + 1}
+                  onMoveUp={() => handleMoveUp(index)}
+                  onMoveDown={() => handleMoveDown(index)}
+                  moveUpDisabled={index === 0}
+                  moveDownDisabled={index === placedTemplates.length - 1}
+                  onDelete={() => handleDelete(placed.id)}
                 />
               ))}
             </div>
           </SortableContext>
+          <DragOverlay>
+            {activeTemplate && (
+              <DetailTemplateBlockContent
+                id={activeTemplate.id}
+                type={activeTemplate.type}
+                pageNumber={activeIndex + 1}
+                onMoveUp={noop}
+                onMoveDown={noop}
+                moveUpDisabled
+                moveDownDisabled
+                onDelete={noop}
+              />
+            )}
+          </DragOverlay>
         </DndContext>
       )}
     </div>
