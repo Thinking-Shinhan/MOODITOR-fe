@@ -18,8 +18,16 @@ interface ImageSlotProps {
   imageSrc: string | null;
 }
 
-// 이미지 슬롯: 이미지가 드롭되기 전에는 placeholder를,
-// 드롭된 후에는 실제 이미지를 슬롯 크기에 맞춰 렌더링한다
+const PLACEHOLDER_ICON_SRC = '/assets/icons/image-placeholder.svg';
+const PLACEHOLDER_ICON_SIZE = 40;
+const PLACEHOLDER_ICON_TEXT_GAP = 16;
+const PLACEHOLDER_FONT_SIZE = 16;
+const PLACEHOLDER_LINE_HEIGHT = 1.5;
+const PLACEHOLDER_TEXT_HEIGHT =
+  PLACEHOLDER_FONT_SIZE * PLACEHOLDER_LINE_HEIGHT * 2; // 2줄
+const PLACEHOLDER_BLOCK_HEIGHT =
+  PLACEHOLDER_ICON_SIZE + PLACEHOLDER_ICON_TEXT_GAP + PLACEHOLDER_TEXT_HEIGHT;
+
 export const ImageSlot = ({
   templateId,
   id,
@@ -30,6 +38,7 @@ export const ImageSlot = ({
   imageSrc,
 }: ImageSlotProps) => {
   const image = useHtmlImage(imageSrc);
+  const placeholderIcon = useHtmlImage(image ? null : PLACEHOLDER_ICON_SRC);
 
   return (
     <Group x={x} y={y}>
@@ -47,17 +56,31 @@ export const ImageSlot = ({
           listening={false}
         />
       ) : (
-        <Text
-          width={width}
-          height={height}
-          text={IMAGE_SLOT_PLACEHOLDER}
-          align="center"
-          verticalAlign="middle"
-          wrap="char"
-          fontSize={14}
-          fill={SLOT_TEXT_FILL}
-          listening={false}
-        />
+        <Group x={width / 2} y={(height - PLACEHOLDER_BLOCK_HEIGHT) / 2}>
+          {placeholderIcon && (
+            <KonvaImage
+              image={placeholderIcon}
+              x={-PLACEHOLDER_ICON_SIZE / 2}
+              y={0}
+              width={PLACEHOLDER_ICON_SIZE}
+              height={PLACEHOLDER_ICON_SIZE}
+              listening={false}
+            />
+          )}
+          <Text
+            x={-width / 2}
+            y={PLACEHOLDER_ICON_SIZE + PLACEHOLDER_ICON_TEXT_GAP}
+            width={width}
+            text={IMAGE_SLOT_PLACEHOLDER}
+            align="center"
+            wrap="char"
+            fontSize={PLACEHOLDER_FONT_SIZE}
+            fontStyle="400"
+            lineHeight={PLACEHOLDER_LINE_HEIGHT}
+            fill={SLOT_TEXT_FILL}
+            listening={false}
+          />
+        </Group>
       )}
     </Group>
   );
