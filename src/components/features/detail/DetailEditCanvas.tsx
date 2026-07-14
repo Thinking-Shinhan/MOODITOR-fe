@@ -88,12 +88,13 @@ export const DetailEditCanvas = () => {
             items={placedTemplates.map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
-            <div className="flex flex-col">
-              {placedTemplates.map((placed) => (
+            <div className="flex flex-col gap-[var(--gap-7)]">
+              {placedTemplates.map((placed, index) => (
                 <DetailTemplateBlock
                   key={placed.id}
                   id={placed.id}
                   type={placed.type}
+                  pageNumber={index + 1}
                 />
               ))}
             </div>

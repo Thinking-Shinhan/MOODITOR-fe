@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Stage, Layer } from 'react-konva';
 import { DetailTemplateGroup } from '@/components/features/detail/DetailTemplateGroup';
+import { DetailTemplateHeader } from '@/components/features/detail/DetailTemplateHeader';
 import { TEMPLATE_HEIGHT as IMAGE_1_1_HEIGHT } from '@/components/features/detail/templates/Image1_1Template';
 import { TEMPLATE_HEIGHT as IMAGE_1_2_HEIGHT } from '@/components/features/detail/templates/Image1_2Template';
 import { TEMPLATE_HEIGHT as IMAGE_2_1_HEIGHT } from '@/components/features/detail/templates/Image2_1Template';
@@ -25,6 +26,7 @@ import type { DetailTemplateType } from '@/types/template';
 interface DetailTemplateBlockProps {
   id: string;
   type: DetailTemplateType;
+  pageNumber: number;
 }
 
 const CANVAS_WIDTH = 879;
@@ -48,7 +50,11 @@ const TEMPLATE_HEIGHTS: Record<DetailTemplateType, number> = {
   SIZE_INFO: SIZE_INFO_HEIGHT,
 };
 
-export const DetailTemplateBlock = ({ id, type }: DetailTemplateBlockProps) => {
+export const DetailTemplateBlock = ({
+  id,
+  type,
+  pageNumber,
+}: DetailTemplateBlockProps) => {
   const {
     attributes,
     listeners,
@@ -62,8 +68,6 @@ export const DetailTemplateBlock = ({ id, type }: DetailTemplateBlockProps) => {
   return (
     <div
       ref={setNodeRef}
-      // dnd-kit의 transform/transition은 드래그 중 실시간으로 계산되는 값이라
-      // Tailwind 클래스로 표현할 수 없어 인라인 스타일이 불가피하다
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -71,8 +75,9 @@ export const DetailTemplateBlock = ({ id, type }: DetailTemplateBlockProps) => {
       }}
       {...attributes}
       {...listeners}
-      className="cursor-grab active:cursor-grabbing"
+      className="flex cursor-grab flex-col gap-[var(--gap-2)] active:cursor-grabbing"
     >
+      <DetailTemplateHeader pageNumber={pageNumber} />
       <Stage width={CANVAS_WIDTH} height={height}>
         <Layer>
           <DetailTemplateGroup templateId={id} type={type} />
