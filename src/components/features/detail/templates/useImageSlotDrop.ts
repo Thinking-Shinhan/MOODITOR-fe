@@ -15,7 +15,7 @@ interface DroppableSlot {
 export const useImageSlotDrop = <T extends DroppableSlot>(
   rootRef: RefObject<Konva.Group | null>,
   templateId: string,
-  slots: T[],
+  slots: readonly T[],
 ) => {
   const [images, setImages] = useState<Record<string, string>>({});
   const activeUrlsRef = useRef<Set<string>>(new Set());
