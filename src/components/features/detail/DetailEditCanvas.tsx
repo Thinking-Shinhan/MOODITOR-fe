@@ -3,11 +3,13 @@
 import { DragEvent, useState } from 'react';
 import {
   DndContext,
+  DragOverlay,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -15,6 +17,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { DetailTemplateBlock } from '@/components/features/detail/DetailTemplateBlock';
+import { DetailTemplateBlockContent } from '@/components/features/detail/DetailTemplateBlockContent';
 import { Body } from '@/components/commons/Typography';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
 
@@ -23,8 +26,11 @@ interface PlacedTemplate {
   type: DetailTemplateType;
 }
 
+const noop = () => {};
+
 export const DetailEditCanvas = () => {
   const [placedTemplates, setPlacedTemplates] = useState<PlacedTemplate[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
@@ -55,7 +61,13 @@ export const DetailEditCanvas = () => {
     ]);
   };
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(String(event.active.id));
+  };
+
   const handleReorder = (event: DragEndEvent) => {
+    setActiveId(null);
+
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
@@ -82,6 +94,9 @@ export const DetailEditCanvas = () => {
     setPlacedTemplates((prev) => prev.filter((item) => item.id !== id));
   };
 
+  const activeIndex = placedTemplates.findIndex((item) => item.id === activeId);
+  const activeTemplate = activeIndex >= 0 ? placedTemplates[activeIndex] : null;
+
   return (
     <div
       onDragOver={handleDragOver}
@@ -98,6 +113,7 @@ export const DetailEditCanvas = () => {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
           onDragEnd={handleReorder}
         >
           <SortableContext
@@ -120,6 +136,25 @@ export const DetailEditCanvas = () => {
               ))}
             </div>
           </SortableContext>
+          {/* verticalListSortingStrategy는 드래그 중인 항목 자체를 목록 안에서
+              옮기는 방식이라, 크기가 서로 다른 블록 사이를 지나갈 때 드래그 중인
+              블록이 원래 그 자리에 있던 블록 크기로 늘어나 보이는 문제가 있다.
+              DragOverlay로 드래그 중 보이는 미리보기를 별도로 띄우면
+              (목록 안의 원본은 반투명 상태로 제자리 크기를 유지) 이 왜곡이 없어진다. */}
+          <DragOverlay>
+            {activeTemplate && (
+              <DetailTemplateBlockContent
+                id={activeTemplate.id}
+                type={activeTemplate.type}
+                pageNumber={activeIndex + 1}
+                onMoveUp={noop}
+                onMoveDown={noop}
+                moveUpDisabled
+                moveDownDisabled
+                onDelete={noop}
+              />
+            )}
+          </DragOverlay>
         </DndContext>
       )}
     </div>
