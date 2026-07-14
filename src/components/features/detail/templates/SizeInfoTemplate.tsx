@@ -364,13 +364,15 @@ const IMAGE_SLOT = {
   type: 'image' as const,
 };
 
+const IMAGE_SLOTS = [IMAGE_SLOT] as const;
+
 export const SizeInfoTemplate = ({
   templateId,
   sizeTable = DEFAULT_SIZE_TABLE,
   materialProperties = DEFAULT_MATERIAL_PROPERTIES,
 }: SizeInfoTemplateProps) => {
   const rootRef = useRef<Konva.Group>(null);
-  const images = useImageSlotDrop(rootRef, templateId, [IMAGE_SLOT]);
+  const images = useImageSlotDrop(rootRef, templateId, IMAGE_SLOTS);
 
   const unitLabelY = IMAGE_SLOT.y + IMAGE_SIZE + SECTION_GAP;
   const sizeTableY = unitLabelY + UNIT_LABEL_HEIGHT + UNIT_TABLE_GAP;
