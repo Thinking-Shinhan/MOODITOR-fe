@@ -18,4 +18,7 @@ export const imageGenerationService = {
 
   createJob: (payload: CreateImageGenerationJobRequest) =>
     apiClient.post<ImageGenerationJob>('/image-generation/jobs', payload),
+
+  getJob: (jobId: number) =>
+    apiClient.get<ImageGenerationJob>(`/image-generation/jobs/${jobId}`),
 };
