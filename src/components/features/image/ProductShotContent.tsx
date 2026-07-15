@@ -88,11 +88,6 @@ export const ProductShotContent = () => {
     ],
   );
 
-  // TODO: 폼 데이터 상태를 확인하기 위한 임시 useEffect, 실제 구현 시 제거
-  useEffect(() => {
-    console.log('제품컷 생성 폼 데이터:', formData);
-  }, [formData]);
-
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const showProductError = submitAttempted && selectedProducts.length === 0;
