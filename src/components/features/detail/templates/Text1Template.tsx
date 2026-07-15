@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import { Group, Rect } from 'react-konva';
 import { EditableTemplateText } from '@/components/features/detail/templates/EditableTemplateText';
+import { useTextSlotContent } from '@/components/features/detail/templates/useTextSlotContent';
 import {
   CANVAS_BG_FILL,
+  EYEBROW_MAX_LENGTH,
+  HEADLINE_MAX_LENGTH,
   LINE_HEIGHT,
   SUBTITLE_COLOR,
   SUBTITLE_FONT_SIZE,
@@ -14,6 +16,7 @@ import {
   TITLE_FONT_SIZE,
   TITLE_TEXT,
   TITLE_Y,
+  type TextTemplateSlot,
 } from '@/components/features/detail/templates/templateConstants';
 
 interface Text1TemplateProps {
@@ -25,9 +28,30 @@ export const TEMPLATE_HEIGHT = 278;
 
 const SLOT = { id: 'slot-1', x: 80, y: 80, width: 719, height: 118 };
 
+export const TEXT_SLOTS: TextTemplateSlot[] = [
+  {
+    slotKey: 'eyebrow',
+    textRole: 'EYEBROW',
+    recommendedMaxLength: EYEBROW_MAX_LENGTH,
+  },
+  {
+    slotKey: 'headline',
+    textRole: 'HEADLINE',
+    recommendedMaxLength: HEADLINE_MAX_LENGTH,
+  },
+];
+
 export const Text1Template = ({ templateId }: Text1TemplateProps) => {
-  const [subtitle, setSubtitle] = useState(SUBTITLE_TEXT);
-  const [title, setTitle] = useState(TITLE_TEXT);
+  const [subtitle, setSubtitle] = useTextSlotContent(
+    templateId,
+    'eyebrow',
+    SUBTITLE_TEXT,
+  );
+  const [title, setTitle] = useTextSlotContent(
+    templateId,
+    'headline',
+    TITLE_TEXT,
+  );
 
   return (
     <Group>
