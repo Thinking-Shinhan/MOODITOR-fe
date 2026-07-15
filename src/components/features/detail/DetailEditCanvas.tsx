@@ -22,6 +22,7 @@ import { Body } from '@/components/commons/Typography';
 import { Toast } from '@/components/commons/Toast';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
+import { SquareMousePointer } from 'lucide-react';
 
 const NO_PRODUCT_SELECTED_MESSAGE =
   '상세페이지 제작 시 활용할 상품을 먼저 선택해주세요.';
@@ -116,13 +117,31 @@ export const DetailEditCanvas = () => {
       <div
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        className="inline-flex"
+        className={
+          placedTemplates.length === 0
+            ? 'flex w-full flex-1 items-center justify-center'
+            : 'inline-flex'
+        }
       >
         {placedTemplates.length === 0 ? (
-          <div className="border-border-subtler flex h-[400px] w-[879px] items-center justify-center rounded-[var(--radius-large1)] border border-dashed">
-            <Body size="medium" className="text-text-subtler">
-              여기에 템플릿을 드래그해서 배치하세요
-            </Body>
+          <div className="bg-bg-gray-subtler flex size-full flex-col items-center justify-center gap-[var(--size-height-4)]">
+            <SquareMousePointer size={32} className="text-icon-disabled-on" />
+            <div className="flex flex-col items-center gap-[var(--gap-2)]">
+              <Body
+                size="medium"
+                bold
+                className="text-text-disabled-on text-center"
+              >
+                상세페이지를 제작하고 싶은 상품을 선택한 후,
+                <br />
+                원하는 템플릿을 이곳으로 드래그해 주세요.
+              </Body>
+              <Body size="xsmall" className="text-text-disabled-on text-center">
+                이미지와 텍스트를 자유롭게 구성해
+                <br />
+                우리 브랜드만의 상세페이지를 완성해 보세요.
+              </Body>
+            </div>
           </div>
         ) : (
           <DndContext
