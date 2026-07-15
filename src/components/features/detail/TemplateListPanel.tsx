@@ -4,9 +4,10 @@ import { DragEvent, Fragment, useState } from 'react';
 import { Dropdown } from '@/components/commons/Dropdown';
 import { Body, Heading } from '@/components/commons/Typography';
 import { ProductSelect } from '@/components/features/image/ProductSelect';
+import { ProductSelectModal } from '@/components/features/detail/ProductSelectModal';
 import { TemplateThumbnailCard } from '@/components/features/detail/TemplateThumbnailCard';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
-import type { SelectedProduct } from '@/types/product';
 
 const PRODUCT_SELECT_EMPTY_STATE_LINES: [string, string] = [
   '상품 리스트에서 상세페이지 제작 시',
@@ -75,9 +76,12 @@ const handleDragStart = (
 
 export const TemplateListPanel = () => {
   const [groupFilter, setGroupFilter] = useState<string | null>(null);
-  // TODO: 상품 리스트에서 선택하는 실제 상품 선택 플로우 연동 필요
-  const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>(
-    [],
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const selectedProduct = useDetailProductSelectionStore(
+    (state) => state.selectedProduct,
+  );
+  const clearProduct = useDetailProductSelectionStore(
+    (state) => state.clearProduct,
   );
 
   const visibleGroups = groupFilter
@@ -87,16 +91,16 @@ export const TemplateListPanel = () => {
   return (
     <div className="border-border-subtler bg-bg-white flex w-[380px] shrink-0 flex-col gap-[var(--gap-8)] overflow-y-auto border-r p-[var(--padding-9)]">
       <ProductSelect
-        selectedProducts={selectedProducts}
+        selectedProducts={selectedProduct ? [selectedProduct] : []}
+        maxSelected={1}
         subtitle="상세페이지에 사용할 상품을 선택해주세요."
         emptyStateLines={PRODUCT_SELECT_EMPTY_STATE_LINES}
-        onClickSelectArea={() => {}}
-        onRemoveProduct={(id) =>
-          setSelectedProducts((prev) =>
-            prev.filter((product) => product.id !== id),
-          )
-        }
+        onClickSelectArea={() => setIsProductModalOpen(true)}
+        onRemoveProduct={clearProduct}
       />
+      {isProductModalOpen && (
+        <ProductSelectModal onClose={() => setIsProductModalOpen(false)} />
+      )}
       <div className="border-border-subtler border-t" />
       <div className="flex flex-col gap-[var(--gap-5)]">
         <div className="flex flex-col gap-[var(--gap-2)]">
