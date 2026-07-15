@@ -6,7 +6,7 @@ import { AlertModal } from '@/components/commons/AlertModal';
 import { Button } from '@/components/commons/Button';
 import { Body } from '@/components/commons/Typography';
 import { Tooltip } from '@/components/commons/Tooltip';
-import { useDetailTemplateCountStore } from '@/stores/detailTemplateCountStore';
+import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
 
 interface DetailEditHeaderProps {
   className?: string;
@@ -16,7 +16,9 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   const [aiTooltipOpen, setAiTooltipOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
-  const hasTemplates = useDetailTemplateCountStore((state) => state.count > 0);
+  const hasTemplates = useDetailCanvasStore(
+    (state) => state.placedTemplates.length > 0,
+  );
 
   return (
     <header
