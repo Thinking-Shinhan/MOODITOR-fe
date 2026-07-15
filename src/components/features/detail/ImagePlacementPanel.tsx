@@ -36,7 +36,10 @@ export const ImagePlacementPanel = ({ onClose }: ImagePlacementPanelProps) => {
     event: DragEvent<HTMLDivElement>,
     image: SavedImage,
   ) => {
-    event.dataTransfer.setData(SAVED_IMAGE_DRAG_TYPE, image.url);
+    event.dataTransfer.setData(
+      SAVED_IMAGE_DRAG_TYPE,
+      JSON.stringify({ assetId: Number(image.id), url: image.url }),
+    );
     event.dataTransfer.effectAllowed = 'copy';
     setDraggingId(image.id);
   };

@@ -38,7 +38,7 @@ export const Image1_2Template = ({ templateId }: Image1_2TemplateProps) => {
           y={slot.y}
           width={slot.width}
           height={slot.height}
-          imageSrc={images[slot.id] ?? null}
+          imageSrc={images[slot.id]?.url ?? null}
         />
       ))}
     </Group>

@@ -61,7 +61,7 @@ export const Image3_2Template = ({ templateId }: Image3_2TemplateProps) => {
           y={slot.y}
           width={slot.width}
           height={slot.height}
-          imageSrc={images[slot.id] ?? null}
+          imageSrc={images[slot.id]?.url ?? null}
         />
       ))}
     </Group>

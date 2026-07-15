@@ -453,7 +453,7 @@ export const SizeInfoTemplate = ({
           y={IMAGE_SLOT.y}
           width={IMAGE_SLOT.width}
           height={IMAGE_SLOT.height}
-          imageSrc={images[IMAGE_SLOT.id] ?? null}
+          imageSrc={images[IMAGE_SLOT.id]?.url ?? null}
         />
 
         <Text
