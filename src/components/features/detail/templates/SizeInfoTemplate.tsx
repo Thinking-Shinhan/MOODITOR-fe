@@ -317,7 +317,6 @@ const MaterialPropertyTable = ({ y, rows }: MaterialPropertyTableProps) => {
               const optionX = MATERIAL_LABEL_WIDTH + optionIndex * optionWidth;
               const checkboxY =
                 (MATERIAL_ROW_HEIGHT - MATERIAL_CHECKBOX_SIZE) / 2;
-              // 체크박스+라벨 그룹 전체를 옵션 칸 가운데로 정렬한다
               const groupWidth =
                 MATERIAL_CHECKBOX_SIZE +
                 MATERIAL_OPTION_GAP +
@@ -404,8 +403,6 @@ export const SizeInfoTemplate = ({
   const sizeTableY = unitLabelY + UNIT_LABEL_HEIGHT + UNIT_TABLE_GAP;
   const materialTableY =
     sizeTableY + getTableHeight(sizeTable.rows.length) + SECTION_GAP;
-  // materialTableY는 콘텐츠 그룹(y={CONTENT_Y}) 기준 상대 좌표라 상단 여백은
-  // 이미 그룹 오프셋으로 반영돼 있다. 배경 높이에는 상단/하단 패딩을 각각 더해야 한다.
   const templateHeight =
     CONTENT_Y + materialTableY + getMaterialTableHeight() + CONTENT_Y;
 
