@@ -13,6 +13,7 @@ interface ToastProps {
   message: string;
   duration?: number;
   onClose: () => void;
+  usePortal?: boolean;
 }
 
 const noopSubscribe = () => () => {};
@@ -30,6 +31,7 @@ export const Toast = ({
   message,
   duration = 2000,
   onClose,
+  usePortal = true,
 }: ToastProps) => {
   const isClient = useIsClient();
 
@@ -41,12 +43,13 @@ export const Toast = ({
 
   if (!isClient || !open) return null;
 
-  return createPortal(
+  const toast = (
     <div className="fixed bottom-[var(--gap-9)] left-1/2 z-50 -translate-x-1/2">
       <div className="bg-bg-white flex items-start rounded-[var(--radius-max)] px-[var(--padding-4)] py-[var(--padding-3)] shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
         <InputMessage state={state} message={message} />
       </div>
-    </div>,
-    document.body,
+    </div>
   );
+
+  return usePortal ? createPortal(toast, document.body) : toast;
 };
