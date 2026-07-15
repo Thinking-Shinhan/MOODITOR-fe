@@ -53,8 +53,6 @@ const TEMPLATE_HEIGHTS: Record<DetailTemplateType, number> = {
   SIZE_INFO: SIZE_INFO_HEIGHT,
 };
 
-// 헤더+캔버스 시각적 내용만 담당한다 (dnd-kit 정렬 로직은 DetailTemplateBlock에서 처리).
-// DragOverlay에 뜨는 드래그 중 미리보기도 이 컴포넌트를 그대로 재사용한다.
 export const DetailTemplateBlockContent = ({
   id,
   type,
@@ -70,6 +68,8 @@ export const DetailTemplateBlockContent = ({
   return (
     <div className="flex flex-col gap-[var(--gap-2)]">
       <DetailTemplateHeader
+        templateId={id}
+        templateType={type}
         pageNumber={pageNumber}
         onMoveUp={onMoveUp}
         onMoveDown={onMoveDown}
