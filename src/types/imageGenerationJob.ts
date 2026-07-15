@@ -1,6 +1,9 @@
 export type CutType = 'MODEL_CUT' | 'PRODUCT_CUT';
 export type GenerationMode = 'PARALLEL';
 
+export type ImageGenerationJobStatus =
+  'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED';
+
 export type ColorTemperature = 'WARM' | 'NEUTRAL' | 'COOL';
 export type CameraAngle =
   | 'EYE_LEVEL_FRONT'
@@ -65,13 +68,16 @@ export interface ImageGenerationResult {
 
 export interface ImageGenerationJob {
   jobId: number;
-  status: string;
+  status: ImageGenerationJobStatus;
   cutType: CutType;
   generationMode: GenerationMode;
   aiName: string;
   requestedCount: number;
   outputCount: number;
-  latencyMs: number;
+  latencyMs: number | null;
   errorMessage: string | null;
+  progressPercent: number;
+  progressStage: string;
+  progressMessage: string;
   results: ImageGenerationResult[];
 }

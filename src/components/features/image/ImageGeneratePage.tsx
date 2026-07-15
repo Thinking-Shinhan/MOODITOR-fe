@@ -4,7 +4,6 @@ import { Tabs } from '@/components/commons/Tabs';
 import { ModelShotContent } from '@/components/features/image/ModelShotContent';
 import { ProductShotContent } from '@/components/features/image/ProductShotContent';
 import { ImageGenerateEmptyCanvas } from '@/components/features/image/ImageGenerateEmptyCanvas';
-import { ImageGenerateLoadingCanvas } from '@/components/features/image/ImageGenerateLoadingCanvas';
 import { ImageGenerateResultCanvas } from '@/components/features/image/ImageGenerateResultCanvas';
 import {
   useModelCutResultStore,
@@ -48,14 +47,15 @@ export default function ImageGeneratePage() {
 
       {/* 캔버스 영역 */}
       <div className="bg-bg-gray-subtler flex flex-1 items-center justify-center">
-        {status === 'loading' && <ImageGenerateLoadingCanvas />}
         {status === 'success' && (
           <ImageGenerateResultCanvas
             images={images}
             aspectRatio={aspectRatio}
           />
         )}
-        {status === 'idle' && <ImageGenerateEmptyCanvas />}
+        {(status === 'idle' || status === 'loading') && (
+          <ImageGenerateEmptyCanvas />
+        )}
       </div>
     </div>
   );

@@ -11,14 +11,17 @@ import { PromptInput } from '@/components/features/image/PromptInput';
 import { StepSectionHeader } from '@/components/commons/StepSectionHeader';
 import { Button } from '@/components/commons/Button';
 import { InputMessage } from '@/components/commons/InputMessage';
+import { ProgressStepModal } from '@/components/commons/ProgressStepModal';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import { useReferenceAssets } from '@/hooks/useReferenceAssets';
 import { useCreateImageGenerationJob } from '@/hooks/useCreateImageGenerationJob';
+import { useImageGenerationPolling } from '@/hooks/useImageGenerationPolling';
 import { useProductCutResultStore } from '@/stores/imageGenerationResultStore';
 import { ApiError } from '@/libs/apiClient';
 import {
   COLOR_TEMPERATURE_MAP,
   REQUEST_ASPECT_RATIO_MAP,
+  SUCCESS_HOLD_DURATION_MS,
 } from '@/constants/image-generation';
 import type { SelectedProduct } from '@/types/product';
 import type { ImageAspectRatio } from '@/types/image';
@@ -85,11 +88,6 @@ export const ProductShotContent = () => {
     ],
   );
 
-  // TODO: 폼 데이터 상태를 확인하기 위한 임시 useEffect, 실제 구현 시 제거
-  useEffect(() => {
-    console.log('제품컷 생성 폼 데이터:', formData);
-  }, [formData]);
-
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const showProductError = submitAttempted && selectedProducts.length === 0;
@@ -110,6 +108,36 @@ export const ProductShotContent = () => {
   const resetGenerationResult = useProductCutResultStore(
     (state) => state.reset,
   );
+  const generationStatus = useProductCutResultStore((state) => state.status);
+
+  // 생성 완료(100%) 화면을 잠깐 보여준 뒤 결과 화면으로 넘어가기 위한 타이머
+  const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+    };
+  }, []);
+
+  const { job, startPolling } = useImageGenerationPolling({
+    onSucceeded: (succeededJob) => {
+      const images = succeededJob.results
+        .filter(
+          (result): result is typeof result & { imageUrl: string } =>
+            !!result.imageUrl,
+        )
+        .map((result) => ({
+          id: String(result.resultId),
+          url: result.imageUrl,
+        }));
+      successTimeoutRef.current = setTimeout(() => {
+        setGenerationResult(images, (aspectRatio as ImageAspectRatio) ?? '3:4');
+      }, SUCCESS_HOLD_DURATION_MS);
+    },
+    onFailed: (failedJob) => {
+      resetGenerationResult();
+      setSubmitError(failedJob.errorMessage ?? '이미지 생성에 실패했습니다.');
+    },
+  });
 
   const handleSubmit = async () => {
     setSubmitAttempted(true);
@@ -153,16 +181,7 @@ export const ProductShotContent = () => {
 
     try {
       const job = await createJob(request);
-      const images = job.results
-        .filter(
-          (result): result is typeof result & { imageUrl: string } =>
-            !!result.imageUrl,
-        )
-        .map((result) => ({
-          id: String(result.resultId),
-          url: result.imageUrl,
-        }));
-      setGenerationResult(images, (aspectRatio as ImageAspectRatio) ?? '3:4');
+      startPolling(job);
     } catch (error) {
       resetGenerationResult();
       setSubmitError(
@@ -251,6 +270,19 @@ export const ProductShotContent = () => {
       >
         {isGenerating ? '생성 중...' : '완료'}
       </Button>
+
+      <ProgressStepModal
+        open={generationStatus === 'loading'}
+        progress={job?.progressPercent ?? 0}
+        title="이미지 생성 중"
+        description={job?.progressMessage ?? ''}
+        steps={Array.from(
+          {
+            length: job?.requestedCount ?? compositionReferenceAssetIds.length,
+          },
+          (_, index) => `이미지 ${index + 1}장 생성 완료`,
+        )}
+      />
     </div>
   );
 };
