@@ -3,8 +3,16 @@
 import { DragEvent, Fragment, useState } from 'react';
 import { Dropdown } from '@/components/commons/Dropdown';
 import { Body, Heading } from '@/components/commons/Typography';
+import { ProductSelect } from '@/components/features/image/ProductSelect';
+import { ProductSelectModal } from '@/components/features/detail/ProductSelectModal';
 import { TemplateThumbnailCard } from '@/components/features/detail/TemplateThumbnailCard';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
+
+const PRODUCT_SELECT_EMPTY_STATE_LINES: [string, string] = [
+  '상품 리스트에서 상세페이지 제작 시',
+  '활용할 상품을 선택해주세요.',
+];
 
 const TEMPLATE_LABELS: Record<DetailTemplateType, string> = {
   IMAGE_1_1: '이미지 1장 (세로)',
@@ -68,6 +76,13 @@ const handleDragStart = (
 
 export const TemplateListPanel = () => {
   const [groupFilter, setGroupFilter] = useState<string | null>(null);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const selectedProduct = useDetailProductSelectionStore(
+    (state) => state.selectedProduct,
+  );
+  const clearProduct = useDetailProductSelectionStore(
+    (state) => state.clearProduct,
+  );
 
   const visibleGroups = groupFilter
     ? TEMPLATE_GROUPS.filter((group) => group.label === groupFilter)
@@ -75,6 +90,18 @@ export const TemplateListPanel = () => {
 
   return (
     <div className="border-border-subtler bg-bg-white flex w-[380px] shrink-0 flex-col gap-[var(--gap-8)] overflow-y-auto border-r p-[var(--padding-9)]">
+      <ProductSelect
+        selectedProducts={selectedProduct ? [selectedProduct] : []}
+        maxSelected={1}
+        subtitle="상세페이지에 사용할 상품을 선택해주세요."
+        emptyStateLines={PRODUCT_SELECT_EMPTY_STATE_LINES}
+        onClickSelectArea={() => setIsProductModalOpen(true)}
+        onRemoveProduct={clearProduct}
+      />
+      {isProductModalOpen && (
+        <ProductSelectModal onClose={() => setIsProductModalOpen(false)} />
+      )}
+      <div className="border-border-subtler border-t" />
       <div className="flex flex-col gap-[var(--gap-5)]">
         <div className="flex flex-col gap-[var(--gap-2)]">
           <Heading size="xsmall" className="text-text-subtle">

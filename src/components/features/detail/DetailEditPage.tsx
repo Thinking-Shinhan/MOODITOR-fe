@@ -25,7 +25,7 @@ export default function DetailEditPage() {
       ) : (
         <TemplateListPanel />
       )}
-      <div className="bg-bg-gray-subtler flex flex-1 flex-col overflow-auto">
+      <div className="bg-bg-gray-subtler flex flex-1 transform-gpu flex-col overflow-auto">
         <DetailEditHeader className="sticky top-0 z-10 shrink-0" />
         <div className="flex flex-1 flex-col items-center px-[60px] pt-[var(--gap-9)]">
           <DetailEditCanvas />
