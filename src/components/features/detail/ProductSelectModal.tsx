@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Info, X } from 'lucide-react';
+import { Button } from '@/components/commons/Button';
 import { Pagination } from '@/components/commons/Pagination';
 import { Spinner } from '@/components/commons/Spinner';
 import { Body, Heading } from '@/components/commons/Typography';
@@ -11,7 +12,7 @@ import { ProductListToolbar } from '@/components/features/product/ProductListToo
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useProducts } from '@/hooks/useProducts';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
-import type { Product, ProductGender } from '@/types/product';
+import type { Product, ProductGender, SelectedProduct } from '@/types/product';
 
 const PAGE_SIZE = 8;
 
@@ -20,13 +21,13 @@ interface ProductSelectModalProps {
 }
 
 export const ProductSelectModal = ({ onClose }: ProductSelectModalProps) => {
-  const selectedProduct = useDetailProductSelectionStore(
-    (state) => state.selectedProduct,
-  );
-  const selectProduct = useDetailProductSelectionStore(
-    (state) => state.selectProduct,
+  const setSelectedProduct = useDetailProductSelectionStore(
+    (state) => state.setSelectedProduct,
   );
 
+  const [pendingProduct, setPendingProduct] = useState<SelectedProduct | null>(
+    () => useDetailProductSelectionStore.getState().selectedProduct,
+  );
   const [infoTooltipOpen, setInfoTooltipOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
@@ -68,11 +69,20 @@ export const ProductSelectModal = ({ onClose }: ProductSelectModalProps) => {
   const products = data?.products.content ?? [];
   const totalPages = data?.products.totalPages ?? 1;
   const selectedIds = new Set(
-    selectedProduct ? [Number(selectedProduct.id)] : [],
+    pendingProduct ? [Number(pendingProduct.id)] : [],
   );
 
   const handleToggle = (product: Product) => {
-    selectProduct({ id: String(product.id), name: product.name, assetIds: [] });
+    setPendingProduct((prev) =>
+      prev?.id === String(product.id)
+        ? null
+        : { id: String(product.id), name: product.name, assetIds: [] },
+    );
+  };
+
+  const handleConfirm = () => {
+    setSelectedProduct(pendingProduct);
+    onClose();
   };
 
   return (
@@ -147,6 +157,14 @@ export const ProductSelectModal = ({ onClose }: ProductSelectModalProps) => {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
+        <Button
+          variant="primary"
+          size="small"
+          onClick={handleConfirm}
+          className="w-full"
+        >
+          선택 완료
+        </Button>
       </div>
     </div>
   );
