@@ -14,7 +14,7 @@ interface Image4_1TemplateProps {
 const TEMPLATE_WIDTH = 879;
 export const TEMPLATE_HEIGHT = 1181;
 
-const SLOTS = [
+export const SLOTS = [
   { id: 'slot-1', x: 0, y: 0, width: 430, height: 581, type: 'image' as const },
   {
     id: 'slot-2',

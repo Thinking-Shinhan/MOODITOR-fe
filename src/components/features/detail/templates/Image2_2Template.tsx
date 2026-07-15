@@ -14,7 +14,7 @@ interface Image2_2TemplateProps {
 const TEMPLATE_WIDTH = 879;
 export const TEMPLATE_HEIGHT = 1181;
 
-const SLOTS = [
+export const SLOTS = [
   {
     id: 'slot-1',
     x: 0,

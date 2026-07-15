@@ -380,7 +380,7 @@ const MaterialPropertyTable = ({ y, rows }: MaterialPropertyTableProps) => {
   );
 };
 
-const IMAGE_SLOT = {
+export const IMAGE_SLOT = {
   id: 'slot-image',
   x: IMAGE_X,
   y: HEADER_BLOCK_HEIGHT + SECTION_GAP,
@@ -389,7 +389,7 @@ const IMAGE_SLOT = {
   type: 'image' as const,
 };
 
-const IMAGE_SLOTS = [IMAGE_SLOT] as const;
+export const SLOTS = [IMAGE_SLOT] as const;
 
 export const SizeInfoTemplate = ({
   templateId,
@@ -397,7 +397,7 @@ export const SizeInfoTemplate = ({
   materialProperties = DEFAULT_MATERIAL_PROPERTIES,
 }: SizeInfoTemplateProps) => {
   const rootRef = useRef<Konva.Group>(null);
-  const images = useImageSlotDrop(rootRef, templateId, IMAGE_SLOTS);
+  const images = useImageSlotDrop(rootRef, templateId, SLOTS);
 
   const unitLabelY = IMAGE_SLOT.y + IMAGE_SIZE + SECTION_GAP;
   const sizeTableY = unitLabelY + UNIT_LABEL_HEIGHT + UNIT_TABLE_GAP;
