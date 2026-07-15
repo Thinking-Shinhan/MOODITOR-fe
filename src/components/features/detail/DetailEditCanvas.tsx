@@ -1,6 +1,6 @@
 'use client';
 
-import { DragEvent, useState } from 'react';
+import { DragEvent, useEffect, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -19,7 +19,14 @@ import {
 import { DetailTemplateBlock } from '@/components/features/detail/DetailTemplateBlock';
 import { DetailTemplateBlockContent } from '@/components/features/detail/DetailTemplateBlockContent';
 import { Body } from '@/components/commons/Typography';
+import { Toast } from '@/components/commons/Toast';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
+import { useDetailTemplateCountStore } from '@/stores/detailTemplateCountStore';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
+import { SquareMousePointer } from 'lucide-react';
+
+const NO_PRODUCT_SELECTED_MESSAGE =
+  '상세페이지 제작 시 활용할 상품을 먼저 선택해주세요.';
 
 interface PlacedTemplate {
   id: string;
@@ -31,6 +38,18 @@ const noop = () => {};
 export const DetailEditCanvas = () => {
   const [placedTemplates, setPlacedTemplates] = useState<PlacedTemplate[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [noProductToastOpen, setNoProductToastOpen] = useState(false);
+  const selectedProduct = useDetailProductSelectionStore(
+    (state) => state.selectedProduct,
+  );
+  const setTemplateCount = useDetailTemplateCountStore(
+    (state) => state.setCount,
+  );
+
+  useEffect(() => {
+    setTemplateCount(placedTemplates.length);
+  }, [placedTemplates.length, setTemplateCount]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
@@ -50,6 +69,11 @@ export const DetailEditCanvas = () => {
     try {
       template = JSON.parse(raw);
     } catch {
+      return;
+    }
+
+    if (!selectedProduct) {
+      setNoProductToastOpen(true);
       return;
     }
 
@@ -98,60 +122,87 @@ export const DetailEditCanvas = () => {
   const activeTemplate = activeIndex >= 0 ? placedTemplates[activeIndex] : null;
 
   return (
-    <div
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      className="inline-flex"
-    >
-      {placedTemplates.length === 0 ? (
-        <div className="border-border-subtler flex h-[400px] w-[879px] items-center justify-center rounded-[var(--radius-large1)] border border-dashed">
-          <Body size="medium" className="text-text-subtler">
-            여기에 템플릿을 드래그해서 배치하세요
-          </Body>
-        </div>
-      ) : (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleReorder}
-        >
-          <SortableContext
-            items={placedTemplates.map((item) => item.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="flex flex-col gap-[var(--gap-7)]">
-              {placedTemplates.map((placed, index) => (
-                <DetailTemplateBlock
-                  key={placed.id}
-                  id={placed.id}
-                  type={placed.type}
-                  pageNumber={index + 1}
-                  onMoveUp={() => handleMoveUp(index)}
-                  onMoveDown={() => handleMoveDown(index)}
-                  moveUpDisabled={index === 0}
-                  moveDownDisabled={index === placedTemplates.length - 1}
-                  onDelete={() => handleDelete(placed.id)}
-                />
-              ))}
+    <>
+      <div
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className={
+          placedTemplates.length === 0
+            ? 'flex w-full flex-1 items-center justify-center'
+            : 'inline-flex'
+        }
+      >
+        {placedTemplates.length === 0 ? (
+          <div className="bg-bg-gray-subtler flex size-full flex-col items-center justify-center gap-[var(--size-height-4)]">
+            <SquareMousePointer size={32} className="text-icon-disabled-on" />
+            <div className="flex flex-col items-center gap-[var(--gap-2)]">
+              <Body
+                size="medium"
+                bold
+                className="text-text-disabled-on text-center"
+              >
+                상세페이지를 제작하고 싶은 상품을 선택한 후,
+                <br />
+                원하는 템플릿을 이곳으로 드래그해 주세요.
+              </Body>
+              <Body size="xsmall" className="text-text-disabled-on text-center">
+                이미지와 텍스트를 자유롭게 구성해
+                <br />
+                우리 브랜드만의 상세페이지를 완성해 보세요.
+              </Body>
             </div>
-          </SortableContext>
-          <DragOverlay>
-            {activeTemplate && (
-              <DetailTemplateBlockContent
-                id={activeTemplate.id}
-                type={activeTemplate.type}
-                pageNumber={activeIndex + 1}
-                onMoveUp={noop}
-                onMoveDown={noop}
-                moveUpDisabled
-                moveDownDisabled
-                onDelete={noop}
-              />
-            )}
-          </DragOverlay>
-        </DndContext>
-      )}
-    </div>
+          </div>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleReorder}
+          >
+            <SortableContext
+              items={placedTemplates.map((item) => item.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="flex flex-col gap-[var(--gap-7)]">
+                {placedTemplates.map((placed, index) => (
+                  <DetailTemplateBlock
+                    key={placed.id}
+                    id={placed.id}
+                    type={placed.type}
+                    pageNumber={index + 1}
+                    onMoveUp={() => handleMoveUp(index)}
+                    onMoveDown={() => handleMoveDown(index)}
+                    moveUpDisabled={index === 0}
+                    moveDownDisabled={index === placedTemplates.length - 1}
+                    onDelete={() => handleDelete(placed.id)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+            <DragOverlay>
+              {activeTemplate && (
+                <DetailTemplateBlockContent
+                  id={activeTemplate.id}
+                  type={activeTemplate.type}
+                  pageNumber={activeIndex + 1}
+                  onMoveUp={noop}
+                  onMoveDown={noop}
+                  moveUpDisabled
+                  moveDownDisabled
+                  onDelete={noop}
+                />
+              )}
+            </DragOverlay>
+          </DndContext>
+        )}
+      </div>
+      <Toast
+        usePortal={false}
+        open={noProductToastOpen}
+        state="error"
+        message={NO_PRODUCT_SELECTED_MESSAGE}
+        onClose={() => setNoProductToastOpen(false)}
+      />
+    </>
   );
 };
