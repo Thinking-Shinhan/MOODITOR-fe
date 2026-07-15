@@ -1,6 +1,6 @@
 'use client';
 
-import { DragEvent, useState } from 'react';
+import { DragEvent, useEffect, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -21,6 +21,7 @@ import { DetailTemplateBlockContent } from '@/components/features/detail/DetailT
 import { Body } from '@/components/commons/Typography';
 import { Toast } from '@/components/commons/Toast';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
+import { useDetailTemplateCountStore } from '@/stores/detailTemplateCountStore';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
 import { SquareMousePointer } from 'lucide-react';
 
@@ -41,6 +42,14 @@ export const DetailEditCanvas = () => {
   const selectedProduct = useDetailProductSelectionStore(
     (state) => state.selectedProduct,
   );
+  const setTemplateCount = useDetailTemplateCountStore(
+    (state) => state.setCount,
+  );
+
+  useEffect(() => {
+    setTemplateCount(placedTemplates.length);
+  }, [placedTemplates.length, setTemplateCount]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );

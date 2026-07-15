@@ -6,6 +6,7 @@ import { AlertModal } from '@/components/commons/AlertModal';
 import { Button } from '@/components/commons/Button';
 import { Body } from '@/components/commons/Typography';
 import { Tooltip } from '@/components/commons/Tooltip';
+import { useDetailTemplateCountStore } from '@/stores/detailTemplateCountStore';
 
 interface DetailEditHeaderProps {
   className?: string;
@@ -15,6 +16,7 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   const [aiTooltipOpen, setAiTooltipOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const hasTemplates = useDetailTemplateCountStore((state) => state.count > 0);
 
   return (
     <header
@@ -55,12 +57,21 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         <Button
           variant="secondary"
           size="large"
-          leftIcon={<Expand size={24} className="text-icon-primary-basic" />}
+          disabled={!hasTemplates}
+          leftIcon={
+            <Expand
+              size={24}
+              className={
+                hasTemplates ? 'text-icon-primary-basic' : 'text-icon-disabled'
+              }
+            />
+          }
         />
         <Button
           variant="primary"
           size="medium"
           className="w-[108px]"
+          disabled={!hasTemplates}
           onClick={() => setSaveModalOpen(true)}
         >
           저장하기
@@ -69,6 +80,7 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
           variant="primary"
           size="medium"
           className="w-[108px]"
+          disabled={!hasTemplates}
           onClick={() => setExportModalOpen(true)}
         >
           내보내기
