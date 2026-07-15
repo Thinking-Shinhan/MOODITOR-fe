@@ -1,6 +1,6 @@
 'use client';
 
-import { DragEvent, useEffect, useState } from 'react';
+import { DragEvent, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -13,42 +13,41 @@ import {
 } from '@dnd-kit/core';
 import {
   SortableContext,
-  arrayMove,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { DetailTemplateBlock } from '@/components/features/detail/DetailTemplateBlock';
 import { DetailTemplateBlockContent } from '@/components/features/detail/DetailTemplateBlockContent';
 import { Body } from '@/components/commons/Typography';
 import { Toast } from '@/components/commons/Toast';
+import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
-import { useDetailTemplateCountStore } from '@/stores/detailTemplateCountStore';
-import type { DetailTemplate, DetailTemplateType } from '@/types/template';
+import type { DetailTemplate } from '@/types/template';
 import { SquareMousePointer } from 'lucide-react';
 
 const NO_PRODUCT_SELECTED_MESSAGE =
   '상세페이지 제작 시 활용할 상품을 먼저 선택해주세요.';
 
-interface PlacedTemplate {
-  id: string;
-  type: DetailTemplateType;
-}
-
 const noop = () => {};
 
 export const DetailEditCanvas = () => {
-  const [placedTemplates, setPlacedTemplates] = useState<PlacedTemplate[]>([]);
+  const placedTemplates = useDetailCanvasStore(
+    (state) => state.placedTemplates,
+  );
+  const addTemplate = useDetailCanvasStore((state) => state.addTemplate);
+  const reorderTemplates = useDetailCanvasStore(
+    (state) => state.reorderTemplates,
+  );
+  const moveTemplateUp = useDetailCanvasStore((state) => state.moveTemplateUp);
+  const moveTemplateDown = useDetailCanvasStore(
+    (state) => state.moveTemplateDown,
+  );
+  const deleteTemplate = useDetailCanvasStore((state) => state.deleteTemplate);
+
   const [activeId, setActiveId] = useState<string | null>(null);
   const [noProductToastOpen, setNoProductToastOpen] = useState(false);
   const selectedProduct = useDetailProductSelectionStore(
     (state) => state.selectedProduct,
   );
-  const setTemplateCount = useDetailTemplateCountStore(
-    (state) => state.setCount,
-  );
-
-  useEffect(() => {
-    setTemplateCount(placedTemplates.length);
-  }, [placedTemplates.length, setTemplateCount]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -79,10 +78,7 @@ export const DetailEditCanvas = () => {
 
     // 드롭 위치와 무관하게 항상 맨 아래에 순서대로 쌓는다
     // TODO: 드롭 위치에 따라 순서를 조정하는 기능 추가
-    setPlacedTemplates((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), type: template.type },
-    ]);
+    addTemplate(template.type);
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -95,27 +91,19 @@ export const DetailEditCanvas = () => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    setPlacedTemplates((prev) => {
-      const oldIndex = prev.findIndex((item) => item.id === active.id);
-      const newIndex = prev.findIndex((item) => item.id === over.id);
-      return arrayMove(prev, oldIndex, newIndex);
-    });
+    reorderTemplates(String(active.id), String(over.id));
   };
 
   const handleMoveUp = (index: number) => {
-    if (index === 0) return;
-    setPlacedTemplates((prev) => arrayMove(prev, index, index - 1));
+    moveTemplateUp(index);
   };
 
   const handleMoveDown = (index: number) => {
-    setPlacedTemplates((prev) => {
-      if (index === prev.length - 1) return prev;
-      return arrayMove(prev, index, index + 1);
-    });
+    moveTemplateDown(index);
   };
 
   const handleDelete = (id: string) => {
-    setPlacedTemplates((prev) => prev.filter((item) => item.id !== id));
+    deleteTemplate(id);
   };
 
   const activeIndex = placedTemplates.findIndex((item) => item.id === activeId);

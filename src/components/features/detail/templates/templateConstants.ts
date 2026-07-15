@@ -1,5 +1,19 @@
 // 템플릿 캔버스 렌더링 공통 색상/폰트 상수
-// Konva는 CSS 변수를 지원하지 않아 디자인 토큰의 실제 값을 직접 지정한다
+// Konva는 CSS 변수를 지원하지 않아 디자인 토큰의 실제 값을 직접 지정
+
+import type { AutoPlacementTextRole } from '@/types/autoPlacement';
+
+// AI 자동 배치 요청 조립에 쓰는 텍스트 슬롯 메타데이터
+export interface TextTemplateSlot {
+  slotKey: string;
+  textRole: AutoPlacementTextRole;
+  recommendedMaxLength: number;
+}
+
+// 폰트 크기/한 줄당 글자 수를 감안한 대략적인 권장 글자 수
+export const EYEBROW_MAX_LENGTH = 30;
+export const HEADLINE_MAX_LENGTH = 28;
+export const BODY_MAX_LENGTH = 80;
 
 // 템플릿 배경(흰색). 슬롯 사이 20px 간격이 흰색 구분선처럼 보이게 한다
 export const CANVAS_BG_FILL = '#ffffff';

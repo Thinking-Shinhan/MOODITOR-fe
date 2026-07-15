@@ -14,7 +14,7 @@ interface Image1_1TemplateProps {
 const TEMPLATE_WIDTH = 879;
 export const TEMPLATE_HEIGHT = 1180;
 
-const SLOTS = [
+export const SLOTS = [
   {
     id: 'slot-1',
     x: 0,
@@ -45,7 +45,7 @@ export const Image1_1Template = ({ templateId }: Image1_1TemplateProps) => {
           y={slot.y}
           width={slot.width}
           height={slot.height}
-          imageSrc={images[slot.id] ?? null}
+          imageSrc={images[slot.id]?.url ?? null}
         />
       ))}
     </Group>
