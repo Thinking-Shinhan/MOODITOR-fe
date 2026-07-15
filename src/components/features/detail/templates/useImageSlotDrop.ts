@@ -5,6 +5,7 @@ import type Konva from 'konva';
 import {
   getSlotImageKey,
   useImagePlacementStore,
+  type PlacedImage,
 } from '@/stores/imagePlacementStore';
 
 interface DroppableSlot {
@@ -12,18 +13,13 @@ interface DroppableSlot {
   type: 'image' | 'text';
 }
 
-// ImagePlacementPanel의 저장된 이미지 카드가 드래그를 시작할 때 이 타입으로
-// dataTransfer에 이미지 URL을 담는다. 템플릿 패널 카드 드래그(application/json)와
-// OS 파일 드래그(dataTransfer.files)와 겹치지 않도록 별도 타입을 쓴다.
 export const SAVED_IMAGE_DRAG_TYPE = 'application/x-aven-saved-image';
 
-// 이미지 슬롯 위에 파일(OS 드래그) 또는 저장된 이미지(패널 드래그)를 놓으면
-// 해당 슬롯에 이미지를 채운다.
-// Konva Stage는 캔버스 하나로 렌더링돼서 슬롯마다 별도의 네이티브 드롭
-// 타겟을 둘 수 없어, 스테이지 컨테이너에 리스너를 걸고 드롭 좌표로
-// getIntersection을 이용해 어느 슬롯인지 찾는다.
-// 이미지 배치 패널에서 놓은 이미지도 같은 슬롯에 들어가야 해서,
-// 슬롯 이미지는 컴포넌트 로컬 상태가 아니라 전역 store(imagePlacementStore)에 둔다.
+interface SavedImageDragPayload {
+  assetId: number;
+  url: string;
+}
+
 export const useImageSlotDrop = <T extends DroppableSlot>(
   rootRef: RefObject<Konva.Group | null>,
   templateId: string,
@@ -34,10 +30,10 @@ export const useImageSlotDrop = <T extends DroppableSlot>(
   const activeUrlsRef = useRef<Set<string>>(new Set());
 
   const images = useMemo(() => {
-    const result: Record<string, string> = {};
+    const result: Record<string, PlacedImage> = {};
     slots.forEach((slot) => {
-      const src = allImages[getSlotImageKey(templateId, slot.id)];
-      if (src) result[slot.id] = src;
+      const image = allImages[getSlotImageKey(templateId, slot.id)];
+      if (image) result[slot.id] = image;
     });
     return result;
   }, [allImages, templateId, slots]);
@@ -45,7 +41,9 @@ export const useImageSlotDrop = <T extends DroppableSlot>(
   useEffect(() => {
     const prev = activeUrlsRef.current;
     const next = new Set(
-      Object.values(images).filter((url) => url.startsWith('blob:')),
+      Object.values(images)
+        .map((image) => image.url)
+        .filter((url) => url.startsWith('blob:')),
     );
 
     prev.forEach((url) => {
@@ -73,9 +71,9 @@ export const useImageSlotDrop = <T extends DroppableSlot>(
     const handleDrop = (event: DragEvent) => {
       event.preventDefault();
 
-      const savedImageUrl = event.dataTransfer?.getData(SAVED_IMAGE_DRAG_TYPE);
+      const savedImageRaw = event.dataTransfer?.getData(SAVED_IMAGE_DRAG_TYPE);
       const file = event.dataTransfer?.files?.[0];
-      if (!savedImageUrl && (!file || !file.type.startsWith('image/'))) return;
+      if (!savedImageRaw && (!file || !file.type.startsWith('image/'))) return;
 
       const stage = rootRef.current?.getStage();
       if (!stage) return;
@@ -91,8 +89,17 @@ export const useImageSlotDrop = <T extends DroppableSlot>(
       );
       if (!slot) return;
 
-      const src = savedImageUrl || URL.createObjectURL(file as File);
-      setStoreImage(templateId, slot.id, src);
+      if (savedImageRaw) {
+        const payload: SavedImageDragPayload = JSON.parse(savedImageRaw);
+        setStoreImage(templateId, slot.id, {
+          url: payload.url,
+          assetId: payload.assetId,
+        });
+        return;
+      }
+
+      const url = URL.createObjectURL(file as File);
+      setStoreImage(templateId, slot.id, { url, assetId: null });
     };
 
     container.addEventListener('dragover', handleDragOver);

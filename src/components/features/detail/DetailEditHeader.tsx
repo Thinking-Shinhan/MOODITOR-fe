@@ -5,8 +5,17 @@ import { Check, Expand, WandSparkles } from 'lucide-react';
 import { AlertModal } from '@/components/commons/AlertModal';
 import { Button } from '@/components/commons/Button';
 import { Body } from '@/components/commons/Typography';
+import { Toast } from '@/components/commons/Toast';
 import { Tooltip } from '@/components/commons/Tooltip';
-import { useDetailTemplateCountStore } from '@/stores/detailTemplateCountStore';
+import { useAutoPlacement } from '@/hooks/useAutoPlacement';
+import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
+import { useImagePlacementStore } from '@/stores/imagePlacementStore';
+import { useTextPlacementStore } from '@/stores/textPlacementStore';
+import {
+  applyAutoPlacementResponse,
+  buildAutoPlacementRequest,
+} from '@/utils/auto-placement';
 
 interface DetailEditHeaderProps {
   className?: string;
@@ -16,7 +25,48 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   const [aiTooltipOpen, setAiTooltipOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
-  const hasTemplates = useDetailTemplateCountStore((state) => state.count > 0);
+  const [autoPlacementErrorMessage, setAutoPlacementErrorMessage] = useState<
+    string | null
+  >(null);
+  const hasTemplates = useDetailCanvasStore(
+    (state) => state.placedTemplates.length > 0,
+  );
+  const selectedProduct = useDetailProductSelectionStore(
+    (state) => state.selectedProduct,
+  );
+  const autoPlacement = useAutoPlacement();
+
+  const handleAutoPlaceAll = () => {
+    if (!selectedProduct) return;
+
+    const { placedTemplates } = useDetailCanvasStore.getState();
+    const { images } = useImagePlacementStore.getState();
+    const { texts } = useTextPlacementStore.getState();
+
+    const request = buildAutoPlacementRequest({
+      productId: Number(selectedProduct.id),
+      mode: 'REGENERATE_ALL',
+      placedTemplates,
+      images,
+      texts,
+    });
+
+    autoPlacement.mutate(request, {
+      onSuccess: (response) => {
+        applyAutoPlacementResponse(response);
+        if (response.status === 'PARTIAL_SUCCESS') {
+          setAutoPlacementErrorMessage(
+            '일부 문구 생성에 실패했어요. 다시 시도해주세요.',
+          );
+        }
+      },
+      onError: () => {
+        setAutoPlacementErrorMessage(
+          'AI 자동 배치에 실패했어요. 잠시 후 다시 시도해주세요.',
+        );
+      },
+    });
+  };
 
   return (
     <header
@@ -30,6 +80,10 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         >
           <button
             type="button"
+            onClick={handleAutoPlaceAll}
+            disabled={
+              !hasTemplates || !selectedProduct || autoPlacement.isPending
+            }
             className="bg-btn-secondary-fill border-border-border hover:border-border-subtle disabled:border-border-subtle group flex cursor-pointer items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border px-[var(--padding-5)] py-[var(--padding-3)] disabled:cursor-not-allowed"
           >
             <WandSparkles
@@ -41,7 +95,7 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
               bold
               className="text-text-border group-hover:text-text-subtler group-disabled:text-text-disabled"
             >
-              AI 자동 배치
+              {autoPlacement.isPending ? '배치 중...' : 'AI 자동 배치'}
             </Body>
           </button>
           {aiTooltipOpen && (
@@ -104,6 +158,13 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
           <Check size={20} strokeWidth={1.3} className="text-icon-inverse" />
         }
         onConfirm={() => setExportModalOpen(false)}
+      />
+      <Toast
+        usePortal={false}
+        open={autoPlacementErrorMessage !== null}
+        state="error"
+        message={autoPlacementErrorMessage ?? ''}
+        onClose={() => setAutoPlacementErrorMessage(null)}
       />
     </header>
   );
