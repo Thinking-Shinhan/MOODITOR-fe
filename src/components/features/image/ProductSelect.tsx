@@ -13,7 +13,14 @@ interface ProductSelectProps {
   onClickSelectArea: () => void;
   onRemoveProduct?: (id: string) => void;
   onAddMore?: () => void;
+  subtitle?: string;
+  emptyStateLines?: [string, string];
 }
+
+const DEFAULT_EMPTY_STATE_LINES: [string, string] = [
+  '상품 리스트에서 이미지 제작 시',
+  '활용할 상품을 선택해주세요.',
+];
 
 export const ProductSelect = ({
   showError = false,
@@ -22,6 +29,8 @@ export const ProductSelect = ({
   onClickSelectArea,
   onRemoveProduct,
   onAddMore,
+  subtitle,
+  emptyStateLines = DEFAULT_EMPTY_STATE_LINES,
 }: ProductSelectProps) => {
   const displayedProducts = maxSelected
     ? selectedProducts.slice(0, maxSelected)
@@ -33,12 +42,19 @@ export const ProductSelect = ({
   return (
     <div className="flex w-full flex-col gap-[var(--gap-4)]">
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
-        <Body size="medium" bold className="text-text-subtle">
-          상품 선택
-        </Body>
-        {showError && (
-          <InputMessage state="error" message="상품을 선택해 주세요." />
+      <div className="flex flex-col gap-[var(--gap-2)]">
+        <div className="flex items-center justify-between">
+          <Body size="medium" bold className="text-text-subtle">
+            상품 선택
+          </Body>
+          {showError && (
+            <InputMessage state="error" message="상품을 선택해 주세요." />
+          )}
+        </div>
+        {subtitle && (
+          <Body size="xsmall" className="text-text-subtler">
+            {subtitle}
+          </Body>
         )}
       </div>
 
@@ -104,8 +120,9 @@ export const ProductSelect = ({
             bold
             className="text-text-disabled-on text-center"
           >
-            상품 리스트에서 이미지 제작 시<br />
-            활용할 상품을 선택해주세요.
+            {emptyStateLines[0]}
+            <br />
+            {emptyStateLines[1]}
           </Body>
         </button>
       )}
