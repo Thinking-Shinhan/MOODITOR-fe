@@ -15,7 +15,13 @@ import { Text4Template } from '@/components/features/detail/templates/Text4Templ
 import { Text5Template } from '@/components/features/detail/templates/Text5Template';
 import { MaterialTemplate } from '@/components/features/detail/templates/MaterialTemplate';
 import { SizeTipTemplate } from '@/components/features/detail/templates/SizeTipTemplate';
-import { SizeInfoTemplate } from '@/components/features/detail/templates/SizeInfoTemplate';
+import {
+  SizeInfoTemplate,
+  buildMaterialPropertiesFromProduct,
+  buildSizeTableFromProduct,
+} from '@/components/features/detail/templates/SizeInfoTemplate';
+import { useDetailPageInit } from '@/hooks/useDetailPageInit';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import type { DetailTemplateType } from '@/types/template';
 
 interface DetailTemplateGroupProps {
@@ -27,6 +33,13 @@ export const DetailTemplateGroup = ({
   templateId,
   type,
 }: DetailTemplateGroupProps) => {
+  const selectedProduct = useDetailProductSelectionStore(
+    (state) => state.selectedProduct,
+  );
+  const { data } = useDetailPageInit(
+    selectedProduct ? Number(selectedProduct.id) : null,
+  );
+
   switch (type) {
     case 'IMAGE_1_1':
       return <Image1_1Template templateId={templateId} />;
@@ -59,7 +72,15 @@ export const DetailTemplateGroup = ({
     case 'SIZE_TIP':
       return <SizeTipTemplate templateId={templateId} />;
     case 'SIZE_INFO':
-      return <SizeInfoTemplate templateId={templateId} />;
+      return (
+        <SizeInfoTemplate
+          templateId={templateId}
+          sizeTable={data ? buildSizeTableFromProduct(data.product) : undefined}
+          materialProperties={
+            data ? buildMaterialPropertiesFromProduct(data.product) : undefined
+          }
+        />
+      );
     default:
       return null;
   }

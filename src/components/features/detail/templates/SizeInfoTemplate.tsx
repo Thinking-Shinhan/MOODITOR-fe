@@ -6,15 +6,14 @@ import type Konva from 'konva';
 import { ImageSlot } from '@/components/features/detail/templates/ImageSlot';
 import { useImageSlotDrop } from '@/components/features/detail/templates/useImageSlotDrop';
 import { CANVAS_BG_FILL } from '@/components/features/detail/templates/templateConstants';
+import type { DetailPageProduct } from '@/types/detailPage';
 
-// 사이즈표: 서버에서 컬럼 구성/행 개수가 그대로 내려오는 걸 가정한 구조
 export interface SizeInfoTableData {
   columns: string[];
   rows: string[][];
+  unit: string;
 }
 
-// 소재 특성표: 행(안감/신축성/비침/촉감/두께감)은 5개 고정, 옵션 목록과
-// 선택 여부만 서버 데이터로 채워진다
 export interface MaterialPropertyOption {
   label: string;
   selected: boolean;
@@ -23,7 +22,6 @@ export interface MaterialPropertyOption {
 interface SizeInfoTemplateProps {
   templateId: string;
   sizeTable?: SizeInfoTableData;
-  // MATERIAL_PROPERTY_LABELS와 같은 순서(안감/신축성/비침/촉감/두께감)의 5개 배열
   materialProperties?: MaterialPropertyOption[][];
 }
 
@@ -54,7 +52,6 @@ const IMAGE_SIZE = 400;
 const IMAGE_X = (CONTENT_WIDTH - IMAGE_SIZE) / 2;
 
 // --- 단위 라벨 ---
-const UNIT_LABEL_TEXT = '단위 : cm';
 const UNIT_LABEL_COLOR = '#84949e'; // --color-text-disabled-on
 const UNIT_LABEL_FONT_SIZE = 12;
 const UNIT_LABEL_HEIGHT = 18;
@@ -71,7 +68,6 @@ const TABLE_FONT_SIZE = 12;
 
 // --- 소재 특성표 (라벨 5개 고정, 옵션 개수는 행마다 다를 수 있음) ---
 const MATERIAL_PROPERTY_LABELS = ['안감', '신축성', '비침', '촉감', '두께감'];
-// Figma 실측(get_metadata): 행 높이 46px, 라벨 칸은 px-40(양쪽) + 텍스트 박스 70px = 150px
 const MATERIAL_ROW_HEIGHT = 46;
 const MATERIAL_LABEL_WIDTH = 150;
 const MATERIAL_BORDER_COLOR = '#cdd1d5'; // --color-border-subtle
@@ -82,7 +78,6 @@ const MATERIAL_CHECKBOX_SELECTED_FILL = '#131416'; // --color-btn-primary-fill-b
 const MATERIAL_CHECKBOX_BORDER = '#58616a'; // --color-border-basic
 const MATERIAL_CHECKMARK_COLOR = '#ffffff'; // --color-icon-inverse
 const MATERIAL_CHECKMARK_SIZE = 8;
-// 체크박스+라벨 그룹은 옵션 칸 안에서 좌우 중앙 정렬된다 (Figma: items-center justify-center)
 const MATERIAL_OPTION_GAP = 12; // --gap/4
 const MATERIAL_OPTION_LABEL_WIDTH = 75;
 
@@ -102,6 +97,7 @@ const DEFAULT_SIZE_TABLE: SizeInfoTableData = {
     '어깨너비',
     '밑단단면',
   ],
+  unit: 'cm',
   rows: [
     ['001', '60.5', '48.5', '32', '19.5', '40.5', '49'],
     ['002', '60.5', '48.5', '32', '19.5', '40.5', '49'],
@@ -109,33 +105,63 @@ const DEFAULT_SIZE_TABLE: SizeInfoTableData = {
   ],
 };
 
-const DEFAULT_MATERIAL_PROPERTIES: MaterialPropertyOption[][] = [
-  [
-    { label: '기모', selected: false },
-    { label: '있음', selected: false },
-    { label: '없음', selected: true },
-  ],
-  [
-    { label: '매우 좋음', selected: false },
-    { label: '보통', selected: false },
-    { label: '없음', selected: true },
-  ],
-  [
-    { label: '있음', selected: false },
-    { label: '약간', selected: false },
-    { label: '없음', selected: true },
-  ],
-  [
-    { label: '쾌적함', selected: false },
-    { label: '부드러움', selected: false },
-    { label: '드라이함', selected: true },
-  ],
-  [
-    { label: '두꺼움', selected: false },
-    { label: '보통', selected: false },
-    { label: '없음', selected: true },
-  ],
+const MATERIAL_PROPERTY_OPTION_LABELS: string[][] = [
+  ['기모', '있음', '없음'],
+  ['매우 좋음', '보통', '없음'],
+  ['있음', '약간', '없음'],
+  ['쾌적함', '부드러움', '드라이함'],
+  ['두꺼움', '보통', '없음'],
 ];
+
+const DEFAULT_MATERIAL_PROPERTIES: MaterialPropertyOption[][] =
+  MATERIAL_PROPERTY_OPTION_LABELS.map((labels) =>
+    labels.map((label, index) => ({
+      label,
+      selected: index === labels.length - 1,
+    })),
+  );
+
+export const buildSizeTableFromProduct = (
+  product: Pick<DetailPageProduct, 'sizes'>,
+): SizeInfoTableData => {
+  const measurementNames =
+    product.sizes[0]?.measurements.map((measurement) => measurement.name) ?? [];
+  const unit = product.sizes[0]?.measurements[0]?.unit ?? 'cm';
+
+  return {
+    columns: ['SIZE', ...measurementNames],
+    unit,
+    rows: product.sizes.map((size) => [
+      size.size,
+      ...measurementNames.map((name) => {
+        const measurement = size.measurements.find((m) => m.name === name);
+        return measurement ? String(measurement.value) : '-';
+      }),
+    ]),
+  };
+};
+
+export const buildMaterialPropertiesFromProduct = (
+  product: Pick<
+    DetailPageProduct,
+    'lining' | 'elasticity' | 'transparency' | 'touchFeeling' | 'thickness'
+  >,
+): MaterialPropertyOption[][] => {
+  const values = [
+    product.lining,
+    product.elasticity,
+    product.transparency,
+    product.touchFeeling,
+    product.thickness,
+  ];
+
+  return MATERIAL_PROPERTY_OPTION_LABELS.map((labels, rowIndex) =>
+    labels.map((label, optionIndex) => ({
+      label,
+      selected: optionIndex === values[rowIndex] - 1,
+    })),
+  );
+};
 
 const getTableHeight = (rowCount: number) => TABLE_ROW_HEIGHT * (rowCount + 1);
 const getMaterialTableHeight = () =>
@@ -436,7 +462,7 @@ export const SizeInfoTemplate = ({
         <Text
           y={unitLabelY}
           width={CONTENT_WIDTH}
-          text={UNIT_LABEL_TEXT}
+          text={`단위 : ${sizeTable.unit}`}
           fontSize={UNIT_LABEL_FONT_SIZE}
           fill={UNIT_LABEL_COLOR}
           listening={false}
