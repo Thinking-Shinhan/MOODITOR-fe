@@ -6,6 +6,7 @@ import { Body, Heading } from '@/components/commons/Typography';
 import { ProductSelect } from '@/components/features/image/ProductSelect';
 import { ProductSelectModal } from '@/components/features/detail/ProductSelectModal';
 import { TemplateThumbnailCard } from '@/components/features/detail/TemplateThumbnailCard';
+import { useDetailPageInit } from '@/hooks/useDetailPageInit';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import type { DetailTemplate, DetailTemplateType } from '@/types/template';
 
@@ -83,6 +84,8 @@ export const TemplateListPanel = () => {
   const clearProduct = useDetailProductSelectionStore(
     (state) => state.clearProduct,
   );
+
+  useDetailPageInit(selectedProduct ? Number(selectedProduct.id) : null);
 
   const visibleGroups = groupFilter
     ? TEMPLATE_GROUPS.filter((group) => group.label === groupFilter)

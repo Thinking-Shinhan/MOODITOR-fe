@@ -2,32 +2,13 @@
 
 import { DragEvent, useState } from 'react';
 import { X } from 'lucide-react';
-import { Dropdown } from '@/components/commons/Dropdown';
 import { Body, Heading } from '@/components/commons/Typography';
 import { SAVED_IMAGE_DRAG_TYPE } from '@/components/features/detail/templates/useImageSlotDrop';
-import { useImageFolderAssets } from '@/hooks/useImageFolderAssets';
-
-// TODO: 상품 선택 기능이 생기면 상위에서 실제 상품 ID를 받도록 변경
-const TEMP_PRODUCT_ID = 14;
-
-const MODEL_SHOT_CATEGORY = '모델컷 이미지';
-const PRODUCT_SHOT_CATEGORY = '제품컷 이미지';
-
-const MODEL_SHOT_ROLES = new Set([
-  'FULL_BODY',
-  'THREE_QUARTER_BODY',
-  'HALF_BODY',
-  'CLOSE_UP',
-  'WIDE_MARGIN',
-  'GENERATED_IMAGE',
-]);
-
-const getImageCategory = (assetRole: string) =>
-  MODEL_SHOT_ROLES.has(assetRole) ? MODEL_SHOT_CATEGORY : PRODUCT_SHOT_CATEGORY;
+import { useDetailPageInit } from '@/hooks/useDetailPageInit';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 
 interface SavedImage {
   id: string;
-  category: string;
   url: string;
 }
 
@@ -36,25 +17,20 @@ interface ImagePlacementPanelProps {
 }
 
 export const ImagePlacementPanel = ({ onClose }: ImagePlacementPanelProps) => {
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
-  const { data, isLoading, isError } = useImageFolderAssets(TEMP_PRODUCT_ID);
+  const selectedProduct = useDetailProductSelectionStore(
+    (state) => state.selectedProduct,
+  );
+  const { data, isLoading, isError } = useDetailPageInit(
+    selectedProduct ? Number(selectedProduct.id) : null,
+  );
 
-  const savedImages: SavedImage[] =
+  const visibleImages: SavedImage[] =
     data?.assets.map((asset) => ({
-      id: String(asset.assetId),
-      category: getImageCategory(asset.assetRole),
-      url: asset.imageUrl,
+      id: String(asset.id),
+      url: asset.fileUrl,
     })) ?? [];
-
-  const categoryOptions = Array.from(
-    new Set(savedImages.map((image) => image.category)),
-  ).map((category) => ({ label: category, value: category }));
-
-  const visibleImages = categoryFilter
-    ? savedImages.filter((image) => image.category === categoryFilter)
-    : savedImages;
 
   const handleDragStart = (
     event: DragEvent<HTMLDivElement>,
@@ -67,36 +43,22 @@ export const ImagePlacementPanel = ({ onClose }: ImagePlacementPanelProps) => {
 
   return (
     <div className="border-border-subtler bg-bg-white flex w-[380px] shrink-0 flex-col gap-[var(--gap-8)] overflow-y-auto border-r p-[32px]">
-      <div className="flex flex-col gap-[var(--gap-5)]">
-        <div className="flex flex-col gap-[var(--gap-2)]">
-          <div className="flex items-center justify-between">
-            <Heading size="xsmall" className="text-text-basic">
-              이미지 배치
-            </Heading>
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex size-[16px] cursor-pointer items-center justify-center"
-            >
-              <X size={16} className="text-icon-gray" />
-            </button>
-          </div>
-          <Body size="xsmall" className="text-text-subtler">
-            상세페이지 템플릿에 이미지를 배치해주세요.
-          </Body>
+      <div className="flex flex-col gap-[var(--gap-2)]">
+        <div className="flex items-center justify-between">
+          <Heading size="xsmall" className="text-text-basic">
+            이미지 배치
+          </Heading>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex size-[16px] cursor-pointer items-center justify-center"
+          >
+            <X size={16} className="text-icon-gray" />
+          </button>
         </div>
-        <Dropdown
-          label={categoryFilter ?? '모든 이미지'}
-          options={categoryOptions}
-          value={categoryFilter}
-          onChange={setCategoryFilter}
-          className="w-full"
-          panelWidthClassName="w-full"
-          panelGapClassName="mt-[var(--gap-3)]"
-          triggerClassName="bg-btn-tertiary-fill w-full justify-between rounded-[var(--radius-xsmall2)] px-[var(--padding-4)] py-[var(--size-height-2)]"
-          labelClassName="text-text-subtler"
-          labelBold
-        />
+        <Body size="xsmall" className="text-text-subtler">
+          상세페이지 템플릿에 이미지를 배치해주세요.
+        </Body>
       </div>
       <div className="flex flex-col gap-[var(--gap-4)]">
         <Body size="medium" bold className="text-text-subtle">
