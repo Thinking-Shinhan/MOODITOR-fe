@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import type Konva from 'konva';
 import { Group, Image as KonvaImage, Rect, Text } from 'react-konva';
 import { useHtmlImage } from '@/components/features/detail/templates/useHtmlImage';
 import {
@@ -7,6 +9,7 @@ import {
   IMAGE_SLOT_PLACEHOLDER,
   SLOT_TEXT_FILL,
 } from '@/components/features/detail/templates/templateConstants';
+import { useImagePlacementStore } from '@/stores/imagePlacementStore';
 
 interface ImageSlotProps {
   templateId: string;
@@ -17,6 +20,9 @@ interface ImageSlotProps {
   height: number;
   imageSrc: string | null;
 }
+
+// --color-bg-gray-subtle-2 (Konva는 CSS 변수를 못 읽어 리터럴 값 사용)
+const IMAGE_SLOT_ACTIVE_FILL = '#CDD1D5';
 
 const PLACEHOLDER_ICON_SRC = '/assets/icons/image-placeholder.svg';
 const PLACEHOLDER_ICON_SIZE = 40;
@@ -68,6 +74,14 @@ export const ImageSlot = ({
 }: ImageSlotProps) => {
   const image = useHtmlImage(imageSrc);
   const placeholderIcon = useHtmlImage(image ? null : PLACEHOLDER_ICON_SRC);
+  const openPanel = useImagePlacementStore((state) => state.openPanel);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+
+  const setCursor = (target: Konva.Node, cursor: string) => {
+    const container = target.getStage()?.container();
+    if (container) container.style.cursor = cursor;
+  };
 
   return (
     <Group x={x} y={y}>
@@ -75,7 +89,19 @@ export const ImageSlot = ({
         name={`slot-${templateId}-${id}`}
         width={width}
         height={height}
-        fill={IMAGE_SLOT_FILL}
+        fill={isHovered || isPressed ? IMAGE_SLOT_ACTIVE_FILL : IMAGE_SLOT_FILL}
+        onClick={() => openPanel()}
+        onMouseEnter={(event) => {
+          setIsHovered(true);
+          setCursor(event.target, 'pointer');
+        }}
+        onMouseLeave={(event) => {
+          setIsHovered(false);
+          setIsPressed(false);
+          setCursor(event.target, 'default');
+        }}
+        onMouseDown={() => setIsPressed(true)}
+        onMouseUp={() => setIsPressed(false)}
       />
       {image ? (
         <KonvaImage
