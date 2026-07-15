@@ -76,5 +76,8 @@ export interface ImageGenerationJob {
   outputCount: number;
   latencyMs: number | null;
   errorMessage: string | null;
+  progressPercent: number;
+  progressStage: string;
+  progressMessage: string;
   results: ImageGenerationResult[];
 }

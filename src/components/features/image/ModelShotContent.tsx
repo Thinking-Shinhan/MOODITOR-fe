@@ -12,9 +12,11 @@ import { Body } from '@/components/commons/Typography';
 import { OptionButton } from '@/components/commons/OptionButton';
 import { Button } from '@/components/commons/Button';
 import { InputMessage } from '@/components/commons/InputMessage';
+import { ProgressStepModal } from '@/components/commons/ProgressStepModal';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import { useReferenceAssets } from '@/hooks/useReferenceAssets';
 import { useCreateImageGenerationJob } from '@/hooks/useCreateImageGenerationJob';
+import { useImageGenerationPolling } from '@/hooks/useImageGenerationPolling';
 import { useModelCutResultStore } from '@/stores/imageGenerationResultStore';
 import { ApiError } from '@/libs/apiClient';
 import {
@@ -22,6 +24,7 @@ import {
   CAMERA_ANGLE_MAP,
   FRAMING_MAP,
   REQUEST_ASPECT_RATIO_MAP,
+  SUCCESS_HOLD_DURATION_MS,
 } from '@/constants/image-generation';
 import type { SelectedProduct } from '@/types/product';
 import type { ImageAspectRatio } from '@/types/image';
@@ -30,7 +33,6 @@ import type {
   OutfitItem,
 } from '@/types/imageGenerationJob';
 
-// 임시 폼 구조
 interface ModelShotFormData {
   products: SelectedProduct[];
   modelReferenceAssetId: number | null;
@@ -42,6 +44,9 @@ interface ModelShotFormData {
   prompt: string;
   aspectRatio: string | null;
 }
+
+// 모델컷은 항상 4장을 요청한다
+const MODEL_CUT_REQUESTED_COUNT = 4;
 
 const CAMERA_ANGLE_OPTIONS = ['정면', '좌측 사선', '우측 사선', '후면'];
 const COMPOSITION_OPTIONS = [
@@ -123,11 +128,6 @@ export const ModelShotContent = () => {
     ],
   );
 
-  // TODO: 폼 데이터 상태를 확인하기 위한 임시 useEffect, 실제 구현 시 제거
-  useEffect(() => {
-    console.log('모델컷 생성 폼 데이터:', formData);
-  }, [formData]);
-
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const showProductError = submitAttempted && selectedProducts.length === 0;
@@ -145,6 +145,36 @@ export const ModelShotContent = () => {
     (state) => state.setResult,
   );
   const resetGenerationResult = useModelCutResultStore((state) => state.reset);
+  const generationStatus = useModelCutResultStore((state) => state.status);
+
+  // 생성 완료(100%) 화면을 잠깐 보여준 뒤 결과 화면으로 넘어가기 위한 타이머
+  const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+    };
+  }, []);
+
+  const { job, startPolling } = useImageGenerationPolling({
+    onSucceeded: (succeededJob) => {
+      const images = succeededJob.results
+        .filter(
+          (result): result is typeof result & { imageUrl: string } =>
+            !!result.imageUrl,
+        )
+        .map((result) => ({
+          id: String(result.resultId),
+          url: result.imageUrl,
+        }));
+      successTimeoutRef.current = setTimeout(() => {
+        setGenerationResult(images, (aspectRatio as ImageAspectRatio) ?? '3:4');
+      }, SUCCESS_HOLD_DURATION_MS);
+    },
+    onFailed: (failedJob) => {
+      resetGenerationResult();
+      setSubmitError(failedJob.errorMessage ?? '이미지 생성에 실패했습니다.');
+    },
+  });
 
   const handleSubmit = async () => {
     setSubmitAttempted(true);
@@ -179,7 +209,7 @@ export const ModelShotContent = () => {
       productId: Number(selectedProducts[0].id),
       cutType: 'MODEL_CUT',
       generationMode: 'PARALLEL',
-      requestedCount: 4,
+      requestedCount: MODEL_CUT_REQUESTED_COUNT,
       // 프롬프트가 공백이면 요청이 거부되어, 미입력 시 공백 문자 하나를 대신 보낸다
       prompt: prompt.trim().length > 0 ? prompt : '_',
       userOptionsJson: JSON.stringify({
@@ -198,16 +228,7 @@ export const ModelShotContent = () => {
 
     try {
       const job = await createJob(request);
-      const images = job.results
-        .filter(
-          (result): result is typeof result & { imageUrl: string } =>
-            !!result.imageUrl,
-        )
-        .map((result) => ({
-          id: String(result.resultId),
-          url: result.imageUrl,
-        }));
-      setGenerationResult(images, (aspectRatio as ImageAspectRatio) ?? '3:4');
+      startPolling(job);
     } catch (error) {
       resetGenerationResult();
       setSubmitError(
@@ -361,6 +382,17 @@ export const ModelShotContent = () => {
       >
         {isGenerating ? '생성 중...' : '완료'}
       </Button>
+
+      <ProgressStepModal
+        open={generationStatus === 'loading'}
+        progress={job?.progressPercent ?? 0}
+        title="이미지 생성 중"
+        description={job?.progressMessage ?? ''}
+        steps={Array.from(
+          { length: job?.requestedCount ?? MODEL_CUT_REQUESTED_COUNT },
+          (_, index) => `이미지 ${index + 1}장 생성 완료`,
+        )}
+      />
     </div>
   );
 };

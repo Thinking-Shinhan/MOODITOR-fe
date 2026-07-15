@@ -9,6 +9,9 @@ export const COLOR_TONE_OPTIONS = ['웜톤', '뉴트럴톤', '쿨톤'];
 
 export const PROMPT_MAX_LENGTH = 500;
 
+// 생성 완료(100%) 상태를 잠깐 보여준 뒤 결과 화면으로 전환하기까지의 대기 시간
+export const SUCCESS_HOLD_DURATION_MS = 1000;
+
 export const ASPECT_RATIO_OPTIONS = [
   { label: '1:1', iconClassName: 'w-[24px] h-[24px]' },
   { label: '2:3', iconClassName: 'w-[16px] h-[24px]' },
