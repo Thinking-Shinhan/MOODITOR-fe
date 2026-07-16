@@ -1,9 +1,7 @@
-// api 스팩 확정 후 변경 예정
 export type SelectedProduct = {
   id: string;
   name: string;
   imageUrl?: string;
-  // 업로드된 앞/뒷면 이미지 asset ID (이미지 생성 요청의 referenceJson.outfitItems에 사용)
   assetIds: number[];
 };
 
@@ -18,6 +16,16 @@ export interface ProductListParams {
   size?: number;
 }
 
+export interface ProductImageRef {
+  assetId: number;
+  imageUrl: string;
+}
+
+export interface ProductImages {
+  front: ProductImageRef | null;
+  back: ProductImageRef | null;
+}
+
 export interface Product {
   id: number;
   code: string;
@@ -27,6 +35,7 @@ export interface Product {
   color: string;
   price: number;
   createdAt: string;
+  productImages: ProductImages;
 }
 
 export interface ProductPage {
