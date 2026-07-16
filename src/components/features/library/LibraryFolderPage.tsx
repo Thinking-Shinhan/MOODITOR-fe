@@ -14,6 +14,7 @@ import {
 } from '@/components/features/library/LibraryImageCard';
 import { useImageFolderAssets } from '@/hooks/useImageFolderAssets';
 import { useDeleteLibraryAsset } from '@/hooks/useDeleteLibraryAsset';
+import { useDeleteDetailPage } from '@/hooks/useDeleteDetailPage';
 import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
 import type { LibraryImageAsset } from '@/types/imageLibrary';
 
@@ -33,8 +34,11 @@ export const LibraryFolderPage = () => {
 
   const { data, isLoading, isError } = useImageFolderAssets(productId);
   const deleteAsset = useDeleteLibraryAsset();
+  const deleteDetailPage = useDeleteDetailPage();
   const toggleLike = useToggleAssetLike();
   const [assetIdToDelete, setAssetIdToDelete] = useState<number | null>(null);
+  const [isDetailPageDeleteConfirmOpen, setIsDetailPageDeleteConfirmOpen] =
+    useState(false);
 
   const invalidateAssets = () => {
     queryClient.invalidateQueries({
@@ -48,6 +52,15 @@ export const LibraryFolderPage = () => {
       onSuccess: () => {
         invalidateAssets();
         setAssetIdToDelete(null);
+      },
+    });
+  };
+
+  const handleConfirmDeleteDetailPage = () => {
+    deleteDetailPage.mutate(productId, {
+      onSuccess: () => {
+        invalidateAssets();
+        setIsDetailPageDeleteConfirmOpen(false);
       },
     });
   };
@@ -142,6 +155,7 @@ export const LibraryFolderPage = () => {
               imageUrl={data.detailPage.fileUrl}
               fileName={data.detailPage.fileName}
               createdAt={data.detailPage.createdAt}
+              onDelete={() => setIsDetailPageDeleteConfirmOpen(true)}
             />
           </div>
         </div>
@@ -156,6 +170,17 @@ export const LibraryFolderPage = () => {
         cancelText="취소"
         onCancel={() => setAssetIdToDelete(null)}
         onConfirm={handleConfirmDelete}
+      />
+
+      <AlertModal
+        open={isDetailPageDeleteConfirmOpen}
+        title="해당 상세페이지를 삭제하시겠어요?"
+        description={
+          '저장된 상세페이지가 삭제되며,\n삭제된 내용은 복구할 수 없습니다.'
+        }
+        cancelText="취소"
+        onCancel={() => setIsDetailPageDeleteConfirmOpen(false)}
+        onConfirm={handleConfirmDeleteDetailPage}
       />
     </div>
   );
