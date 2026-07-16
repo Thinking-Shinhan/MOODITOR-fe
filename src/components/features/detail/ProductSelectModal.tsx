@@ -73,11 +73,19 @@ export const ProductSelectModal = ({ onClose }: ProductSelectModalProps) => {
   );
 
   const handleToggle = (product: Product) => {
-    setPendingProduct((prev) =>
-      prev?.id === String(product.id)
-        ? null
-        : { id: String(product.id), name: product.name, assetIds: [] },
-    );
+    setPendingProduct((prev) => {
+      if (prev?.id === String(product.id)) return null;
+
+      const { front, back } = product.productImages;
+      return {
+        id: String(product.id),
+        name: product.name,
+        imageUrl: front?.imageUrl,
+        assetIds: [front?.assetId, back?.assetId].filter(
+          (id): id is number => id !== undefined,
+        ),
+      };
+    });
   };
 
   const handleConfirm = () => {
