@@ -1,6 +1,7 @@
 import { apiClient } from '@/libs/apiClient';
 import type {
   AssetLikeResponse,
+  DeleteLibraryAssetResponse,
   ImageFolderAssetsResponse,
   ImageFolderListResponse,
 } from '@/types/imageLibrary';
@@ -20,4 +21,7 @@ export const imageLibraryService = {
 
   toggleLike: (assetId: number) =>
     apiClient.post<AssetLikeResponse>(`/library/${assetId}/like`, undefined),
+
+  deleteAsset: (assetId: number) =>
+    apiClient.delete<DeleteLibraryAssetResponse>(`/library/assets/${assetId}`),
 };
