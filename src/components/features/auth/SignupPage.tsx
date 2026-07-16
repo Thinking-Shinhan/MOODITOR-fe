@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { Input } from '@/components/commons/Input';
 import { Button } from '@/components/commons/Button';
 import { FormError } from '@/components/commons/FormError';
+import { Body } from '@/components/commons/Typography';
+import { AuthHeader } from '@/components/features/auth/AuthHeader';
 import { useSignup } from '@/hooks/useSignup';
 
 const signupSchema = z
@@ -56,72 +58,77 @@ export default function SignupPage() {
   const onSubmit = (data: SignupFormData) => signup(data);
 
   return (
-    <div className="flex h-full items-center justify-center py-[var(--padding-9)]">
-      <div className="bg-bg-white border-border-subtler w-full max-w-sm rounded-(--radius-large2) border p-[var(--padding-9)]">
-        <h1 className="text-text-border mb-[var(--gap-7)] text-center text-[20px] leading-[1.5] font-bold">
-          회원가입
-        </h1>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          noValidate
-          className="flex flex-col gap-[var(--gap-5)]"
-        >
-          <Input
-            label="아이디"
-            placeholder="아이디 입력 (4~20자)"
-            required
-            error={errors.loginId?.message}
-            {...register('loginId')}
-          />
-          <Input
-            label="비밀번호"
-            type="password"
-            placeholder="영문, 숫자, 특수문자 포함 8자 이상"
-            required
-            error={errors.password?.message}
-            {...register('password')}
-          />
-          <Input
-            label="비밀번호 확인"
-            type="password"
-            placeholder="비밀번호 재입력"
-            required
-            error={errors.passwordConfirm?.message}
-            {...register('passwordConfirm')}
-          />
-          <Input
-            label="이름"
-            placeholder="이름 입력 (2~8자)"
-            required
-            error={errors.name?.message}
-            {...register('name')}
-          />
-          <Input
-            label="브랜드명"
-            placeholder="브랜드명 입력"
-            required
-            error={errors.brandName?.message}
-            {...register('brandName')}
-          />
-          <FormError message={serverError} />
-          <Button
-            type="submit"
-            variant="primary"
-            size="large"
-            disabled={isPending}
+    <div className="flex h-full min-h-screen w-full flex-col">
+      <AuthHeader />
+      <div className="flex flex-1 items-center justify-center py-[var(--padding-9)]">
+        <div className="bg-bg-white border-border-subtler flex flex-col items-center gap-[var(--gap-8)] rounded-[var(--radius-large2)] border p-[var(--padding-9)] shadow-[0px_2px_4px_rgba(0,0,0,0.04)]">
+          <Body size="large" bold className="text-text-basic">
+            회원가입
+          </Body>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            className="flex w-[360px] flex-col items-center gap-[var(--gap-8)]"
           >
-            {isPending ? '처리 중...' : '회원가입'}
-          </Button>
-        </form>
-        <p className="text-text-subtler mt-[var(--gap-5)] text-center text-[14px] leading-[1.5]">
-          이미 계정이 있으신가요?{' '}
-          <Link
-            href="/login"
-            className="text-text-primary-basic hover:text-btn-primary-hovered font-semibold"
-          >
-            로그인
-          </Link>
-        </p>
+            <div className="flex w-full flex-col gap-[var(--gap-7)]">
+              <Input
+                label="아이디"
+                placeholder="아이디 입력 (4~20자)"
+                required
+                error={errors.loginId?.message}
+                {...register('loginId')}
+              />
+              <Input
+                label="비밀번호"
+                type="password"
+                placeholder="비밀번호 입력 (영문, 숫자, 특수문자 포함 8자 이상)"
+                required
+                error={errors.password?.message}
+                {...register('password')}
+              />
+              <Input
+                label="비밀번호 확인"
+                type="password"
+                placeholder="비밀번호 재입력해주세요."
+                required
+                error={errors.passwordConfirm?.message}
+                {...register('passwordConfirm')}
+              />
+              <Input
+                label="이름"
+                placeholder="이름을 입력해주세요."
+                required
+                error={errors.name?.message}
+                {...register('name')}
+              />
+              <Input
+                label="브랜드명"
+                placeholder="브랜드명을 입력해주세요."
+                required
+                error={errors.brandName?.message}
+                {...register('brandName')}
+              />
+            </div>
+            <FormError message={serverError} />
+            <div className="flex w-full flex-col items-center gap-[var(--gap-4)]">
+              <Button
+                type="submit"
+                variant="primary"
+                size="medium"
+                disabled={isPending}
+                className="w-full"
+              >
+                {isPending ? '처리 중...' : '회원가입 완료'}
+              </Button>
+              <p className="text-text-disabled text-[12px] leading-[1.5] font-semibold">
+                이미 계정이 있으신가요?{' '}
+                <Link href="/login" className="text-text-basic underline">
+                  로그인하기
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

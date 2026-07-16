@@ -27,6 +27,8 @@ const NAV_ITEMS: NavItemConfig[] = [
   { href: '/library', icon: Library, label: '라이브러리' },
 ];
 
+const HIDDEN_SIDEBAR_PATHS = ['/detail-edit/preview', '/login', '/signup'];
+
 export const Sidebar = () => {
   const {
     isCollapsed: collapsed,
@@ -35,7 +37,7 @@ export const Sidebar = () => {
   } = useSidebarStore();
   const pathname = usePathname();
 
-  if (!_hasHydrated || pathname === '/detail-edit/preview') return null;
+  if (!_hasHydrated || HIDDEN_SIDEBAR_PATHS.includes(pathname)) return null;
 
   return (
     <aside
