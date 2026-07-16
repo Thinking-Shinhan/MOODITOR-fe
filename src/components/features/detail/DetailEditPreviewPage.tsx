@@ -1,17 +1,82 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Minimize2, X } from 'lucide-react';
+import { Check, Minimize2, X } from 'lucide-react';
+import { AlertModal } from '@/components/commons/AlertModal';
 import { Button } from '@/components/commons/Button';
 import { Body } from '@/components/commons/Typography';
+import { Toast } from '@/components/commons/Toast';
+import { useSaveDetailPage } from '@/hooks/useSaveDetailPage';
+import { ApiError } from '@/libs/apiClient';
 import { useDetailPagePreviewStore } from '@/stores/detailPagePreviewStore';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 
 export const DetailEditPreviewPage = () => {
   const router = useRouter();
   const imageUrl = useDetailPagePreviewStore((state) => state.imageUrl);
+  const selectedProduct = useDetailProductSelectionStore(
+    (state) => state.selectedProduct,
+  );
+  const saveDetailPage = useSaveDetailPage();
+
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [saveErrorMessage, setSaveErrorMessage] = useState<string | null>(null);
+  const [exportErrorMessage, setExportErrorMessage] = useState<string | null>(
+    null,
+  );
+  const [isSaving, setIsSaving] = useState(false);
+  const [isExportingLocal, setIsExportingLocal] = useState(false);
 
   const handleClose = () => {
     router.push('/detail-edit');
+  };
+
+  const handleSave = async () => {
+    if (!imageUrl || !selectedProduct) return;
+
+    setIsSaving(true);
+    try {
+      const blob = await (await fetch(imageUrl)).blob();
+      const file = new File(
+        [blob],
+        `상세페이지-${selectedProduct.name}-${Date.now()}.png`,
+        { type: 'image/png' },
+      );
+      await saveDetailPage.mutateAsync({
+        productId: Number(selectedProduct.id),
+        file,
+      });
+      setSaveModalOpen(true);
+    } catch (error) {
+      setSaveErrorMessage(
+        error instanceof ApiError
+          ? error.message
+          : '상세페이지 저장에 실패했어요. 다시 시도해주세요.',
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleExportLocal = () => {
+    if (!imageUrl) return;
+
+    setIsExportingLocal(true);
+    try {
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = `상세페이지-${
+        selectedProduct?.name ?? '상품'
+      }-${Date.now()}.png`;
+      link.click();
+      setExportModalOpen(true);
+    } catch {
+      setExportErrorMessage('이미지 내보내기에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      setIsExportingLocal(false);
+    }
   };
 
   return (
@@ -34,11 +99,23 @@ export const DetailEditPreviewPage = () => {
               <Minimize2 size={24} className="text-icon-primary-basic" />
             }
           />
-          <Button variant="primary" size="medium" className="w-[108px]">
-            저장하기
+          <Button
+            variant="primary"
+            size="medium"
+            className="w-[108px]"
+            disabled={!imageUrl || !selectedProduct || isSaving}
+            onClick={handleSave}
+          >
+            {isSaving ? '저장 중...' : '저장하기'}
           </Button>
-          <Button variant="primary" size="medium" className="w-[108px]">
-            내보내기
+          <Button
+            variant="primary"
+            size="medium"
+            className="w-[108px]"
+            disabled={!imageUrl || isExportingLocal}
+            onClick={handleExportLocal}
+          >
+            {isExportingLocal ? '내보내는 중...' : '내보내기'}
           </Button>
         </div>
       </header>
@@ -52,6 +129,37 @@ export const DetailEditPreviewPage = () => {
           </Body>
         )}
       </div>
+
+      <AlertModal
+        open={saveModalOpen}
+        title="저장 완료!"
+        description="저장한 이미지는 라이브러리에서 확인할 수 있어요."
+        icon={
+          <Check size={20} strokeWidth={1.3} className="text-icon-inverse" />
+        }
+        onConfirm={() => setSaveModalOpen(false)}
+      />
+      <AlertModal
+        open={exportModalOpen}
+        title="내보내기 완료!"
+        description="이미지를 성공적으로 내보냈어요."
+        icon={
+          <Check size={20} strokeWidth={1.3} className="text-icon-inverse" />
+        }
+        onConfirm={() => setExportModalOpen(false)}
+      />
+      <Toast
+        open={saveErrorMessage !== null}
+        state="error"
+        message={saveErrorMessage ?? ''}
+        onClose={() => setSaveErrorMessage(null)}
+      />
+      <Toast
+        open={exportErrorMessage !== null}
+        state="error"
+        message={exportErrorMessage ?? ''}
+        onClose={() => setExportErrorMessage(null)}
+      />
     </div>
   );
 };
