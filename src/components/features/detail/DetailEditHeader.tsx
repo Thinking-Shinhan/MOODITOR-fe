@@ -7,6 +7,7 @@ import { Button } from '@/components/commons/Button';
 import { Body } from '@/components/commons/Typography';
 import { Toast } from '@/components/commons/Toast';
 import { Tooltip } from '@/components/commons/Tooltip';
+import { TEMPLATE_HEIGHTS } from '@/components/features/detail/DetailTemplateBlockContent';
 import { useAutoPlacement } from '@/hooks/useAutoPlacement';
 import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
@@ -16,6 +17,7 @@ import {
   applyAutoPlacementResponse,
   buildAutoPlacementRequest,
 } from '@/utils/auto-placement';
+import { exportDetailPageImage } from '@/utils/exportDetailPageImage';
 
 interface DetailEditHeaderProps {
   className?: string;
@@ -28,6 +30,11 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   const [autoPlacementErrorMessage, setAutoPlacementErrorMessage] = useState<
     string | null
   >(null);
+  const [exportErrorMessage, setExportErrorMessage] = useState<string | null>(
+    null,
+  );
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isExportingLocal, setIsExportingLocal] = useState(false);
   const hasTemplates = useDetailCanvasStore(
     (state) => state.placedTemplates.length > 0,
   );
@@ -66,6 +73,46 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         );
       },
     });
+  };
+
+  const handlePreview = async () => {
+    setIsPreviewing(true);
+    try {
+      const { placedTemplates } = useDetailCanvasStore.getState();
+      const blob = await exportDetailPageImage(
+        placedTemplates,
+        TEMPLATE_HEIGHTS,
+      );
+      window.open(URL.createObjectURL(blob), '_blank');
+    } catch {
+      setExportErrorMessage('미리보기를 불러오지 못했어요. 다시 시도해주세요.');
+    } finally {
+      setIsPreviewing(false);
+    }
+  };
+
+  const handleExportLocal = async () => {
+    setIsExportingLocal(true);
+    try {
+      const { placedTemplates } = useDetailCanvasStore.getState();
+      const blob = await exportDetailPageImage(
+        placedTemplates,
+        TEMPLATE_HEIGHTS,
+      );
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `상세페이지-${
+        selectedProduct?.name ?? '상품'
+      }-${Date.now()}.png`;
+      link.click();
+      URL.revokeObjectURL(url);
+      setExportModalOpen(true);
+    } catch {
+      setExportErrorMessage('이미지 내보내기에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      setIsExportingLocal(false);
+    }
   };
 
   return (
@@ -111,7 +158,8 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         <Button
           variant="secondary"
           size="large"
-          disabled={!hasTemplates}
+          disabled={!hasTemplates || isPreviewing}
+          onClick={handlePreview}
           leftIcon={
             <Expand
               size={24}
@@ -134,10 +182,10 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
           variant="primary"
           size="medium"
           className="w-[108px]"
-          disabled={!hasTemplates}
-          onClick={() => setExportModalOpen(true)}
+          disabled={!hasTemplates || isExportingLocal}
+          onClick={handleExportLocal}
         >
-          내보내기
+          {isExportingLocal ? '내보내는 중...' : '내보내기'}
         </Button>
       </div>
 
@@ -165,6 +213,13 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         state="error"
         message={autoPlacementErrorMessage ?? ''}
         onClose={() => setAutoPlacementErrorMessage(null)}
+      />
+      <Toast
+        usePortal={false}
+        open={exportErrorMessage !== null}
+        state="error"
+        message={exportErrorMessage ?? ''}
+        onClose={() => setExportErrorMessage(null)}
       />
     </header>
   );
