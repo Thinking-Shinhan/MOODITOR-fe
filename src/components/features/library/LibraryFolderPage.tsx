@@ -12,6 +12,7 @@ import {
 } from '@/components/features/library/LibraryImageCard';
 import { useImageFolderAssets } from '@/hooks/useImageFolderAssets';
 import { useDeleteAsset } from '@/hooks/useDeleteAsset';
+import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
 import type { LibraryImageAsset } from '@/types/imageLibrary';
 
 const getFileNameFromUrl = (url: string) => {
@@ -30,15 +31,20 @@ export const LibraryFolderPage = () => {
 
   const { data, isLoading, isError } = useImageFolderAssets(productId);
   const deleteAsset = useDeleteAsset();
+  const toggleLike = useToggleAssetLike();
+
+  const invalidateAssets = () => {
+    queryClient.invalidateQueries({
+      queryKey: ['imageFolderAssets', productId],
+    });
+  };
 
   const handleDelete = (assetId: number) => {
-    deleteAsset.mutate(assetId, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ['imageFolderAssets', productId],
-        });
-      },
-    });
+    deleteAsset.mutate(assetId, { onSuccess: invalidateAssets });
+  };
+
+  const handleToggleLike = (assetId: number) => {
+    toggleLike.mutate(assetId, { onSuccess: invalidateAssets });
   };
 
   if (isLoading) {
@@ -105,6 +111,7 @@ export const LibraryFolderPage = () => {
                 fileName={getFileNameFromUrl(asset.imageUrl)}
                 createdAt={asset.createdAt}
                 liked={asset.isLiked}
+                onToggleLike={() => handleToggleLike(asset.assetId)}
                 onDelete={() => handleDelete(asset.assetId)}
               />
             ))}

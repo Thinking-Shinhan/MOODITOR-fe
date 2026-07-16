@@ -1,6 +1,7 @@
 'use client';
 
-import { Heart, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import { LikeButton } from '@/components/commons/LikeButton';
 import { Body } from '@/components/commons/Typography';
 
 export type LibraryImageCardType = 'MODEL_CUT' | 'PRODUCT_CUT' | 'DETAIL_PAGE';
@@ -75,18 +76,13 @@ export const LibraryImageCard = ({
           </button>
         )}
 
-        <button
-          type="button"
-          onClick={onToggleLike}
-          className="absolute right-[var(--padding-4)] bottom-[var(--padding-4)] flex size-[20px] cursor-pointer items-center justify-center"
-        >
-          <Heart
-            size={20}
-            strokeWidth={1.3}
-            className={liked ? 'text-icon-gray' : 'text-icon-inverse'}
-            fill={liked ? 'currentColor' : 'none'}
-          />
-        </button>
+        <LikeButton
+          liked={liked}
+          onToggleLike={onToggleLike}
+          strokeWidth={1.3}
+          iconClassName={liked ? 'text-icon-gray' : 'text-icon-inverse'}
+          className="absolute right-[var(--padding-4)] bottom-[var(--padding-4)]"
+        />
       </div>
 
       <div className="flex w-full flex-col gap-[var(--gap-2)] px-[var(--padding-5)] py-[var(--padding-4)]">

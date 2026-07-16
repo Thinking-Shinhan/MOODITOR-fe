@@ -6,10 +6,11 @@ import { Check, ChevronRight } from 'lucide-react';
 import { Body } from '@/components/commons/Typography';
 import { TextButton } from '@/components/commons/TextButton';
 import { GeneratedImageCard } from '@/components/features/image/GeneratedImageCard';
+import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
 import type { ImageAspectRatio } from '@/types/image';
 
 interface GeneratedImage {
-  id: string;
+  assetId: number;
   url: string;
 }
 
@@ -41,17 +42,19 @@ export const ImageGenerateResultCanvas = ({
   aspectRatio,
 }: ImageGenerateResultCanvasProps) => {
   const router = useRouter();
-  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+  const toggleLike = useToggleAssetLike();
 
-  const handleToggleLike = (id: string) => {
-    setLikedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
+  const handleToggleLike = (assetId: number) => {
+    toggleLike.mutate(assetId, {
+      onSuccess: ({ liked }) => {
+        setLikedIds((prev) => {
+          const next = new Set(prev);
+          if (liked) next.add(assetId);
+          else next.delete(assetId);
+          return next;
+        });
+      },
     });
   };
 
@@ -85,10 +88,10 @@ export const ImageGenerateResultCanvas = ({
       >
         {images.map((image) => (
           <GeneratedImageCard
-            key={image.id}
+            key={image.assetId}
             url={image.url}
-            liked={likedIds.has(image.id)}
-            onToggleLike={() => handleToggleLike(image.id)}
+            liked={likedIds.has(image.assetId)}
+            onToggleLike={() => handleToggleLike(image.assetId)}
             className={cardClassName}
           />
         ))}

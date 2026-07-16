@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart } from 'lucide-react';
+import { LikeButton } from '@/components/commons/LikeButton';
 
 interface GeneratedImageCardProps {
   url: string;
@@ -30,22 +30,14 @@ export const GeneratedImageCard = ({
         alt=""
         className="absolute inset-0 size-full object-cover"
       />
-      <button
-        type="button"
-        onClick={onToggleLike}
-        aria-label={liked ? '좋아요 취소' : '좋아요'}
-        aria-pressed={liked}
+      <LikeButton
+        liked={liked}
+        onToggleLike={onToggleLike}
         className={[
-          'absolute top-[15px] left-[15px] flex size-5 cursor-pointer items-center justify-center transition-opacity',
+          'absolute top-[15px] left-[15px] transition-opacity',
           liked ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
         ].join(' ')}
-      >
-        <Heart
-          size={20}
-          className="text-icon-gray"
-          fill={liked ? 'currentColor' : 'none'}
-        />
-      </button>
+      />
     </div>
   );
 };

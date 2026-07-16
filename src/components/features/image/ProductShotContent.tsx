@@ -126,7 +126,7 @@ export const ProductShotContent = () => {
             !!result.imageUrl,
         )
         .map((result) => ({
-          id: String(result.resultId),
+          assetId: result.assetId,
           url: result.imageUrl,
         }));
       successTimeoutRef.current = setTimeout(() => {
