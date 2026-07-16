@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertModal } from '@/components/commons/AlertModal';
+import { Toast } from '@/components/commons/Toast';
 import { Heading, Body } from '@/components/commons/Typography';
 import { Spinner } from '@/components/commons/Spinner';
 import { LibraryFolderHeader } from '@/components/features/library/LibraryFolderHeader';
@@ -16,7 +17,14 @@ import { useImageFolderAssets } from '@/hooks/useImageFolderAssets';
 import { useDeleteLibraryAsset } from '@/hooks/useDeleteLibraryAsset';
 import { useDeleteDetailPage } from '@/hooks/useDeleteDetailPage';
 import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
-import type { LibraryImageAsset } from '@/types/imageLibrary';
+import type {
+  ImageFolderAssetsResponse,
+  LibraryImageAsset,
+} from '@/types/imageLibrary';
+
+interface MutationContext {
+  previous: ImageFolderAssetsResponse | undefined;
+}
 
 const getFileNameFromUrl = (url: string) => {
   try {
@@ -33,40 +41,103 @@ export const LibraryFolderPage = () => {
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useImageFolderAssets(productId);
-  const deleteAsset = useDeleteLibraryAsset();
-  const deleteDetailPage = useDeleteDetailPage();
-  const toggleLike = useToggleAssetLike();
   const [assetIdToDelete, setAssetIdToDelete] = useState<number | null>(null);
   const [isDetailPageDeleteConfirmOpen, setIsDetailPageDeleteConfirmOpen] =
     useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const assetsQueryKey = ['imageFolderAssets', productId];
+
+  const snapshotAssets = async (): Promise<MutationContext> => {
+    await queryClient.cancelQueries({ queryKey: assetsQueryKey });
+    return {
+      previous:
+        queryClient.getQueryData<ImageFolderAssetsResponse>(assetsQueryKey),
+    };
+  };
+
+  const rollback = (context: MutationContext | undefined) => {
+    if (context?.previous) {
+      queryClient.setQueryData(assetsQueryKey, context.previous);
+    }
+    setErrorMessage('요청을 처리하지 못했어요. 다시 시도해주세요.');
+  };
 
   const invalidateAssets = () => {
-    queryClient.invalidateQueries({
-      queryKey: ['imageFolderAssets', productId],
-    });
+    queryClient.invalidateQueries({ queryKey: assetsQueryKey });
   };
+
+  const deleteAsset = useDeleteLibraryAsset<MutationContext>({
+    onMutate: async (assetId) => {
+      const context = await snapshotAssets();
+      if (context.previous) {
+        queryClient.setQueryData<ImageFolderAssetsResponse>(assetsQueryKey, {
+          ...context.previous,
+          modelCutAssets: context.previous.modelCutAssets.filter(
+            (asset) => asset.assetId !== assetId,
+          ),
+          productCutAssets: context.previous.productCutAssets.filter(
+            (asset) => asset.assetId !== assetId,
+          ),
+        });
+      }
+      return context;
+    },
+    onError: (_error, _assetId, context) => rollback(context),
+    onSettled: invalidateAssets,
+  });
+
+  const deleteDetailPage = useDeleteDetailPage<MutationContext>({
+    onMutate: async () => {
+      const context = await snapshotAssets();
+      if (context.previous) {
+        queryClient.setQueryData<ImageFolderAssetsResponse>(assetsQueryKey, {
+          ...context.previous,
+          hasDetailPage: false,
+          detailPage: null,
+        });
+      }
+      return context;
+    },
+    onError: (_error, _productId, context) => rollback(context),
+    onSettled: invalidateAssets,
+  });
+
+  const toggleLike = useToggleAssetLike<MutationContext>({
+    onMutate: async (assetId) => {
+      const context = await snapshotAssets();
+      if (context.previous) {
+        const flip = (assets: LibraryImageAsset[]) =>
+          assets.map((asset) =>
+            asset.assetId === assetId
+              ? { ...asset, isLiked: !asset.isLiked }
+              : asset,
+          );
+        queryClient.setQueryData<ImageFolderAssetsResponse>(assetsQueryKey, {
+          ...context.previous,
+          modelCutAssets: flip(context.previous.modelCutAssets),
+          productCutAssets: flip(context.previous.productCutAssets),
+        });
+      }
+      return context;
+    },
+    onError: (_error, _assetId, context) => rollback(context),
+    onSettled: invalidateAssets,
+  });
 
   const handleConfirmDelete = () => {
     if (assetIdToDelete === null) return;
-    deleteAsset.mutate(assetIdToDelete, {
-      onSuccess: () => {
-        invalidateAssets();
-        setAssetIdToDelete(null);
-      },
-    });
+    deleteAsset.mutate(assetIdToDelete);
+    setAssetIdToDelete(null);
   };
 
   const handleConfirmDeleteDetailPage = () => {
-    deleteDetailPage.mutate(productId, {
-      onSuccess: () => {
-        invalidateAssets();
-        setIsDetailPageDeleteConfirmOpen(false);
-      },
-    });
+    deleteDetailPage.mutate(productId);
+    setIsDetailPageDeleteConfirmOpen(false);
   };
 
   const handleToggleLike = (assetId: number) => {
-    toggleLike.mutate(assetId, { onSuccess: invalidateAssets });
+    toggleLike.mutate(assetId);
   };
 
   if (isLoading) {
@@ -181,6 +252,13 @@ export const LibraryFolderPage = () => {
         cancelText="취소"
         onCancel={() => setIsDetailPageDeleteConfirmOpen(false)}
         onConfirm={handleConfirmDeleteDetailPage}
+      />
+
+      <Toast
+        open={errorMessage !== null}
+        state="error"
+        message={errorMessage ?? ''}
+        onClose={() => setErrorMessage(null)}
       />
     </div>
   );
