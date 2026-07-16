@@ -1,5 +1,6 @@
 import { apiClient } from '@/libs/apiClient';
 import type {
+  AssetLikeResponse,
   ImageFolderAssetsResponse,
   ImageFolderListResponse,
 } from '@/types/imageLibrary';
@@ -16,4 +17,7 @@ export const imageLibraryService = {
     apiClient.get<ImageFolderAssetsResponse>(
       `/library/image-folders/${productId}/assets`,
     ),
+
+  toggleLike: (assetId: number) =>
+    apiClient.post<AssetLikeResponse>(`/library/${assetId}/like`, undefined),
 };

@@ -26,6 +26,11 @@ export interface ImageFolderListResponse {
   imageFolders: ImageFolder[];
 }
 
+export interface AssetLikeResponse {
+  assetId: number;
+  liked: boolean;
+}
+
 export interface LibraryImageAsset {
   assetId: number;
   type: string;
