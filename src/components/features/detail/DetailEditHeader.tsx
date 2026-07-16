@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Check, Expand, WandSparkles } from 'lucide-react';
 import { AlertModal } from '@/components/commons/AlertModal';
 import { Button } from '@/components/commons/Button';
@@ -12,6 +13,7 @@ import { useAutoPlacement } from '@/hooks/useAutoPlacement';
 import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import { useImagePlacementStore } from '@/stores/imagePlacementStore';
+import { useDetailPagePreviewStore } from '@/stores/detailPagePreviewStore';
 import { useTextPlacementStore } from '@/stores/textPlacementStore';
 import {
   applyAutoPlacementResponse,
@@ -24,6 +26,10 @@ interface DetailEditHeaderProps {
 }
 
 export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
+  const router = useRouter();
+  const setPreviewImageUrl = useDetailPagePreviewStore(
+    (state) => state.setImageUrl,
+  );
   const [aiTooltipOpen, setAiTooltipOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -83,7 +89,8 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         placedTemplates,
         TEMPLATE_HEIGHTS,
       );
-      window.open(URL.createObjectURL(blob), '_blank');
+      setPreviewImageUrl(URL.createObjectURL(blob));
+      router.push('/detail-edit/preview');
     } catch {
       setExportErrorMessage('미리보기를 불러오지 못했어요. 다시 시도해주세요.');
     } finally {
