@@ -24,7 +24,13 @@ import { TEMPLATE_HEIGHT as TEXT_4_HEIGHT } from '@/components/features/detail/t
 import { TEMPLATE_HEIGHT as TEXT_5_HEIGHT } from '@/components/features/detail/templates/Text5Template';
 import { TEMPLATE_HEIGHT as MATERIAL_HEIGHT } from '@/components/features/detail/templates/MaterialTemplate';
 import { TEMPLATE_HEIGHT as SIZE_TIP_HEIGHT } from '@/components/features/detail/templates/SizeTipTemplate';
-import { TEMPLATE_HEIGHT as SIZE_INFO_HEIGHT } from '@/components/features/detail/templates/SizeInfoTemplate';
+import {
+  TEMPLATE_HEIGHT as SIZE_INFO_HEIGHT,
+  buildSizeTableFromProduct,
+  getSizeInfoTemplateHeight,
+} from '@/components/features/detail/templates/SizeInfoTemplate';
+import { useDetailPageInit } from '@/hooks/useDetailPageInit';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import type { DetailTemplateType } from '@/types/template';
 
 interface DetailTemplateBlockContentProps {
@@ -69,7 +75,16 @@ export const DetailTemplateBlockContent = ({
   moveDownDisabled,
   onDelete,
 }: DetailTemplateBlockContentProps) => {
-  const height = TEMPLATE_HEIGHTS[type];
+  const selectedProduct = useDetailProductSelectionStore(
+    (state) => state.selectedProduct,
+  );
+  const { data } = useDetailPageInit(
+    selectedProduct ? Number(selectedProduct.id) : null,
+  );
+  const height =
+    type === 'SIZE_INFO' && data
+      ? getSizeInfoTemplateHeight(buildSizeTableFromProduct(data.product))
+      : TEMPLATE_HEIGHTS[type];
   const stageRef = useRef<Konva.Stage>(null);
 
   useEffect(() => {

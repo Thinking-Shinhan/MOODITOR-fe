@@ -4,13 +4,18 @@ import type { DetailTemplateType } from '@/types/template';
 
 const CANVAS_WIDTH = 879;
 
+const getBlockHeight = (
+  template: PlacedTemplate,
+  templateHeights: Record<DetailTemplateType, number>,
+) => getStageRef(template.id)?.height() ?? templateHeights[template.type];
+
 export const exportDetailPageImage = (
   placedTemplates: PlacedTemplate[],
   templateHeights: Record<DetailTemplateType, number>,
   pixelRatio = 1,
 ): Promise<Blob> => {
   const totalHeight = placedTemplates.reduce(
-    (sum, template) => sum + templateHeights[template.type],
+    (sum, template) => sum + getBlockHeight(template, templateHeights),
     0,
   );
 
@@ -26,7 +31,7 @@ export const exportDetailPageImage = (
   let y = 0;
   for (const template of placedTemplates) {
     const stage = getStageRef(template.id);
-    const blockHeight = templateHeights[template.type];
+    const blockHeight = getBlockHeight(template, templateHeights);
     if (stage) {
       const blockCanvas = stage.toCanvas({ pixelRatio });
       ctx.drawImage(blockCanvas, 0, y * pixelRatio);
