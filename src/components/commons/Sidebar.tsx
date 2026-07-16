@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSidebarStore } from '@/stores/sidebarStore';
+import { useLogout } from '@/hooks/useLogout';
 import { Label } from '@/components/commons/Typography';
 import {
   Home,
@@ -27,6 +28,8 @@ const NAV_ITEMS: NavItemConfig[] = [
   { href: '/library', icon: Library, label: '라이브러리' },
 ];
 
+const HIDDEN_SIDEBAR_PATHS = ['/detail-edit/preview', '/login', '/signup'];
+
 export const Sidebar = () => {
   const {
     isCollapsed: collapsed,
@@ -34,8 +37,9 @@ export const Sidebar = () => {
     _hasHydrated,
   } = useSidebarStore();
   const pathname = usePathname();
+  const { logout, isPending: isLoggingOut } = useLogout();
 
-  if (!_hasHydrated || pathname === '/detail-edit/preview') return null;
+  if (!_hasHydrated || HIDDEN_SIDEBAR_PATHS.includes(pathname)) return null;
 
   return (
     <aside
@@ -109,10 +113,13 @@ export const Sidebar = () => {
       <div>
         <button
           type="button"
+          onClick={() => logout()}
+          disabled={isLoggingOut}
           aria-label="로그아웃"
           className={[
             'flex cursor-pointer items-center rounded-[var(--radius-small2)] transition-colors',
             'text-text-disabled-on hover:bg-btn-tertiary-fill-hovered hover:text-text-subtle',
+            'disabled:cursor-not-allowed disabled:opacity-50',
             collapsed
               ? 'mx-auto h-[37px] w-[37px] justify-center'
               : 'w-full gap-[var(--gap-4)] px-[var(--gap-5)] py-[var(--size-height-2)]',
