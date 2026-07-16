@@ -21,6 +21,8 @@ export interface LoginRequest {
 
 export type LoginResponse = Record<string, never>;
 
+export type LogoutResponse = Record<string, never>;
+
 export interface ApiErrorResponse {
   error: {
     code: string;
