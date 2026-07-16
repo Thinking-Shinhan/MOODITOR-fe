@@ -1,9 +1,23 @@
 import { apiClient } from '@/libs/apiClient';
-import type { DetailPageInitResponse } from '@/types/detailPage';
+import type {
+  DetailPageInitResponse,
+  DetailPageSaveResponse,
+} from '@/types/detailPage';
 
 export const detailPageService = {
   getInitData: (productId: number) =>
     apiClient.get<DetailPageInitResponse>(
       `/detail-pages/init?productId=${productId}`,
     ),
+
+  save: (productId: number, file: File) => {
+    const formData = new FormData();
+    formData.append('productId', String(productId));
+    formData.append('file', file);
+
+    return apiClient.postForm<DetailPageSaveResponse>(
+      '/detail-pages',
+      formData,
+    );
+  },
 };

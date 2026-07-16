@@ -1,8 +1,14 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { Stage, Layer } from 'react-konva';
+import type Konva from 'konva';
 import { DetailTemplateGroup } from '@/components/features/detail/DetailTemplateGroup';
 import { DetailTemplateHeader } from '@/components/features/detail/DetailTemplateHeader';
+import {
+  registerStageRef,
+  unregisterStageRef,
+} from '@/components/features/detail/stageRefRegistry';
 import { TEMPLATE_HEIGHT as IMAGE_1_1_HEIGHT } from '@/components/features/detail/templates/Image1_1Template';
 import { TEMPLATE_HEIGHT as IMAGE_1_2_HEIGHT } from '@/components/features/detail/templates/Image1_2Template';
 import { TEMPLATE_HEIGHT as IMAGE_2_1_HEIGHT } from '@/components/features/detail/templates/Image2_1Template';
@@ -18,7 +24,13 @@ import { TEMPLATE_HEIGHT as TEXT_4_HEIGHT } from '@/components/features/detail/t
 import { TEMPLATE_HEIGHT as TEXT_5_HEIGHT } from '@/components/features/detail/templates/Text5Template';
 import { TEMPLATE_HEIGHT as MATERIAL_HEIGHT } from '@/components/features/detail/templates/MaterialTemplate';
 import { TEMPLATE_HEIGHT as SIZE_TIP_HEIGHT } from '@/components/features/detail/templates/SizeTipTemplate';
-import { TEMPLATE_HEIGHT as SIZE_INFO_HEIGHT } from '@/components/features/detail/templates/SizeInfoTemplate';
+import {
+  TEMPLATE_HEIGHT as SIZE_INFO_HEIGHT,
+  buildSizeTableFromProduct,
+  getSizeInfoTemplateHeight,
+} from '@/components/features/detail/templates/SizeInfoTemplate';
+import { useDetailPageInit } from '@/hooks/useDetailPageInit';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import type { DetailTemplateType } from '@/types/template';
 
 interface DetailTemplateBlockContentProps {
@@ -34,7 +46,7 @@ interface DetailTemplateBlockContentProps {
 
 const CANVAS_WIDTH = 879;
 
-const TEMPLATE_HEIGHTS: Record<DetailTemplateType, number> = {
+export const TEMPLATE_HEIGHTS: Record<DetailTemplateType, number> = {
   IMAGE_1_1: IMAGE_1_1_HEIGHT,
   IMAGE_1_2: IMAGE_1_2_HEIGHT,
   IMAGE_2_1: IMAGE_2_1_HEIGHT,
@@ -63,7 +75,24 @@ export const DetailTemplateBlockContent = ({
   moveDownDisabled,
   onDelete,
 }: DetailTemplateBlockContentProps) => {
-  const height = TEMPLATE_HEIGHTS[type];
+  const selectedProduct = useDetailProductSelectionStore(
+    (state) => state.selectedProduct,
+  );
+  const { data } = useDetailPageInit(
+    selectedProduct ? Number(selectedProduct.id) : null,
+  );
+  const height =
+    type === 'SIZE_INFO' && data
+      ? getSizeInfoTemplateHeight(buildSizeTableFromProduct(data.product))
+      : TEMPLATE_HEIGHTS[type];
+  const stageRef = useRef<Konva.Stage>(null);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    registerStageRef(id, stage);
+    return () => unregisterStageRef(id, stage);
+  }, [id]);
 
   return (
     <div className="flex flex-col gap-[var(--gap-2)]">
@@ -77,7 +106,7 @@ export const DetailTemplateBlockContent = ({
         moveDownDisabled={moveDownDisabled}
         onDelete={onDelete}
       />
-      <Stage width={CANVAS_WIDTH} height={height}>
+      <Stage ref={stageRef} width={CANVAS_WIDTH} height={height}>
         <Layer>
           <DetailTemplateGroup templateId={id} type={type} />
         </Layer>
