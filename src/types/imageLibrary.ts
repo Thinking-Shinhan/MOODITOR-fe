@@ -36,6 +36,11 @@ export interface DeleteLibraryAssetResponse {
   message: string;
 }
 
+export interface DeleteDetailPageResponse {
+  productId: number;
+  message: string;
+}
+
 export interface LibraryImageAsset {
   assetId: number;
   type: string;

@@ -1,6 +1,7 @@
 import { apiClient } from '@/libs/apiClient';
 import type {
   AssetLikeResponse,
+  DeleteDetailPageResponse,
   DeleteLibraryAssetResponse,
   ImageFolderAssetsResponse,
   ImageFolderListResponse,
@@ -24,4 +25,9 @@ export const imageLibraryService = {
 
   deleteAsset: (assetId: number) =>
     apiClient.delete<DeleteLibraryAssetResponse>(`/library/assets/${assetId}`),
+
+  deleteDetailPage: (productId: number) =>
+    apiClient.delete<DeleteDetailPageResponse>(
+      `/library/image-folders/${productId}/detail-page`,
+    ),
 };
