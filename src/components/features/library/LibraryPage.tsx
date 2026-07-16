@@ -5,12 +5,6 @@ import { Spinner } from '@/components/commons/Spinner';
 import { LibraryProductCard } from '@/components/features/library/LibraryProductCard';
 import { useImageFolders } from '@/hooks/useImageFolders';
 
-// TODO: /library/image-folders 응답에 모델컷/제품컷/상세페이지 개수와 생성일이 아직 없어서, 백엔드가 필드를 추가해줄 때까지 목업 값으로 채움
-const MOCK_MODEL_CUT_COUNT = 8;
-const MOCK_PRODUCT_CUT_COUNT = 4;
-const MOCK_DETAIL_PAGE_COUNT = 1;
-const MOCK_CREATED_AT = '2026-07-14T00:00:00';
-
 export const LibraryPage = () => {
   const { data, isLoading, isError } = useImageFolders();
   const imageFolders = data?.imageFolders ?? [];
@@ -43,17 +37,17 @@ export const LibraryPage = () => {
           </Body>
         )}
         {!isLoading && !isError && imageFolders.length > 0 && (
-          <div className="grid w-full grid-cols-[repeat(4,minmax(0,1fr))] gap-x-[var(--gap-6)] gap-y-[var(--gap-6)]">
+          <div className="grid w-full grid-cols-[repeat(auto-fill,267px)] gap-[var(--gap-6)]">
             {imageFolders.map((folder) => (
               <LibraryProductCard
                 key={folder.productId}
                 productName={folder.productName}
-                images={folder.thumbnailUrl ? [folder.thumbnailUrl] : []}
-                modelCutCount={MOCK_MODEL_CUT_COUNT}
-                productCutCount={MOCK_PRODUCT_CUT_COUNT}
-                detailPageCount={MOCK_DETAIL_PAGE_COUNT}
-                totalImageCount={folder.assetCount}
-                createdAt={MOCK_CREATED_AT}
+                images={folder.previewImages.map((image) => image.imageUrl)}
+                modelCutCount={folder.counts.modelCut}
+                productCutCount={folder.counts.productCut}
+                detailPageCount={folder.counts.detailPage}
+                totalImageCount={folder.counts.total}
+                createdAt={folder.updatedAt}
               />
             ))}
           </div>

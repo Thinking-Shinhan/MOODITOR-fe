@@ -1,11 +1,23 @@
+export interface ImageFolderPreviewImage {
+  assetId: number;
+  imageUrl: string;
+}
+
+export interface ImageFolderCounts {
+  modelCut: number;
+  productCut: number;
+  detailPage: number;
+  total: number;
+}
+
 export interface ImageFolder {
   productId: number;
   productCode: string;
   productName: string;
   category: string;
-  assetCount: number;
-  thumbnailAssetId: number;
-  thumbnailUrl: string;
+  previewImages: ImageFolderPreviewImage[];
+  counts: ImageFolderCounts;
+  updatedAt: string;
 }
 
 export interface ImageFolderListResponse {
