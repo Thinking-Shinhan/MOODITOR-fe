@@ -8,7 +8,6 @@ import { InputMessage } from '@/components/commons/InputMessage';
 import { ImageUploadField } from '@/components/commons/ImageUploadField';
 import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import { useUploadProductImages } from '@/hooks/useUploadProductImages';
-import { useProductImages } from '@/hooks/useProductImages';
 import { useDeleteAsset } from '@/hooks/useDeleteAsset';
 import { useObjectUrl } from '@/hooks/useObjectUrl';
 import { ApiError } from '@/libs/apiClient';
@@ -27,7 +26,6 @@ export const ProductImageUploadPanel = ({
   const addProducts = useProductSelectionStore((state) => state.addProducts);
   const { mutateAsync: uploadProductImages, isPending } =
     useUploadProductImages();
-  const { data: existingImages } = useProductImages(selectedProduct.id);
   const { mutateAsync: deleteAsset } = useDeleteAsset();
 
   const [frontImage, setFrontImage] = useState<File | null>(null);
@@ -36,11 +34,8 @@ export const ProductImageUploadPanel = ({
   const [backRemoved, setBackRemoved] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const existingFrontAsset =
-    existingImages?.find((image) => image.assetRole === 'PRODUCT_FRONT') ??
-    null;
-  const existingBackAsset =
-    existingImages?.find((image) => image.assetRole === 'PRODUCT_BACK') ?? null;
+  const existingFrontAsset = selectedProduct.productImages.front;
+  const existingBackAsset = selectedProduct.productImages.back;
 
   const frontObjectUrl = useObjectUrl(frontImage);
   const backObjectUrl = useObjectUrl(backImage);
@@ -121,9 +116,6 @@ export const ProductImageUploadPanel = ({
         await uploadProductImages({ productId: selectedProduct.id, items });
       }
 
-      // 업로드(POST) 응답의 imageUrl은 서명되지 않은 URL이라 비공개 버킷에서 바로 열리지
-      // 않는다. 조회(GET) API는 서명된 URL을 내려주므로, 업로드 후 다시 조회해서 사용한다.
-      // TODO: 백엔드가 업로드 응답에도 서명된 URL을 내려주게 되면 재조회 없이 바로 써도 됨
       const latestImages = await assetService.getProductImages(
         selectedProduct.id,
       );
