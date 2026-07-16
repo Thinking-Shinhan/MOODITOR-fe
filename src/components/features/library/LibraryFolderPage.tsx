@@ -81,7 +81,7 @@ export const LibraryFolderPage = () => {
   );
 
   return (
-    <div className="flex w-full flex-col items-start gap-[var(--gap-8)] p-[var(--padding-9)]">
+    <div className="flex w-full flex-col items-start gap-[var(--gap-8)] py-[32px] pl-[32px]">
       <LibraryFolderHeader
         productName={data.productName}
         productCode={data.productCode}
@@ -95,14 +95,14 @@ export const LibraryFolderPage = () => {
           <Heading size="xsmall" className="text-text-basic">
             이미지
           </Heading>
-          <ChevronRight size={20} className="text-icon-disabled" />
+          <ChevronRight size={20} className="text-icon-gray" />
         </div>
         {imageAssets.length === 0 ? (
           <Body size="medium" className="text-text-subtler">
             저장된 이미지가 없습니다.
           </Body>
         ) : (
-          <div className="flex w-full flex-wrap items-start gap-[var(--gap-5)]">
+          <div className="flex w-full items-start gap-[var(--gap-5)] overflow-x-auto">
             {imageAssets.map((asset) => (
               <LibraryImageCard
                 key={asset.assetId}
@@ -125,9 +125,9 @@ export const LibraryFolderPage = () => {
             <Heading size="xsmall" className="text-text-basic">
               상세페이지
             </Heading>
-            <ChevronRight size={20} className="text-icon-disabled" />
+            <ChevronRight size={20} className="text-icon-gray" />
           </div>
-          <div className="flex w-full flex-wrap items-start gap-[var(--gap-5)]">
+          <div className="flex w-full items-start gap-[var(--gap-5)] overflow-x-auto">
             <LibraryImageCard
               type="DETAIL_PAGE"
               imageUrl={data.detailPage.fileUrl}

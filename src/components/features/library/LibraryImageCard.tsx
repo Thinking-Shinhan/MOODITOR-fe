@@ -42,7 +42,7 @@ export const LibraryImageCard = ({
   const isDetailPage = type === 'DETAIL_PAGE';
 
   return (
-    <div className="bg-bg-white border-border-subtler hover:border-border-basic group flex w-[215px] flex-col items-start overflow-hidden rounded-[var(--radius-medium2)] border shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
+    <div className="bg-bg-white border-border-subtler hover:border-border-basic group flex w-[215px] shrink-0 flex-col items-start overflow-hidden rounded-[var(--radius-medium2)] border shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
       <div
         className={`bg-bg-gray-subtle relative w-full shrink-0 ${isDetailPage ? 'h-[280px]' : 'h-[160px]'}`}
       >
