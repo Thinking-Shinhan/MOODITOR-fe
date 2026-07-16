@@ -50,3 +50,13 @@ export interface DetailPageInitResponse {
   product: DetailPageProduct;
   assets: DetailPageAsset[];
 }
+
+export type DetailPageStatus = 'EXPORTED';
+
+export interface DetailPageSaveResponse {
+  detailPageId: number;
+  productId: number;
+  status: DetailPageStatus;
+  fileUrl: string;
+  fileName: string;
+}

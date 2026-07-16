@@ -10,6 +10,8 @@ import { Toast } from '@/components/commons/Toast';
 import { Tooltip } from '@/components/commons/Tooltip';
 import { TEMPLATE_HEIGHTS } from '@/components/features/detail/DetailTemplateBlockContent';
 import { useAutoPlacement } from '@/hooks/useAutoPlacement';
+import { useSaveDetailPage } from '@/hooks/useSaveDetailPage';
+import { ApiError } from '@/libs/apiClient';
 import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import { useImagePlacementStore } from '@/stores/imagePlacementStore';
@@ -39,8 +41,10 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   const [exportErrorMessage, setExportErrorMessage] = useState<string | null>(
     null,
   );
+  const [saveErrorMessage, setSaveErrorMessage] = useState<string | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isExportingLocal, setIsExportingLocal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const hasTemplates = useDetailCanvasStore(
     (state) => state.placedTemplates.length > 0,
   );
@@ -48,6 +52,7 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
     (state) => state.selectedProduct,
   );
   const autoPlacement = useAutoPlacement();
+  const saveDetailPage = useSaveDetailPage();
 
   const handleAutoPlaceAll = () => {
     if (!selectedProduct) return;
@@ -95,6 +100,37 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
       setExportErrorMessage('미리보기를 불러오지 못했어요. 다시 시도해주세요.');
     } finally {
       setIsPreviewing(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!selectedProduct) return;
+
+    setIsSaving(true);
+    try {
+      const { placedTemplates } = useDetailCanvasStore.getState();
+      const blob = await exportDetailPageImage(
+        placedTemplates,
+        TEMPLATE_HEIGHTS,
+      );
+      const file = new File(
+        [blob],
+        `상세페이지-${selectedProduct.name}-${Date.now()}.png`,
+        { type: 'image/png' },
+      );
+      await saveDetailPage.mutateAsync({
+        productId: Number(selectedProduct.id),
+        file,
+      });
+      setSaveModalOpen(true);
+    } catch (error) {
+      setSaveErrorMessage(
+        error instanceof ApiError
+          ? error.message
+          : '상세페이지 저장에 실패했어요. 다시 시도해주세요.',
+      );
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -180,10 +216,10 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
           variant="primary"
           size="medium"
           className="w-[108px]"
-          disabled={!hasTemplates}
-          onClick={() => setSaveModalOpen(true)}
+          disabled={!hasTemplates || !selectedProduct || isSaving}
+          onClick={handleSave}
         >
-          저장하기
+          {isSaving ? '저장 중...' : '저장하기'}
         </Button>
         <Button
           variant="primary"
@@ -227,6 +263,13 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         state="error"
         message={exportErrorMessage ?? ''}
         onClose={() => setExportErrorMessage(null)}
+      />
+      <Toast
+        usePortal={false}
+        open={saveErrorMessage !== null}
+        state="error"
+        message={saveErrorMessage ?? ''}
+        onClose={() => setSaveErrorMessage(null)}
       />
     </header>
   );
