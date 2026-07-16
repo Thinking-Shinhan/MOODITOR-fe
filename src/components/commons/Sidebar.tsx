@@ -35,7 +35,7 @@ export const Sidebar = () => {
   } = useSidebarStore();
   const pathname = usePathname();
 
-  if (!_hasHydrated) return null;
+  if (!_hasHydrated || pathname === '/detail-edit/preview') return null;
 
   return (
     <aside

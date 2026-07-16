@@ -1,33 +1,50 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Check, Expand, WandSparkles } from 'lucide-react';
 import { AlertModal } from '@/components/commons/AlertModal';
 import { Button } from '@/components/commons/Button';
 import { Body } from '@/components/commons/Typography';
 import { Toast } from '@/components/commons/Toast';
 import { Tooltip } from '@/components/commons/Tooltip';
+import { TEMPLATE_HEIGHTS } from '@/components/features/detail/DetailTemplateBlockContent';
 import { useAutoPlacement } from '@/hooks/useAutoPlacement';
+import { useSaveDetailPage } from '@/hooks/useSaveDetailPage';
+import { ApiError } from '@/libs/apiClient';
 import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import { useImagePlacementStore } from '@/stores/imagePlacementStore';
+import { useDetailPagePreviewStore } from '@/stores/detailPagePreviewStore';
 import { useTextPlacementStore } from '@/stores/textPlacementStore';
 import {
   applyAutoPlacementResponse,
   buildAutoPlacementRequest,
 } from '@/utils/auto-placement';
+import { exportDetailPageImage } from '@/utils/exportDetailPageImage';
 
 interface DetailEditHeaderProps {
   className?: string;
 }
 
 export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
+  const router = useRouter();
+  const setPreviewImageUrl = useDetailPagePreviewStore(
+    (state) => state.setImageUrl,
+  );
   const [aiTooltipOpen, setAiTooltipOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [autoPlacementErrorMessage, setAutoPlacementErrorMessage] = useState<
     string | null
   >(null);
+  const [exportErrorMessage, setExportErrorMessage] = useState<string | null>(
+    null,
+  );
+  const [saveErrorMessage, setSaveErrorMessage] = useState<string | null>(null);
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isExportingLocal, setIsExportingLocal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const hasTemplates = useDetailCanvasStore(
     (state) => state.placedTemplates.length > 0,
   );
@@ -35,6 +52,7 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
     (state) => state.selectedProduct,
   );
   const autoPlacement = useAutoPlacement();
+  const saveDetailPage = useSaveDetailPage();
 
   const handleAutoPlaceAll = () => {
     if (!selectedProduct) return;
@@ -66,6 +84,78 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         );
       },
     });
+  };
+
+  const handlePreview = async () => {
+    setIsPreviewing(true);
+    try {
+      const { placedTemplates } = useDetailCanvasStore.getState();
+      const blob = await exportDetailPageImage(
+        placedTemplates,
+        TEMPLATE_HEIGHTS,
+      );
+      setPreviewImageUrl(URL.createObjectURL(blob));
+      router.push('/detail-edit/preview');
+    } catch {
+      setExportErrorMessage('미리보기를 불러오지 못했어요. 다시 시도해주세요.');
+    } finally {
+      setIsPreviewing(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!selectedProduct) return;
+
+    setIsSaving(true);
+    try {
+      const { placedTemplates } = useDetailCanvasStore.getState();
+      const blob = await exportDetailPageImage(
+        placedTemplates,
+        TEMPLATE_HEIGHTS,
+      );
+      const file = new File(
+        [blob],
+        `상세페이지-${selectedProduct.name}-${Date.now()}.png`,
+        { type: 'image/png' },
+      );
+      await saveDetailPage.mutateAsync({
+        productId: Number(selectedProduct.id),
+        file,
+      });
+      setSaveModalOpen(true);
+    } catch (error) {
+      setSaveErrorMessage(
+        error instanceof ApiError
+          ? error.message
+          : '상세페이지 저장에 실패했어요. 다시 시도해주세요.',
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleExportLocal = async () => {
+    setIsExportingLocal(true);
+    try {
+      const { placedTemplates } = useDetailCanvasStore.getState();
+      const blob = await exportDetailPageImage(
+        placedTemplates,
+        TEMPLATE_HEIGHTS,
+      );
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `상세페이지-${
+        selectedProduct?.name ?? '상품'
+      }-${Date.now()}.png`;
+      link.click();
+      URL.revokeObjectURL(url);
+      setExportModalOpen(true);
+    } catch {
+      setExportErrorMessage('이미지 내보내기에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      setIsExportingLocal(false);
+    }
   };
 
   return (
@@ -111,7 +201,8 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         <Button
           variant="secondary"
           size="large"
-          disabled={!hasTemplates}
+          disabled={!hasTemplates || isPreviewing}
+          onClick={handlePreview}
           leftIcon={
             <Expand
               size={24}
@@ -125,19 +216,19 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
           variant="primary"
           size="medium"
           className="w-[108px]"
-          disabled={!hasTemplates}
-          onClick={() => setSaveModalOpen(true)}
+          disabled={!hasTemplates || !selectedProduct || isSaving}
+          onClick={handleSave}
         >
-          저장하기
+          {isSaving ? '저장 중...' : '저장하기'}
         </Button>
         <Button
           variant="primary"
           size="medium"
           className="w-[108px]"
-          disabled={!hasTemplates}
-          onClick={() => setExportModalOpen(true)}
+          disabled={!hasTemplates || isExportingLocal}
+          onClick={handleExportLocal}
         >
-          내보내기
+          {isExportingLocal ? '내보내는 중...' : '내보내기'}
         </Button>
       </div>
 
@@ -165,6 +256,20 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         state="error"
         message={autoPlacementErrorMessage ?? ''}
         onClose={() => setAutoPlacementErrorMessage(null)}
+      />
+      <Toast
+        usePortal={false}
+        open={exportErrorMessage !== null}
+        state="error"
+        message={exportErrorMessage ?? ''}
+        onClose={() => setExportErrorMessage(null)}
+      />
+      <Toast
+        usePortal={false}
+        open={saveErrorMessage !== null}
+        state="error"
+        message={saveErrorMessage ?? ''}
+        onClose={() => setSaveErrorMessage(null)}
       />
     </header>
   );

@@ -167,18 +167,26 @@ const getTableHeight = (rowCount: number) => TABLE_ROW_HEIGHT * (rowCount + 1);
 const getMaterialTableHeight = () =>
   MATERIAL_ROW_HEIGHT * MATERIAL_PROPERTY_LABELS.length;
 
-export const TEMPLATE_HEIGHT =
-  CONTENT_Y +
-  HEADER_BLOCK_HEIGHT +
-  SECTION_GAP +
-  IMAGE_SIZE +
-  SECTION_GAP +
-  UNIT_LABEL_HEIGHT +
-  UNIT_TABLE_GAP +
-  getTableHeight(DEFAULT_SIZE_TABLE.rows.length) +
-  SECTION_GAP +
-  getMaterialTableHeight() +
-  CONTENT_Y;
+const IMAGE_SLOT_Y = HEADER_BLOCK_HEIGHT + SECTION_GAP;
+
+// 사이즈표 행 수(sizeTable.rows.length)에 따라 실측 이미지 아래 레이아웃과
+// 전체 템플릿 높이가 달라진다. Stage 높이(DetailTemplateBlockContent)와
+// 캔버스 합성(exportDetailPageImage) 양쪽이 이 실데이터 기반 계산을 그대로
+// 써야, 렌더링된 흰 배경보다 Stage가 더 커서 생기는 빈 공간이 없어진다
+const getSizeInfoLayout = (sizeTable: SizeInfoTableData) => {
+  const unitLabelY = IMAGE_SLOT_Y + IMAGE_SIZE + SECTION_GAP;
+  const sizeTableY = unitLabelY + UNIT_LABEL_HEIGHT + UNIT_TABLE_GAP;
+  const materialTableY =
+    sizeTableY + getTableHeight(sizeTable.rows.length) + SECTION_GAP;
+  const templateHeight =
+    CONTENT_Y + materialTableY + getMaterialTableHeight() + CONTENT_Y;
+  return { unitLabelY, sizeTableY, materialTableY, templateHeight };
+};
+
+export const getSizeInfoTemplateHeight = (sizeTable: SizeInfoTableData) =>
+  getSizeInfoLayout(sizeTable).templateHeight;
+
+export const TEMPLATE_HEIGHT = getSizeInfoTemplateHeight(DEFAULT_SIZE_TABLE);
 
 interface SizeTableProps {
   y: number;
@@ -383,7 +391,7 @@ const MaterialPropertyTable = ({ y, rows }: MaterialPropertyTableProps) => {
 export const IMAGE_SLOT = {
   id: 'slot-image',
   x: IMAGE_X,
-  y: HEADER_BLOCK_HEIGHT + SECTION_GAP,
+  y: IMAGE_SLOT_Y,
   width: IMAGE_SIZE,
   height: IMAGE_SIZE,
   type: 'image' as const,
@@ -399,12 +407,8 @@ export const SizeInfoTemplate = ({
   const rootRef = useRef<Konva.Group>(null);
   const images = useImageSlotDrop(rootRef, templateId, SLOTS);
 
-  const unitLabelY = IMAGE_SLOT.y + IMAGE_SIZE + SECTION_GAP;
-  const sizeTableY = unitLabelY + UNIT_LABEL_HEIGHT + UNIT_TABLE_GAP;
-  const materialTableY =
-    sizeTableY + getTableHeight(sizeTable.rows.length) + SECTION_GAP;
-  const templateHeight =
-    CONTENT_Y + materialTableY + getMaterialTableHeight() + CONTENT_Y;
+  const { unitLabelY, sizeTableY, materialTableY, templateHeight } =
+    getSizeInfoLayout(sizeTable);
 
   return (
     <Group ref={rootRef}>
