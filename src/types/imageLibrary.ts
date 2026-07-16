@@ -1,3 +1,17 @@
+export interface ImageFolder {
+  productId: number;
+  productCode: string;
+  productName: string;
+  category: string;
+  assetCount: number;
+  thumbnailAssetId: number;
+  thumbnailUrl: string;
+}
+
+export interface ImageFolderListResponse {
+  imageFolders: ImageFolder[];
+}
+
 export interface LibraryImageAsset {
   assetId: number;
   type: string;
