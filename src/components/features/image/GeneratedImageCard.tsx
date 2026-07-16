@@ -18,10 +18,7 @@ export const GeneratedImageCard = ({
   return (
     <div
       className={[
-        'group relative overflow-hidden rounded-[var(--radius-small1)] border transition-colors',
-        liked
-          ? 'border-border-border'
-          : 'hover:border-border-subtle border-transparent',
+        'group border-border-border relative overflow-hidden rounded-[var(--radius-small1)] border',
         className,
       ].join(' ')}
     >
@@ -34,7 +31,7 @@ export const GeneratedImageCard = ({
         liked={liked}
         onToggleLike={onToggleLike}
         className={[
-          'absolute top-[15px] left-[15px] transition-opacity',
+          'absolute right-[16px] bottom-[16px] transition-opacity',
           liked ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
         ].join(' ')}
       />
