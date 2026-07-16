@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Heading, Body } from '@/components/commons/Typography';
 import { Spinner } from '@/components/commons/Spinner';
 import { LibraryProductCard } from '@/components/features/library/LibraryProductCard';
@@ -39,16 +40,21 @@ export const LibraryPage = () => {
         {!isLoading && !isError && imageFolders.length > 0 && (
           <div className="grid w-full grid-cols-[repeat(auto-fill,267px)] gap-[var(--gap-6)]">
             {imageFolders.map((folder) => (
-              <LibraryProductCard
+              <Link
                 key={folder.productId}
-                productName={folder.productName}
-                images={folder.previewImages.map((image) => image.imageUrl)}
-                modelCutCount={folder.counts.modelCut}
-                productCutCount={folder.counts.productCut}
-                detailPageCount={folder.counts.detailPage}
-                totalImageCount={folder.counts.total}
-                createdAt={folder.updatedAt}
-              />
+                href={`/library/${folder.productId}`}
+                className="contents"
+              >
+                <LibraryProductCard
+                  productName={folder.productName}
+                  images={folder.previewImages.map((image) => image.imageUrl)}
+                  modelCutCount={folder.counts.modelCut}
+                  productCutCount={folder.counts.productCut}
+                  detailPageCount={folder.counts.detailPage}
+                  totalImageCount={folder.counts.total}
+                  createdAt={folder.updatedAt}
+                />
+              </Link>
             ))}
           </div>
         )}

@@ -36,7 +36,7 @@ export const LibraryFolderHeader = ({
   gender,
 }: LibraryFolderHeaderProps) => {
   return (
-    <div className="flex w-full flex-col items-start gap-[var(--gap-5)]">
+    <div className="flex w-[637px] flex-col items-start gap-[var(--gap-5)]">
       <div className="flex items-center gap-[var(--gap-2)]">
         <Link href="/library">
           <Body size="xsmall" bold className="text-text-disabled">
