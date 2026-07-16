@@ -1,3 +1,5 @@
-export default function LibraryPage() {
-  return <div>라이브러리</div>;
+import { LibraryPage } from '@/components/features/library/LibraryPage';
+
+export default function Page() {
+  return <LibraryPage />;
 }

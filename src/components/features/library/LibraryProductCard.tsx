@@ -46,7 +46,7 @@ export const LibraryProductCard = ({
   const [mainImage, subImage1, subImage2] = images;
 
   return (
-    <div className="bg-bg-white border-border-subtler flex w-[267px] flex-col overflow-hidden rounded-[var(--radius-medium2)] border shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
+    <div className="bg-bg-white border-border-subtler flex w-[267px] cursor-pointer flex-col overflow-hidden rounded-[var(--radius-medium2)] border shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
       <div className="flex items-center gap-[var(--gap-3)]">
         <div className="bg-bg-gray-subtle h-[184px] w-[143px] shrink-0">
           {mainImage && (
