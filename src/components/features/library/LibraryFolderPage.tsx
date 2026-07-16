@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { AlertModal } from '@/components/commons/AlertModal';
 import { Heading, Body } from '@/components/commons/Typography';
 import { Spinner } from '@/components/commons/Spinner';
 import { LibraryFolderHeader } from '@/components/features/library/LibraryFolderHeader';
@@ -11,7 +13,7 @@ import {
   type LibraryImageCardType,
 } from '@/components/features/library/LibraryImageCard';
 import { useImageFolderAssets } from '@/hooks/useImageFolderAssets';
-import { useDeleteAsset } from '@/hooks/useDeleteAsset';
+import { useDeleteLibraryAsset } from '@/hooks/useDeleteLibraryAsset';
 import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
 import type { LibraryImageAsset } from '@/types/imageLibrary';
 
@@ -30,8 +32,9 @@ export const LibraryFolderPage = () => {
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useImageFolderAssets(productId);
-  const deleteAsset = useDeleteAsset();
+  const deleteAsset = useDeleteLibraryAsset();
   const toggleLike = useToggleAssetLike();
+  const [assetIdToDelete, setAssetIdToDelete] = useState<number | null>(null);
 
   const invalidateAssets = () => {
     queryClient.invalidateQueries({
@@ -39,8 +42,14 @@ export const LibraryFolderPage = () => {
     });
   };
 
-  const handleDelete = (assetId: number) => {
-    deleteAsset.mutate(assetId, { onSuccess: invalidateAssets });
+  const handleConfirmDelete = () => {
+    if (assetIdToDelete === null) return;
+    deleteAsset.mutate(assetIdToDelete, {
+      onSuccess: () => {
+        invalidateAssets();
+        setAssetIdToDelete(null);
+      },
+    });
   };
 
   const handleToggleLike = (assetId: number) => {
@@ -112,7 +121,7 @@ export const LibraryFolderPage = () => {
                 createdAt={asset.createdAt}
                 liked={asset.isLiked}
                 onToggleLike={() => handleToggleLike(asset.assetId)}
-                onDelete={() => handleDelete(asset.assetId)}
+                onDelete={() => setAssetIdToDelete(asset.assetId)}
               />
             ))}
           </div>
@@ -137,6 +146,17 @@ export const LibraryFolderPage = () => {
           </div>
         </div>
       )}
+
+      <AlertModal
+        open={assetIdToDelete !== null}
+        title="해당 이미지를 삭제하시겠어요?"
+        description={
+          '저장된 해당 이미지가 삭제되며,\n삭제된 내용은 복구할 수 없습니다.'
+        }
+        cancelText="취소"
+        onCancel={() => setAssetIdToDelete(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };
