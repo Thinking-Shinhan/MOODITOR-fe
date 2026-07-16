@@ -50,7 +50,7 @@ export const LibraryImageCard = ({
           <img
             src={imageUrl}
             alt=""
-            className="absolute bottom-0 left-1/2 h-[256px] w-[167px] -translate-x-1/2 rounded-t-[var(--radius-small2)] object-cover"
+            className="absolute bottom-0 left-1/2 h-[256px] w-[167px] -translate-x-1/2 rounded-t-[var(--radius-small2)] object-cover object-top"
           />
         ) : (
           <img
