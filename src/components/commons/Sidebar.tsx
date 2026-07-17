@@ -28,7 +28,12 @@ const NAV_ITEMS: NavItemConfig[] = [
   { href: '/library', icon: Library, label: '라이브러리' },
 ];
 
-const HIDDEN_SIDEBAR_PATHS = ['/detail-edit/preview', '/login', '/signup'];
+const HIDDEN_SIDEBAR_PATHS = [
+  '/detail-edit/preview',
+  '/login',
+  '/signup',
+  '/onboarding',
+];
 
 export const Sidebar = () => {
   const {

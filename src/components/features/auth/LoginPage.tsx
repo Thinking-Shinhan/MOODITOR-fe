@@ -8,7 +8,7 @@ import { Input } from '@/components/commons/Input';
 import { Button } from '@/components/commons/Button';
 import { FormError } from '@/components/commons/FormError';
 import { Body } from '@/components/commons/Typography';
-import { AuthHeader } from '@/components/features/auth/AuthHeader';
+import { ServiceHeader } from '@/components/commons/ServiceHeader';
 import { useLogin } from '@/hooks/useLogin';
 
 const loginSchema = z.object({
@@ -35,7 +35,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex h-full min-h-screen w-full flex-col">
-      <AuthHeader />
+      <ServiceHeader />
       <div className="flex flex-1 items-center justify-center">
         <div className="bg-bg-white border-border-subtler flex flex-col items-center gap-[var(--gap-8)] rounded-[var(--radius-large2)] border p-[var(--padding-9)] shadow-[0px_2px_4px_rgba(0,0,0,0.04)]">
           <Body size="large" bold className="text-text-basic">
