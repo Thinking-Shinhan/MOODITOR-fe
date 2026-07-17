@@ -3,13 +3,14 @@
 import { useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { ProgressStepCard } from '@/components/commons/ProgressStepCard';
+import type { ImageGenerationProgressItem } from '@/types/imageGenerationJob';
 
 interface ProgressStepModalProps {
   open: boolean;
   progress: number;
   title: string;
   description: string;
-  steps: string[];
+  progressItems: ImageGenerationProgressItem[];
 }
 
 const noopSubscribe = () => () => {};
@@ -26,7 +27,7 @@ export const ProgressStepModal = ({
   progress,
   title,
   description,
-  steps,
+  progressItems,
 }: ProgressStepModalProps) => {
   const isClient = useIsClient();
 
@@ -38,7 +39,7 @@ export const ProgressStepModal = ({
         progress={progress}
         title={title}
         description={description}
-        steps={steps}
+        progressItems={progressItems}
       />
     </div>,
     document.body,
