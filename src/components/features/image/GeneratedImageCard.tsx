@@ -18,7 +18,7 @@ export const GeneratedImageCard = ({
   return (
     <div
       className={[
-        'group border-border-border relative overflow-hidden rounded-[var(--radius-small1)] border',
+        'group hover:outline-border-border relative overflow-hidden rounded-[var(--radius-small1)] hover:outline hover:outline-1',
         className,
       ].join(' ')}
     >
