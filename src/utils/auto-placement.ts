@@ -33,17 +33,12 @@ interface BuildAutoPlacementRequestParams {
   texts: Record<string, string>;
 }
 
-// 캔버스 상태(placedTemplates/images/texts)로부터 자동 배치 요청 바디를 조립
-// MATERIAL/SIZE_TIP은 채울 슬롯이 없어 요청에서 제외하되, blockOrder는 캔버스 상의 실제 위치를 그대로 반영(제외된 블록도 순서 계산에는 포함)
-export const buildAutoPlacementRequest = ({
-  productId,
-  mode,
-  targetInstanceKey,
-  placedTemplates,
-  images,
-  texts,
-}: BuildAutoPlacementRequestParams): AutoPlacementRequest => {
-  const templateBlocks: AutoPlacementTemplateBlock[] = placedTemplates
+export const buildTemplateBlocks = (
+  placedTemplates: PlacedTemplate[],
+  images: Record<string, PlacedImage>,
+  texts: Record<string, string>,
+): AutoPlacementTemplateBlock[] =>
+  placedTemplates
     .map((template, index) => ({ template, blockOrder: index + 1 }))
     .filter(({ template }) => isAutoPlaceableTemplateType(template.type))
     .map(({ template, blockOrder }) => {
@@ -77,16 +72,20 @@ export const buildAutoPlacementRequest = ({
       };
     });
 
-  return {
-    productId,
-    mode,
-    ...(targetInstanceKey ? { targetInstanceKey } : {}),
-    templateBlocks,
-  };
-};
+export const buildAutoPlacementRequest = ({
+  productId,
+  mode,
+  targetInstanceKey,
+  placedTemplates,
+  images,
+  texts,
+}: BuildAutoPlacementRequestParams): AutoPlacementRequest => ({
+  productId,
+  mode,
+  ...(targetInstanceKey ? { targetInstanceKey } : {}),
+  templateBlocks: buildTemplateBlocks(placedTemplates, images, texts),
+});
 
-// 응답의 placements/copies를 각 store에 그대로 반영
-// 컴포넌트 렌더링 중이 아니라 mutation 콜백에서 호출되므로 훅이 아니라 zustand의 vanilla getState()/액션을 직접 사용
 export const applyAutoPlacementResponse = (response: AutoPlacementResponse) => {
   const { setImage } = useImagePlacementStore.getState();
   const { setText } = useTextPlacementStore.getState();

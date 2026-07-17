@@ -2,30 +2,52 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Expand, WandSparkles } from 'lucide-react';
+import { AlignLeft, Check, Expand, WandSparkles } from 'lucide-react';
 import { AlertModal } from '@/components/commons/AlertModal';
 import { Button } from '@/components/commons/Button';
 import { Body } from '@/components/commons/Typography';
 import { Toast } from '@/components/commons/Toast';
 import { Tooltip } from '@/components/commons/Tooltip';
+import { ProgressStepModal } from '@/components/commons/ProgressStepModal';
 import { TEMPLATE_HEIGHTS } from '@/components/features/detail/DetailTemplateBlockContent';
 import { useAutoPlacement } from '@/hooks/useAutoPlacement';
 import { useSaveDetailPage } from '@/hooks/useSaveDetailPage';
+import { useReviewCopy } from '@/hooks/useReviewCopy';
+import { useFakeProgress } from '@/hooks/useFakeProgress';
 import { ApiError } from '@/libs/apiClient';
 import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import { useImagePlacementStore } from '@/stores/imagePlacementStore';
 import { useDetailPagePreviewStore } from '@/stores/detailPagePreviewStore';
 import { useTextPlacementStore } from '@/stores/textPlacementStore';
+import { useCopyReviewStore } from '@/stores/copyReviewStore';
 import {
   applyAutoPlacementResponse,
   buildAutoPlacementRequest,
 } from '@/utils/auto-placement';
+import {
+  buildReviewCopyRequest,
+  mapReviewCopyIssuesToItems,
+} from '@/utils/reviewCopy';
 import { exportDetailPageImage } from '@/utils/exportDetailPageImage';
 
 interface DetailEditHeaderProps {
   className?: string;
 }
+
+const AUTO_PLACEMENT_RESULT_DELAY_MS = 1000;
+
+interface ProgressChecklistDefinition {
+  label: string;
+  // 이 진행률(%) 이상이면 활성화 상태로 표시
+  threshold: number;
+}
+
+const AUTO_PLACEMENT_CHECKLIST: ProgressChecklistDefinition[] = [
+  { label: '이미지 배치 중', threshold: 1 },
+  { label: 'AI 문구 생성 중', threshold: 50 },
+  { label: '모든 페이지 배치 완료', threshold: 100 },
+];
 
 export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   const router = useRouter();
@@ -42,6 +64,9 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
     null,
   );
   const [saveErrorMessage, setSaveErrorMessage] = useState<string | null>(null);
+  const [reviewCopyErrorMessage, setReviewCopyErrorMessage] = useState<
+    string | null
+  >(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isExportingLocal, setIsExportingLocal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -53,6 +78,15 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   );
   const autoPlacement = useAutoPlacement();
   const saveDetailPage = useSaveDetailPage();
+  const reviewCopy = useReviewCopy();
+  const openCopyReviewPanel = useCopyReviewStore((state) => state.openPanel);
+  const setCopyReviewItems = useCopyReviewStore((state) => state.setItems);
+  const [isAutoPlacing, setIsAutoPlacing] = useState(false);
+  const {
+    progress: autoPlacementProgress,
+    reset: resetAutoPlacementProgress,
+    complete: completeAutoPlacementProgress,
+  } = useFakeProgress(isAutoPlacing);
 
   const handleAutoPlaceAll = () => {
     if (!selectedProduct) return;
@@ -69,18 +103,58 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
       texts,
     });
 
+    setAutoPlacementErrorMessage(null);
+    resetAutoPlacementProgress();
+    setIsAutoPlacing(true);
+
     autoPlacement.mutate(request, {
       onSuccess: (response) => {
-        applyAutoPlacementResponse(response);
-        if (response.status === 'PARTIAL_SUCCESS') {
-          setAutoPlacementErrorMessage(
-            '일부 문구 생성에 실패했어요. 다시 시도해주세요.',
-          );
-        }
+        completeAutoPlacementProgress();
+        setTimeout(() => {
+          applyAutoPlacementResponse(response);
+          setIsAutoPlacing(false);
+          if (response.status === 'PARTIAL_SUCCESS') {
+            setAutoPlacementErrorMessage(
+              '일부 문구 생성에 실패했어요. 다시 시도해주세요.',
+            );
+          }
+        }, AUTO_PLACEMENT_RESULT_DELAY_MS);
       },
       onError: () => {
+        setIsAutoPlacing(false);
         setAutoPlacementErrorMessage(
           'AI 자동 배치에 실패했어요. 잠시 후 다시 시도해주세요.',
+        );
+      },
+    });
+  };
+
+  const handleReviewCopy = () => {
+    if (!selectedProduct) return;
+
+    const { placedTemplates } = useDetailCanvasStore.getState();
+    const { images } = useImagePlacementStore.getState();
+    const { texts } = useTextPlacementStore.getState();
+
+    const request = buildReviewCopyRequest({
+      productId: Number(selectedProduct.id),
+      placedTemplates,
+      images,
+      texts,
+    });
+
+    reviewCopy.mutate(request, {
+      onSuccess: (response) => {
+        setCopyReviewItems(
+          mapReviewCopyIssuesToItems(response.issues, placedTemplates),
+        );
+        openCopyReviewPanel();
+      },
+      onError: (error) => {
+        setReviewCopyErrorMessage(
+          error instanceof ApiError
+            ? error.message
+            : 'AI 문구 검수에 실패했어요. 잠시 후 다시 시도해주세요.',
         );
       },
     });
@@ -171,9 +245,7 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
           <button
             type="button"
             onClick={handleAutoPlaceAll}
-            disabled={
-              !hasTemplates || !selectedProduct || autoPlacement.isPending
-            }
+            disabled={!hasTemplates || !selectedProduct || isAutoPlacing}
             className="bg-btn-secondary-fill border-border-border hover:border-border-subtle disabled:border-border-subtle group flex cursor-pointer items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border px-[var(--padding-5)] py-[var(--padding-3)] disabled:cursor-not-allowed"
           >
             <WandSparkles
@@ -185,7 +257,7 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
               bold
               className="text-text-border group-hover:text-text-subtler group-disabled:text-text-disabled"
             >
-              {autoPlacement.isPending ? '배치 중...' : 'AI 자동 배치'}
+              AI 자동 배치
             </Body>
           </button>
           {aiTooltipOpen && (
@@ -196,6 +268,24 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
             />
           )}
         </div>
+        <button
+          type="button"
+          onClick={handleReviewCopy}
+          disabled={!hasTemplates || !selectedProduct || reviewCopy.isPending}
+          className="bg-btn-secondary-fill border-border-border hover:border-border-subtle disabled:border-border-subtle group flex shrink-0 cursor-pointer items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border px-[var(--padding-5)] py-[var(--padding-3)] disabled:cursor-not-allowed"
+        >
+          <AlignLeft
+            size={16}
+            className="text-icon-gray group-hover:text-icon-gray-light group-disabled:text-icon-disabled"
+          />
+          <Body
+            size="small"
+            bold
+            className="text-text-border group-hover:text-text-subtler group-disabled:text-text-disabled"
+          >
+            {reviewCopy.isPending ? '검수 중...' : 'AI 문구 검수'}
+          </Body>
+        </button>
       </div>
       <div className="flex items-center gap-[var(--gap-4)]">
         <Button
@@ -270,6 +360,25 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         state="error"
         message={saveErrorMessage ?? ''}
         onClose={() => setSaveErrorMessage(null)}
+      />
+      <Toast
+        usePortal={false}
+        open={reviewCopyErrorMessage !== null}
+        state="error"
+        message={reviewCopyErrorMessage ?? ''}
+        onClose={() => setReviewCopyErrorMessage(null)}
+      />
+      <ProgressStepModal
+        open={isAutoPlacing}
+        progress={autoPlacementProgress}
+        title="AI 자동 배치 중"
+        description={
+          '브랜드 무드를 분석해 이미지와 텍스트를\n최적의 위치에 배치하고 있어요.'
+        }
+        items={AUTO_PLACEMENT_CHECKLIST.map((item) => ({
+          label: item.label,
+          active: autoPlacementProgress >= item.threshold,
+        }))}
       />
     </header>
   );

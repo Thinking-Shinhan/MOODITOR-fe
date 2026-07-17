@@ -3,6 +3,7 @@ import type {
   DetailPageInitResponse,
   DetailPageSaveResponse,
 } from '@/types/detailPage';
+import type { ReviewCopyRequest, ReviewCopyResponse } from '@/types/reviewCopy';
 
 export const detailPageService = {
   getInitData: (productId: number) =>
@@ -20,4 +21,7 @@ export const detailPageService = {
       formData,
     );
   },
+
+  reviewCopy: (payload: ReviewCopyRequest) =>
+    apiClient.post<ReviewCopyResponse>('/detail-pages/review-copy', payload),
 };
