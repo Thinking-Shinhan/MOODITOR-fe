@@ -4,11 +4,13 @@ import { ServiceHeader } from '@/components/commons/ServiceHeader';
 import { StepProgressBar } from '@/components/commons/StepProgressBar';
 import { Heading, Body } from '@/components/commons/Typography';
 
-const ONBOARDING_STEPS = ['웹사이트 링크', '브랜드 자료', '무드 분석'];
+const ONBOARDING_STEPS = ['웹사이트 링크', '브랜드 자료', '추가 요청사항'];
 
 interface OnboardingStepLayoutProps {
-  currentStep: number;
-  title: string;
+  // 생략하면 진행 단계 표시줄 대신 headerIcon을 보여준다 (예: 분석 결과 화면)
+  currentStep?: number;
+  headerIcon?: ReactNode;
+  title: ReactNode;
   subtitle: string;
   children: ReactNode;
   onPrevious?: () => void;
@@ -20,6 +22,7 @@ interface OnboardingStepLayoutProps {
 
 export const OnboardingStepLayout = ({
   currentStep,
+  headerIcon,
   title,
   subtitle,
   children,
@@ -33,9 +36,16 @@ export const OnboardingStepLayout = ({
     <ServiceHeader />
     <div className="flex flex-1 flex-col items-center justify-center gap-[var(--gap-10)] py-[var(--padding-9)]">
       <div className="flex w-full flex-col items-center gap-[var(--gap-7)]">
-        <div className="w-[192px]">
-          <StepProgressBar steps={ONBOARDING_STEPS} currentStep={currentStep} />
-        </div>
+        {currentStep !== undefined ? (
+          <div className="w-[192px]">
+            <StepProgressBar
+              steps={ONBOARDING_STEPS}
+              currentStep={currentStep}
+            />
+          </div>
+        ) : (
+          headerIcon
+        )}
         <div className="flex flex-col items-center gap-[var(--gap-2)] text-center">
           <Heading size="medium" className="text-text-basic">
             {title}

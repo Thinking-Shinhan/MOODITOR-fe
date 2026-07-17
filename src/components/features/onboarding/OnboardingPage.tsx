@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Check } from 'lucide-react';
 import { Button } from '@/components/commons/Button';
 import { Toast } from '@/components/commons/Toast';
 import { ApiError } from '@/libs/apiClient';
 import { OnboardingStepLayout } from '@/components/features/onboarding/OnboardingStepLayout';
 import { WebsiteLinkInput } from '@/components/features/onboarding/WebsiteLinkInput';
 import { BrandFileDropzone } from '@/components/features/onboarding/BrandFileDropzone';
+import { AdditionalRequestInput } from '@/components/features/onboarding/AdditionalRequestInput';
 import { BrandMoodAnalysisResult } from '@/components/features/onboarding/BrandMoodAnalysisResult';
 import { useAnalyzeBrandMood } from '@/hooks/useAnalyzeBrandMood';
 import { useSaveBrandMood } from '@/hooks/useSaveBrandMood';
@@ -16,11 +18,27 @@ import type { BrandMoodAnalysis } from '@/types/onboarding';
 // TODO: 회원가입 응답의 브랜드명으로 교체 예정
 const MOCK_BRAND_NAME = '에이븐';
 
+const ResultHeaderIcon = () => (
+  <div className="outline-btn-secondary-fill-hovered bg-icon-primary-basic flex size-[28px] shrink-0 items-center justify-center rounded-[var(--radius-max)] outline-[5px]">
+    <Check size={18} className="text-icon-inverse" strokeWidth={3} />
+  </div>
+);
+
+const AdditionalRequestTitle = () => (
+  <span className="flex items-center gap-[var(--gap-2)]">
+    브랜드에 대해서 더 알려주세요.
+    <span className="bg-btn-tertiary-fill text-text-basic rounded-[var(--radius-max)] px-[var(--padding-5)] py-[var(--padding-2)] text-[14px] leading-[1.5] font-normal">
+      선택
+    </span>
+  </span>
+);
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [brandFile, setBrandFile] = useState<File | null>(null);
+  const [additionalRequest, setAdditionalRequest] = useState('');
   const [analysis, setAnalysis] = useState<BrandMoodAnalysis | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -36,12 +54,12 @@ export default function OnboardingPage() {
       {
         sourceUrl: websiteUrl,
         sourceType: 'URL',
+        sourceText: additionalRequest.trim() || undefined,
         file: brandFile ?? undefined,
       },
       {
         onSuccess: (data) => {
           setAnalysis(data);
-          setCurrentStep(3);
         },
         onError: (error) => {
           setErrorMessage(
@@ -101,11 +119,11 @@ export default function OnboardingPage() {
     />
   );
 
-  if (currentStep === 3 && analysis) {
+  if (analysis) {
     return (
       <>
         <OnboardingStepLayout
-          currentStep={3}
+          headerIcon={<ResultHeaderIcon />}
           title="브랜드 무드 분석 결과를 알려드려요."
           subtitle="분석된 브랜드 무드를 이미지와 상세페이지 제작에 반영해 우리 브랜드에 꼭 맞는 결과물을 만들 수 있어요."
           footer={
@@ -132,26 +150,43 @@ export default function OnboardingPage() {
     );
   }
 
-  if (currentStep === 2) {
+  if (currentStep === 3) {
     return (
       <>
         <OnboardingStepLayout
-          currentStep={2}
-          title="브랜드 자료 업로드를 업로드해 주세요."
-          subtitle="브랜드 가이드, 소개서 등 브랜드의 분위기를 파악할 수 있는 자료를 업로드해 주세요."
+          currentStep={3}
+          title={<AdditionalRequestTitle />}
+          subtitle="브랜드의 분위기나 원하는 방향을 알려주시면, AI가 분석 결과와 생성 결과에 반영해 드려요."
           onPrevious={goToPreviousStep}
           onNext={handleAnalyze}
           nextDisabled={analyzeBrandMood.isPending}
           nextLabel={analyzeBrandMood.isPending ? '분석 중...' : '다음'}
         >
-          <BrandFileDropzone
-            file={brandFile}
-            onSelect={setBrandFile}
-            onRemove={() => setBrandFile(null)}
+          <AdditionalRequestInput
+            value={additionalRequest}
+            onChange={setAdditionalRequest}
           />
         </OnboardingStepLayout>
         {errorToast}
       </>
+    );
+  }
+
+  if (currentStep === 2) {
+    return (
+      <OnboardingStepLayout
+        currentStep={2}
+        title="브랜드 자료 업로드를 업로드해 주세요."
+        subtitle="브랜드 가이드, 소개서 등 브랜드의 분위기를 파악할 수 있는 자료를 업로드해 주세요."
+        onPrevious={goToPreviousStep}
+        onNext={() => setCurrentStep(3)}
+      >
+        <BrandFileDropzone
+          file={brandFile}
+          onSelect={setBrandFile}
+          onRemove={() => setBrandFile(null)}
+        />
+      </OnboardingStepLayout>
     );
   }
 
