@@ -14,6 +14,7 @@ interface OnboardingStepLayoutProps {
   onPrevious?: () => void;
   onNext?: () => void;
   nextDisabled?: boolean;
+  nextLabel?: string;
   footer?: ReactNode;
 }
 
@@ -25,6 +26,7 @@ export const OnboardingStepLayout = ({
   onPrevious,
   onNext,
   nextDisabled = false,
+  nextLabel = '다음',
   footer,
 }: OnboardingStepLayoutProps) => (
   <div className="flex h-full min-h-screen w-full flex-col">
@@ -63,7 +65,7 @@ export const OnboardingStepLayout = ({
             onClick={onNext}
             disabled={nextDisabled}
           >
-            다음
+            {nextLabel}
           </Button>
         </div>
       )}
