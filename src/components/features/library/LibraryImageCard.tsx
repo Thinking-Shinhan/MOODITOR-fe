@@ -1,6 +1,7 @@
 'use client';
 
-import { Heart, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import { LikeButton } from '@/components/commons/LikeButton';
 import { Body } from '@/components/commons/Typography';
 
 export type LibraryImageCardType = 'MODEL_CUT' | 'PRODUCT_CUT' | 'DETAIL_PAGE';
@@ -41,7 +42,7 @@ export const LibraryImageCard = ({
   const isDetailPage = type === 'DETAIL_PAGE';
 
   return (
-    <div className="bg-bg-white border-border-subtler hover:border-border-basic group flex w-[215px] flex-col items-start overflow-hidden rounded-[var(--radius-medium2)] border shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
+    <div className="bg-bg-white border-border-subtler hover:border-border-basic group flex w-[215px] shrink-0 flex-col items-start overflow-hidden rounded-[var(--radius-medium2)] border shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
       <div
         className={`bg-bg-gray-subtle relative w-full shrink-0 ${isDetailPage ? 'h-[280px]' : 'h-[160px]'}`}
       >
@@ -49,7 +50,7 @@ export const LibraryImageCard = ({
           <img
             src={imageUrl}
             alt=""
-            className="absolute bottom-0 left-1/2 h-[256px] w-[167px] -translate-x-1/2 rounded-t-[var(--radius-small2)] object-cover"
+            className="absolute bottom-0 left-1/2 h-[256px] w-[167px] -translate-x-1/2 rounded-t-[var(--radius-small2)] object-cover object-top"
           />
         ) : (
           <img
@@ -75,18 +76,13 @@ export const LibraryImageCard = ({
           </button>
         )}
 
-        <button
-          type="button"
-          onClick={onToggleLike}
-          className="absolute right-[var(--padding-4)] bottom-[var(--padding-4)] flex size-[20px] cursor-pointer items-center justify-center"
-        >
-          <Heart
-            size={20}
-            strokeWidth={1.3}
-            className={liked ? 'text-icon-gray' : 'text-icon-inverse'}
-            fill={liked ? 'currentColor' : 'none'}
-          />
-        </button>
+        <LikeButton
+          liked={liked}
+          onToggleLike={onToggleLike}
+          strokeWidth={1.3}
+          iconClassName={liked ? 'text-icon-gray' : 'text-icon-inverse'}
+          className="absolute right-[var(--padding-4)] bottom-[var(--padding-4)]"
+        />
       </div>
 
       <div className="flex w-full flex-col gap-[var(--gap-2)] px-[var(--padding-5)] py-[var(--padding-4)]">

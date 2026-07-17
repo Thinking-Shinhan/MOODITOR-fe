@@ -4,7 +4,7 @@ import type { ImageAspectRatio } from '@/types/image';
 export type ImageGenerationStatus = 'idle' | 'loading' | 'success';
 
 interface GeneratedImageItem {
-  id: string;
+  assetId: number;
   url: string;
 }
 

@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import { Check, ChevronRight } from 'lucide-react';
 import { Body } from '@/components/commons/Typography';
 import { TextButton } from '@/components/commons/TextButton';
+import { Toast } from '@/components/commons/Toast';
 import { GeneratedImageCard } from '@/components/features/image/GeneratedImageCard';
+import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
 import type { ImageAspectRatio } from '@/types/image';
 
 interface GeneratedImage {
-  id: string;
+  assetId: number;
   url: string;
 }
 
@@ -41,17 +43,29 @@ export const ImageGenerateResultCanvas = ({
   aspectRatio,
 }: ImageGenerateResultCanvasProps) => {
   const router = useRouter();
-  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const toggleLike = useToggleAssetLike();
 
-  const handleToggleLike = (id: string) => {
+  const flipLiked = (assetId: number, liked: boolean) => {
     setLikedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (liked) next.add(assetId);
+      else next.delete(assetId);
       return next;
+    });
+  };
+
+  const handleToggleLike = (assetId: number) => {
+    const wasLiked = likedIds.has(assetId);
+    // 응답을 기다리지 않고 즉시 반영하고, 실패하면 원래 상태로 되돌린다
+    flipLiked(assetId, !wasLiked);
+
+    toggleLike.mutate(assetId, {
+      onError: () => {
+        flipLiked(assetId, wasLiked);
+        setErrorMessage('요청을 처리하지 못했어요. 다시 시도해주세요.');
+      },
     });
   };
 
@@ -85,10 +99,10 @@ export const ImageGenerateResultCanvas = ({
       >
         {images.map((image) => (
           <GeneratedImageCard
-            key={image.id}
+            key={image.assetId}
             url={image.url}
-            liked={likedIds.has(image.id)}
-            onToggleLike={() => handleToggleLike(image.id)}
+            liked={likedIds.has(image.assetId)}
+            onToggleLike={() => handleToggleLike(image.assetId)}
             className={cardClassName}
           />
         ))}
@@ -102,6 +116,13 @@ export const ImageGenerateResultCanvas = ({
       >
         라이브러리 가기
       </TextButton>
+
+      <Toast
+        open={errorMessage !== null}
+        state="error"
+        message={errorMessage ?? ''}
+        onClose={() => setErrorMessage(null)}
+      />
     </div>
   );
 };
