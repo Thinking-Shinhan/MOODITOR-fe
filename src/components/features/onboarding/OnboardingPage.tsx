@@ -11,7 +11,7 @@ import { WebsiteLinkInput } from '@/components/features/onboarding/WebsiteLinkIn
 import { BrandFileDropzone } from '@/components/features/onboarding/BrandFileDropzone';
 import { AdditionalRequestInput } from '@/components/features/onboarding/AdditionalRequestInput';
 import { BrandMoodAnalysisResult } from '@/components/features/onboarding/BrandMoodAnalysisResult';
-import { BrandMoodAnalysisProgressModal } from '@/components/features/onboarding/BrandMoodAnalysisProgressModal';
+import { ProgressStepModal } from '@/components/commons/ProgressStepModal';
 import { useAnalyzeBrandMood } from '@/hooks/useAnalyzeBrandMood';
 import { useSaveBrandMood } from '@/hooks/useSaveBrandMood';
 import { useFakeProgress } from '@/hooks/useFakeProgress';
@@ -22,6 +22,18 @@ const MOCK_BRAND_NAME = '에이븐';
 
 // 100%로 바뀐 걸 잠깐 보여준 뒤 결과 화면으로 전환하기 위한 대기 시간
 const RESULT_TRANSITION_DELAY_MS = 1000;
+
+interface ProgressChecklistDefinition {
+  label: string;
+  // 이 진행률(%) 이상이면 활성화 상태로 표시
+  threshold: number;
+}
+
+const MOOD_ANALYSIS_CHECKLIST: ProgressChecklistDefinition[] = [
+  { label: '브랜드 웹사이트 분석 중', threshold: 1 },
+  { label: '브랜드 자료 분석 중', threshold: 40 },
+  { label: '무드 분석 완료', threshold: 100 },
+];
 
 const ResultHeaderIcon = () => (
   <div className="outline-btn-secondary-fill-hovered bg-icon-primary-basic flex size-[28px] shrink-0 items-center justify-center rounded-[var(--radius-max)] outline-[5px]">
@@ -185,9 +197,18 @@ export default function OnboardingPage() {
             onChange={setAdditionalRequest}
           />
         </OnboardingStepLayout>
-        <BrandMoodAnalysisProgressModal
+        <ProgressStepModal
           open={isAnalyzing}
           progress={fakeProgress}
+          title="브랜드 무드 분석 중"
+          completeTitle="브랜드 무드 분석 완료!"
+          description={
+            '웹사이트와 브랜드 자료를 바탕으로\n결과를 분석하고 있어요.'
+          }
+          items={MOOD_ANALYSIS_CHECKLIST.map((item) => ({
+            label: item.label,
+            active: fakeProgress >= item.threshold,
+          }))}
         />
         {errorToast}
       </>

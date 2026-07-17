@@ -1,13 +1,18 @@
 import { Check } from 'lucide-react';
 import { ProgressRing } from '@/components/commons/ProgressRing';
 import { Heading, Body } from '@/components/commons/Typography';
-import type { ImageGenerationProgressItem } from '@/types/imageGenerationJob';
+
+export interface ProgressChecklistItem {
+  label: string;
+  active: boolean;
+}
 
 interface ProgressStepCardProps {
   progress: number;
   title: string;
   description: string;
-  progressItems: ImageGenerationProgressItem[];
+  items: ProgressChecklistItem[];
+  completeTitle?: string;
   className?: string;
 }
 
@@ -15,10 +20,12 @@ export const ProgressStepCard = ({
   progress,
   title,
   description,
-  progressItems,
+  items,
+  completeTitle,
   className = '',
 }: ProgressStepCardProps) => {
   const clamped = Math.min(100, Math.max(0, progress));
+  const isComplete = clamped >= 100;
 
   return (
     <div
@@ -28,7 +35,7 @@ export const ProgressStepCard = ({
         <ProgressRing progress={clamped} />
         <div className="flex w-full flex-col items-center gap-[var(--gap-2)] text-center">
           <Heading size="medium" className="text-text-basic w-full">
-            {title}
+            {isComplete && completeTitle ? completeTitle : title}
           </Heading>
           <Body
             size="medium"
@@ -39,46 +46,41 @@ export const ProgressStepCard = ({
         </div>
       </div>
       <div className="flex w-[193px] flex-col items-start gap-[var(--gap-4)]">
-        {progressItems.map((item) => {
-          const completed = item.status === 'SUCCEEDED';
-          const label = `이미지 ${item.outputIndex + 1}장 생성 완료`;
-
-          return (
-            <div
-              key={item.outputIndex}
-              className={[
-                'flex w-full items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border-[0.5px] py-[var(--padding-3)] pr-[var(--padding-5)] pl-[var(--padding-4)]',
-                'bg-bg-white drop-shadow-[0px_2px_4px_rgba(0,0,0,0.04)]',
-                completed
-                  ? 'border-btn-secondary-border'
-                  : 'border-btn-outline-border',
-              ].join(' ')}
+        {items.map((item) => (
+          <div
+            key={item.label}
+            className={[
+              'flex w-full items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border-[0.5px] py-[var(--padding-3)] pr-[var(--padding-5)] pl-[var(--padding-4)]',
+              'bg-bg-white drop-shadow-[0px_2px_4px_rgba(0,0,0,0.04)]',
+              item.active
+                ? 'border-btn-secondary-border'
+                : 'border-btn-outline-border',
+            ].join(' ')}
+          >
+            <span
+              className={`flex size-7 h-7 w-7 shrink-0 items-center justify-center rounded-full ${
+                item.active ? 'bg-icon-primary-basic' : 'bg-icon-disabled'
+              }`}
             >
-              <span
-                className={`flex size-7 h-7 w-7 shrink-0 items-center justify-center rounded-full ${
-                  completed ? 'bg-icon-primary-basic' : 'bg-icon-disabled'
-                }`}
+              <Check
+                size={16}
+                className="text-icon-inverse"
+                strokeWidth={2.5}
+              />
+            </span>
+            {item.active ? (
+              <Body
+                size="small"
+                bold
+                className="text-text-subtle whitespace-nowrap"
               >
-                <Check
-                  size={16}
-                  className="text-icon-inverse"
-                  strokeWidth={2.5}
-                />
-              </span>
-              {completed ? (
-                <Body
-                  size="small"
-                  bold
-                  className="text-text-subtle whitespace-nowrap"
-                >
-                  {label}
-                </Body>
-              ) : (
-                <div className="bg-btn-disabled-fill h-2 min-w-px flex-1" />
-              )}
-            </div>
-          );
-        })}
+                {item.label}
+              </Body>
+            ) : (
+              <div className="bg-btn-disabled-fill h-2 min-w-px flex-1" />
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
