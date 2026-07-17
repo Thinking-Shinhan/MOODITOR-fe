@@ -14,6 +14,7 @@ interface OnboardingStepLayoutProps {
   onPrevious?: () => void;
   onNext?: () => void;
   nextDisabled?: boolean;
+  footer?: ReactNode;
 }
 
 export const OnboardingStepLayout = ({
@@ -24,6 +25,7 @@ export const OnboardingStepLayout = ({
   onPrevious,
   onNext,
   nextDisabled = false,
+  footer,
 }: OnboardingStepLayoutProps) => (
   <div className="flex h-full min-h-screen w-full flex-col">
     <ServiceHeader />
@@ -44,25 +46,27 @@ export const OnboardingStepLayout = ({
 
       {children}
 
-      <div className="flex w-[660px] items-start gap-[var(--gap-5)]">
-        <Button
-          variant="tertiary"
-          size="large"
-          className="flex-1"
-          onClick={onPrevious}
-        >
-          이전
-        </Button>
-        <Button
-          variant="primary"
-          size="large"
-          className="flex-1"
-          onClick={onNext}
-          disabled={nextDisabled}
-        >
-          다음
-        </Button>
-      </div>
+      {footer ?? (
+        <div className="flex w-[660px] items-start gap-[var(--gap-5)]">
+          <Button
+            variant="tertiary"
+            size="large"
+            className="flex-1"
+            onClick={onPrevious}
+          >
+            이전
+          </Button>
+          <Button
+            variant="primary"
+            size="large"
+            className="flex-1"
+            onClick={onNext}
+            disabled={nextDisabled}
+          >
+            다음
+          </Button>
+        </div>
+      )}
     </div>
   </div>
 );
