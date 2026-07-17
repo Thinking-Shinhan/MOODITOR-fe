@@ -23,7 +23,11 @@ export default function OnboardingPage() {
         onPrevious={goToPreviousStep}
         onNext={goToNextStep}
       >
-        <BrandFileDropzone file={brandFile} onSelect={setBrandFile} />
+        <BrandFileDropzone
+          file={brandFile}
+          onSelect={setBrandFile}
+          onRemove={() => setBrandFile(null)}
+        />
       </OnboardingStepLayout>
     );
   }
