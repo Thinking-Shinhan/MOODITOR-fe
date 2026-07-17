@@ -4,7 +4,9 @@ import dynamic from 'next/dynamic';
 import { DetailEditHeader } from '@/components/features/detail/DetailEditHeader';
 import { ImagePlacementPanel } from '@/components/features/detail/ImagePlacementPanel';
 import { TemplateListPanel } from '@/components/features/detail/TemplateListPanel';
+import { CopyReviewPanel } from '@/components/features/detail/CopyReviewPanel';
 import { useImagePlacementStore } from '@/stores/imagePlacementStore';
+import { useCopyReviewStore } from '@/stores/copyReviewStore';
 
 const DetailEditCanvas = dynamic(
   () =>
@@ -15,13 +17,30 @@ const DetailEditCanvas = dynamic(
 );
 
 export default function DetailEditPage() {
-  const isPanelOpen = useImagePlacementStore((state) => state.isPanelOpen);
-  const closePanel = useImagePlacementStore((state) => state.closePanel);
+  const isImagePanelOpen = useImagePlacementStore((state) => state.isPanelOpen);
+  const closeImagePanel = useImagePlacementStore((state) => state.closePanel);
+  const isCopyReviewPanelOpen = useCopyReviewStore(
+    (state) => state.isPanelOpen,
+  );
+  const closeCopyReviewPanel = useCopyReviewStore((state) => state.closePanel);
+  const copyReviewItems = useCopyReviewStore((state) => state.items);
+  const applyCopyReviewItem = useCopyReviewStore((state) => state.applyItem);
+  const applyAllCopyReviewItems = useCopyReviewStore((state) => state.applyAll);
 
   return (
     <div className="flex h-full">
-      {isPanelOpen ? (
-        <ImagePlacementPanel onClose={closePanel} />
+      {isCopyReviewPanelOpen ? (
+        <CopyReviewPanel
+          items={copyReviewItems}
+          onApply={applyCopyReviewItem}
+          onApplyAll={applyAllCopyReviewItems}
+          onClose={closeCopyReviewPanel}
+          applyAllDisabled={copyReviewItems.every(
+            (item) => item.status === 'applied',
+          )}
+        />
+      ) : isImagePanelOpen ? (
+        <ImagePlacementPanel onClose={closeImagePanel} />
       ) : (
         <TemplateListPanel />
       )}

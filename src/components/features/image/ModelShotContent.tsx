@@ -388,7 +388,10 @@ export const ModelShotContent = () => {
         progress={job?.progressPercent ?? 0}
         title="이미지 생성 중"
         description={job?.progressMessage ?? ''}
-        progressItems={job?.progressItems ?? []}
+        items={(job?.progressItems ?? []).map((item) => ({
+          label: `이미지 ${item.outputIndex + 1}장 생성 완료`,
+          active: item.status === 'SUCCEEDED',
+        }))}
       />
     </div>
   );
