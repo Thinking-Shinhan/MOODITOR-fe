@@ -72,6 +72,15 @@ export interface ImageGenerationResult {
   imageBase64: string | null;
 }
 
+export type ImageGenerationProgressItemStatus =
+  'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED';
+
+export interface ImageGenerationProgressItem {
+  outputIndex: number;
+  status: ImageGenerationProgressItemStatus;
+  message: string | null;
+}
+
 export interface ImageGenerationJob {
   jobId: number;
   status: ImageGenerationJobStatus;
@@ -85,5 +94,6 @@ export interface ImageGenerationJob {
   progressPercent: number;
   progressStage: string;
   progressMessage: string;
+  progressItems: ImageGenerationProgressItem[];
   results: ImageGenerationResult[];
 }

@@ -388,10 +388,7 @@ export const ModelShotContent = () => {
         progress={job?.progressPercent ?? 0}
         title="이미지 생성 중"
         description={job?.progressMessage ?? ''}
-        steps={Array.from(
-          { length: job?.requestedCount ?? MODEL_CUT_REQUESTED_COUNT },
-          (_, index) => `이미지 ${index + 1}장 생성 완료`,
-        )}
+        progressItems={job?.progressItems ?? []}
       />
     </div>
   );
