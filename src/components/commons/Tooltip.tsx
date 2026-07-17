@@ -1,10 +1,12 @@
 import { Body } from '@/components/commons/Typography';
 
-type TooltipPlacement = 'right' | 'top';
+type TooltipPlacement = 'right' | 'top' | 'bottom';
+type TooltipArrowAlign = 'center' | 'left';
 
 interface TooltipProps {
   text: string;
   placement?: TooltipPlacement;
+  arrowAlign?: TooltipArrowAlign;
   dismissible?: boolean;
   onDismiss?: () => void;
   className?: string;
@@ -13,6 +15,7 @@ interface TooltipProps {
 export const Tooltip = ({
   text,
   placement = 'right',
+  arrowAlign = 'center',
   className = '',
 }: TooltipProps) => {
   const bubble = (
@@ -26,11 +29,23 @@ export const Tooltip = ({
     </div>
   );
 
-  if (placement === 'top') {
+  if (placement === 'top' || placement === 'bottom') {
+    const arrowPositionClass =
+      arrowAlign === 'left' ? 'left-[24px]' : 'left-1/2 -translate-x-1/2';
+
     return (
-      <div className={`flex flex-col items-center ${className}`}>
-        {bubble}
-        <div className="border-t-btn-primary-fill-black h-0 w-0 border-t-[9px] border-r-[5.5px] border-l-[5.5px] border-r-transparent border-l-transparent" />
+      <div className={`relative flex flex-col items-start ${className}`}>
+        {placement === 'top' && bubble}
+        <div
+          className={[
+            'absolute h-0 w-0 border-r-[5.5px] border-l-[5.5px] border-r-transparent border-l-transparent',
+            placement === 'top'
+              ? 'border-t-btn-primary-fill-black top-full border-t-[9px]'
+              : 'border-b-btn-primary-fill-black bottom-full border-b-[9px]',
+            arrowPositionClass,
+          ].join(' ')}
+        />
+        {placement === 'bottom' && bubble}
       </div>
     );
   }
