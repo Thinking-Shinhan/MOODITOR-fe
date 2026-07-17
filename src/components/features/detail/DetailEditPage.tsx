@@ -20,7 +20,6 @@ const DetailEditCanvas = dynamic(
   { ssr: false },
 );
 
-// TODO: replace with real "문구 검수" API response once the backend endpoint exists
 const MOCK_COPY_REVIEW_ITEMS: CopyReviewItem[] = [
   {
     id: '1',
@@ -72,7 +71,6 @@ export default function DetailEditPage() {
   const isCopyReviewPanelOpen = useCopyReviewStore(
     (state) => state.isPanelOpen,
   );
-  // const isCopyReviewPanelOpen = true; // TODO: 임시로 항상 켜져있도록 설정. 추후 문구 검수 기능이 구현되면 isPanelOpen으로 변경
   const closeCopyReviewPanel = useCopyReviewStore((state) => state.closePanel);
 
   const [copyReviewItems, setCopyReviewItems] = useState(
