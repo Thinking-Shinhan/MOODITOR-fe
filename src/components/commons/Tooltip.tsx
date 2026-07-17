@@ -32,20 +32,32 @@ export const Tooltip = ({
   if (placement === 'top' || placement === 'bottom') {
     const arrowPositionClass =
       arrowAlign === 'left' ? 'left-[24px]' : 'left-1/2 -translate-x-1/2';
+    const containerEdgeClass =
+      placement === 'top' ? 'pb-[9.526px]' : 'pt-[9.526px]';
+    const arrowEdgeClass = placement === 'top' ? 'bottom-0' : 'top-0';
 
     return (
-      <div className={`relative flex flex-col items-start ${className}`}>
-        {placement === 'top' && bubble}
+      <div className={className}>
         <div
-          className={[
-            'absolute h-0 w-0 border-r-[5.5px] border-l-[5.5px] border-r-transparent border-l-transparent',
-            placement === 'top'
-              ? 'border-t-btn-primary-fill-black top-full border-t-[9px]'
-              : 'border-b-btn-primary-fill-black bottom-full border-b-[9px]',
-            arrowPositionClass,
-          ].join(' ')}
-        />
-        {placement === 'bottom' && bubble}
+          className={`relative flex flex-col items-start ${containerEdgeClass}`}
+        >
+          {placement === 'top' && bubble}
+          <svg
+            viewBox="0 0 11 9.526"
+            className={[
+              'absolute h-[9.526px] w-[11px]',
+              placement === 'top' ? 'rotate-180' : '',
+              arrowEdgeClass,
+              arrowPositionClass,
+            ].join(' ')}
+          >
+            <path
+              d="M0 9.526 L4.5 1.732 Q5.5 0 6.5 1.732 L11 9.526 Z"
+              className="fill-btn-primary-fill-black"
+            />
+          </svg>
+          {placement === 'bottom' && bubble}
+        </div>
       </div>
     );
   }
