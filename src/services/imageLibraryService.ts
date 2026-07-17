@@ -21,7 +21,7 @@ export const imageLibraryService = {
     ),
 
   toggleLike: (assetId: number) =>
-    apiClient.post<AssetLikeResponse>(`/library/${assetId}/like`, undefined),
+    apiClient.patch<AssetLikeResponse>(`/library/${assetId}/like`, undefined),
 
   deleteAsset: (assetId: number) =>
     apiClient.delete<DeleteLibraryAssetResponse>(`/library/assets/${assetId}`),
