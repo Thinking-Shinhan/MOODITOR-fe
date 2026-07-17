@@ -212,18 +212,18 @@ export const ModelShotContent = () => {
       requestedCount: MODEL_CUT_REQUESTED_COUNT,
       // 프롬프트가 공백이면 요청이 거부되어, 미입력 시 공백 문자 하나를 대신 보낸다
       prompt: prompt.trim().length > 0 ? prompt : '_',
-      userOptionsJson: JSON.stringify({
+      userOptionsJson: {
         colorTemperature: colorTone ? COLOR_TEMPERATURE_MAP[colorTone] : null,
         cameraAngle: cameraAngle ? CAMERA_ANGLE_MAP[cameraAngle] : null,
         framing: composition ? FRAMING_MAP[composition] : null,
         aspectRatio: aspectRatio ? REQUEST_ASPECT_RATIO_MAP[aspectRatio] : null,
-      }),
-      referenceJson: JSON.stringify({
+      },
+      referenceJson: {
         outfitItems,
         modelReferenceId: modelReferenceAssetId,
         poseReferenceId: poseReferenceAssetId,
         backgroundReferenceId: backgroundReferenceAssetId,
-      }),
+      },
     };
 
     try {
@@ -388,10 +388,7 @@ export const ModelShotContent = () => {
         progress={job?.progressPercent ?? 0}
         title="이미지 생성 중"
         description={job?.progressMessage ?? ''}
-        steps={Array.from(
-          { length: job?.requestedCount ?? MODEL_CUT_REQUESTED_COUNT },
-          (_, index) => `이미지 ${index + 1}장 생성 완료`,
-        )}
+        progressItems={job?.progressItems ?? []}
       />
     </div>
   );

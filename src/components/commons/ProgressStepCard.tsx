@@ -1,12 +1,13 @@
 import { Check } from 'lucide-react';
 import { ProgressRing } from '@/components/commons/ProgressRing';
 import { Heading, Body } from '@/components/commons/Typography';
+import type { ImageGenerationProgressItem } from '@/types/imageGenerationJob';
 
 interface ProgressStepCardProps {
   progress: number;
   title: string;
   description: string;
-  steps: string[];
+  progressItems: ImageGenerationProgressItem[];
   className?: string;
 }
 
@@ -14,14 +15,10 @@ export const ProgressStepCard = ({
   progress,
   title,
   description,
-  steps,
+  progressItems,
   className = '',
 }: ProgressStepCardProps) => {
   const clamped = Math.min(100, Math.max(0, progress));
-  const completedCount =
-    steps.length === 0
-      ? 0
-      : Math.min(steps.length, Math.floor((clamped / 100) * steps.length));
 
   return (
     <div
@@ -42,12 +39,13 @@ export const ProgressStepCard = ({
         </div>
       </div>
       <div className="flex w-[193px] flex-col items-start gap-[var(--gap-4)]">
-        {steps.map((step, index) => {
-          const completed = index < completedCount;
+        {progressItems.map((item) => {
+          const completed = item.status === 'SUCCEEDED';
+          const label = `이미지 ${item.outputIndex + 1}장 생성 완료`;
 
           return (
             <div
-              key={step}
+              key={item.outputIndex}
               className={[
                 'flex w-full items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border-[0.5px] py-[var(--padding-3)] pr-[var(--padding-5)] pl-[var(--padding-4)]',
                 'bg-bg-white drop-shadow-[0px_2px_4px_rgba(0,0,0,0.04)]',
@@ -73,7 +71,7 @@ export const ProgressStepCard = ({
                   bold
                   className="text-text-subtle whitespace-nowrap"
                 >
-                  {step}
+                  {label}
                 </Body>
               ) : (
                 <div className="bg-btn-disabled-fill h-2 min-w-px flex-1" />

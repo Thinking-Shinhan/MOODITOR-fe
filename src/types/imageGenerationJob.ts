@@ -32,6 +32,12 @@ export interface ModelCutUserOptions {
   colorTemperature: ColorTemperature | null;
   cameraAngle: CameraAngle | null;
   framing: Framing | null;
+  aspectRatio: RequestAspectRatio | null;
+}
+
+export interface ProductCutUserOptions {
+  colorTemperature: ColorTemperature | null;
+  aspectRatio: RequestAspectRatio | null;
 }
 
 export interface ModelCutReference {
@@ -53,8 +59,8 @@ export interface CreateImageGenerationJobRequest {
   generationMode: GenerationMode;
   requestedCount: number;
   prompt: string;
-  userOptionsJson: string;
-  referenceJson: string;
+  userOptionsJson: ModelCutUserOptions | ProductCutUserOptions;
+  referenceJson: ModelCutReference | ProductCutReference;
 }
 
 export interface ImageGenerationResult {
@@ -64,6 +70,15 @@ export interface ImageGenerationResult {
   status: string;
   imageUrl: string | null;
   imageBase64: string | null;
+}
+
+export type ImageGenerationProgressItemStatus =
+  'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED';
+
+export interface ImageGenerationProgressItem {
+  outputIndex: number;
+  status: ImageGenerationProgressItemStatus;
+  message: string | null;
 }
 
 export interface ImageGenerationJob {
@@ -79,5 +94,6 @@ export interface ImageGenerationJob {
   progressPercent: number;
   progressStage: string;
   progressMessage: string;
+  progressItems: ImageGenerationProgressItem[];
   results: ImageGenerationResult[];
 }

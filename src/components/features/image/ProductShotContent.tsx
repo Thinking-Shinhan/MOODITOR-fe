@@ -172,11 +172,11 @@ export const ProductShotContent = () => {
       generationMode: 'PARALLEL',
       requestedCount: compositionReferenceAssetIds.length,
       prompt: prompt.trim().length > 0 ? prompt.trim() : '_',
-      userOptionsJson: JSON.stringify({
+      userOptionsJson: {
         colorTemperature: colorTone ? COLOR_TEMPERATURE_MAP[colorTone] : null,
         aspectRatio: aspectRatio ? REQUEST_ASPECT_RATIO_MAP[aspectRatio] : null,
-      }),
-      referenceJson: JSON.stringify(referenceJson),
+      },
+      referenceJson,
     };
 
     try {
@@ -276,12 +276,7 @@ export const ProductShotContent = () => {
         progress={job?.progressPercent ?? 0}
         title="이미지 생성 중"
         description={job?.progressMessage ?? ''}
-        steps={Array.from(
-          {
-            length: job?.requestedCount ?? compositionReferenceAssetIds.length,
-          },
-          (_, index) => `이미지 ${index + 1}장 생성 완료`,
-        )}
+        progressItems={job?.progressItems ?? []}
       />
     </div>
   );
