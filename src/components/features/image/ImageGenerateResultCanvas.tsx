@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Check, ChevronRight } from 'lucide-react';
 import { Body } from '@/components/commons/Typography';
 import { TextButton } from '@/components/commons/TextButton';
+import { Toast } from '@/components/commons/Toast';
 import { GeneratedImageCard } from '@/components/features/image/GeneratedImageCard';
 import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
 import type { ImageAspectRatio } from '@/types/image';
@@ -43,17 +44,27 @@ export const ImageGenerateResultCanvas = ({
 }: ImageGenerateResultCanvasProps) => {
   const router = useRouter();
   const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const toggleLike = useToggleAssetLike();
 
+  const flipLiked = (assetId: number, liked: boolean) => {
+    setLikedIds((prev) => {
+      const next = new Set(prev);
+      if (liked) next.add(assetId);
+      else next.delete(assetId);
+      return next;
+    });
+  };
+
   const handleToggleLike = (assetId: number) => {
+    const wasLiked = likedIds.has(assetId);
+    // 응답을 기다리지 않고 즉시 반영하고, 실패하면 원래 상태로 되돌린다
+    flipLiked(assetId, !wasLiked);
+
     toggleLike.mutate(assetId, {
-      onSuccess: ({ liked }) => {
-        setLikedIds((prev) => {
-          const next = new Set(prev);
-          if (liked) next.add(assetId);
-          else next.delete(assetId);
-          return next;
-        });
+      onError: () => {
+        flipLiked(assetId, wasLiked);
+        setErrorMessage('요청을 처리하지 못했어요. 다시 시도해주세요.');
       },
     });
   };
@@ -105,6 +116,13 @@ export const ImageGenerateResultCanvas = ({
       >
         라이브러리 가기
       </TextButton>
+
+      <Toast
+        open={errorMessage !== null}
+        state="error"
+        message={errorMessage ?? ''}
+        onClose={() => setErrorMessage(null)}
+      />
     </div>
   );
 };
