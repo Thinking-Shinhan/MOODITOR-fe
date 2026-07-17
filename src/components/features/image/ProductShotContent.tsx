@@ -172,11 +172,11 @@ export const ProductShotContent = () => {
       generationMode: 'PARALLEL',
       requestedCount: compositionReferenceAssetIds.length,
       prompt: prompt.trim().length > 0 ? prompt.trim() : '_',
-      userOptionsJson: JSON.stringify({
+      userOptionsJson: {
         colorTemperature: colorTone ? COLOR_TEMPERATURE_MAP[colorTone] : null,
         aspectRatio: aspectRatio ? REQUEST_ASPECT_RATIO_MAP[aspectRatio] : null,
-      }),
-      referenceJson: JSON.stringify(referenceJson),
+      },
+      referenceJson,
     };
 
     try {

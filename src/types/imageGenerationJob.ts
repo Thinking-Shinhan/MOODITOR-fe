@@ -32,6 +32,12 @@ export interface ModelCutUserOptions {
   colorTemperature: ColorTemperature | null;
   cameraAngle: CameraAngle | null;
   framing: Framing | null;
+  aspectRatio: RequestAspectRatio | null;
+}
+
+export interface ProductCutUserOptions {
+  colorTemperature: ColorTemperature | null;
+  aspectRatio: RequestAspectRatio | null;
 }
 
 export interface ModelCutReference {
@@ -53,8 +59,8 @@ export interface CreateImageGenerationJobRequest {
   generationMode: GenerationMode;
   requestedCount: number;
   prompt: string;
-  userOptionsJson: string;
-  referenceJson: string;
+  userOptionsJson: ModelCutUserOptions | ProductCutUserOptions;
+  referenceJson: ModelCutReference | ProductCutReference;
 }
 
 export interface ImageGenerationResult {
