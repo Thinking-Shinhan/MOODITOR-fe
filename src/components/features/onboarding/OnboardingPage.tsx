@@ -11,12 +11,17 @@ import { WebsiteLinkInput } from '@/components/features/onboarding/WebsiteLinkIn
 import { BrandFileDropzone } from '@/components/features/onboarding/BrandFileDropzone';
 import { AdditionalRequestInput } from '@/components/features/onboarding/AdditionalRequestInput';
 import { BrandMoodAnalysisResult } from '@/components/features/onboarding/BrandMoodAnalysisResult';
+import { BrandMoodAnalysisProgressModal } from '@/components/features/onboarding/BrandMoodAnalysisProgressModal';
 import { useAnalyzeBrandMood } from '@/hooks/useAnalyzeBrandMood';
 import { useSaveBrandMood } from '@/hooks/useSaveBrandMood';
+import { useFakeProgress } from '@/hooks/useFakeProgress';
 import type { BrandMoodAnalysis } from '@/types/onboarding';
 
 // TODO: 회원가입 응답의 브랜드명으로 교체 예정
 const MOCK_BRAND_NAME = '에이븐';
+
+// 100%로 바뀐 걸 잠깐 보여준 뒤 결과 화면으로 전환하기 위한 대기 시간
+const RESULT_TRANSITION_DELAY_MS = 1000;
 
 const ResultHeaderIcon = () => (
   <div className="outline-btn-secondary-fill-hovered bg-icon-primary-basic flex size-[28px] shrink-0 items-center justify-center rounded-[var(--radius-max)] outline-[5px]">
@@ -41,15 +46,23 @@ export default function OnboardingPage() {
   const [additionalRequest, setAdditionalRequest] = useState('');
   const [analysis, setAnalysis] = useState<BrandMoodAnalysis | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const analyzeBrandMood = useAnalyzeBrandMood();
   const saveBrandMood = useSaveBrandMood();
+  const {
+    progress: fakeProgress,
+    reset: resetFakeProgress,
+    complete: completeFakeProgress,
+  } = useFakeProgress(isAnalyzing);
 
   const goToPreviousStep = () =>
     setCurrentStep((step) => Math.max(step - 1, 1));
 
   const handleAnalyze = () => {
     setErrorMessage(null);
+    resetFakeProgress();
+    setIsAnalyzing(true);
     analyzeBrandMood.mutate(
       {
         sourceUrl: websiteUrl,
@@ -59,9 +72,15 @@ export default function OnboardingPage() {
       },
       {
         onSuccess: (data) => {
-          setAnalysis(data);
+          // 진행률을 100%로 채운 모습을 잠깐 보여준 뒤 결과 화면으로 넘어간다
+          completeFakeProgress();
+          setTimeout(() => {
+            setAnalysis(data);
+            setIsAnalyzing(false);
+          }, RESULT_TRANSITION_DELAY_MS);
         },
         onError: (error) => {
+          setIsAnalyzing(false);
           setErrorMessage(
             error instanceof ApiError
               ? error.message
@@ -159,14 +178,17 @@ export default function OnboardingPage() {
           subtitle="브랜드의 분위기나 원하는 방향을 알려주시면, AI가 분석 결과와 생성 결과에 반영해 드려요."
           onPrevious={goToPreviousStep}
           onNext={handleAnalyze}
-          nextDisabled={analyzeBrandMood.isPending}
-          nextLabel={analyzeBrandMood.isPending ? '분석 중...' : '다음'}
+          nextDisabled={isAnalyzing}
         >
           <AdditionalRequestInput
             value={additionalRequest}
             onChange={setAdditionalRequest}
           />
         </OnboardingStepLayout>
+        <BrandMoodAnalysisProgressModal
+          open={isAnalyzing}
+          progress={fakeProgress}
+        />
         {errorToast}
       </>
     );
