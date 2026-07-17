@@ -61,9 +61,9 @@ export const BrandMoodAnalysisResult = ({
             <Heading size="xsmall" className="text-text-basic w-[200px]">
               {brandName}
             </Heading>
-            <Heading size="small" className="text-text-basic w-[315px]">
+            <Body size="medium" bold className="text-text-basic w-full">
               {analysis.brandSummary}
-            </Heading>
+            </Body>
           </div>
         </div>
 
@@ -90,7 +90,7 @@ export const BrandMoodAnalysisResult = ({
               <Body size="small" className="text-text-subtler w-full">
                 브랜드 톤
               </Body>
-              <div className="flex w-full items-start gap-[var(--gap-4)]">
+              <div className="flex w-full flex-wrap items-start gap-[var(--gap-4)]">
                 {analysis.brandTone.map((tone) => (
                   <Body
                     key={tone}
