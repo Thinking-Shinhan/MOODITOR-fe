@@ -3,21 +3,8 @@
 import { X } from 'lucide-react';
 import { Body, Heading } from '@/components/commons/Typography';
 import { Button } from '@/components/commons/Button';
-import {
-  CopyReviewCard,
-  type CopyReviewStatus,
-} from '@/components/features/detail/CopyReviewCard';
-
-export interface CopyReviewItem {
-  id: string;
-  pageNumber: number;
-  subtitle: string;
-  issueTag: string;
-  currentText: string;
-  suggestedText: string;
-  reason: string;
-  status: CopyReviewStatus;
-}
+import { CopyReviewCard } from '@/components/features/detail/CopyReviewCard';
+import type { CopyReviewItem } from '@/types/reviewCopy';
 
 interface CopyReviewPanelProps {
   items: CopyReviewItem[];

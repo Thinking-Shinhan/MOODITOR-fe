@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Expand, WandSparkles } from 'lucide-react';
+import { AlignLeft, Check, Expand, WandSparkles } from 'lucide-react';
 import { AlertModal } from '@/components/commons/AlertModal';
 import { Button } from '@/components/commons/Button';
 import { Body } from '@/components/commons/Typography';
@@ -11,16 +11,22 @@ import { Tooltip } from '@/components/commons/Tooltip';
 import { TEMPLATE_HEIGHTS } from '@/components/features/detail/DetailTemplateBlockContent';
 import { useAutoPlacement } from '@/hooks/useAutoPlacement';
 import { useSaveDetailPage } from '@/hooks/useSaveDetailPage';
+import { useReviewCopy } from '@/hooks/useReviewCopy';
 import { ApiError } from '@/libs/apiClient';
 import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import { useImagePlacementStore } from '@/stores/imagePlacementStore';
 import { useDetailPagePreviewStore } from '@/stores/detailPagePreviewStore';
 import { useTextPlacementStore } from '@/stores/textPlacementStore';
+import { useCopyReviewStore } from '@/stores/copyReviewStore';
 import {
   applyAutoPlacementResponse,
   buildAutoPlacementRequest,
 } from '@/utils/auto-placement';
+import {
+  buildReviewCopyRequest,
+  mapReviewCopyIssuesToItems,
+} from '@/utils/reviewCopy';
 import { exportDetailPageImage } from '@/utils/exportDetailPageImage';
 
 interface DetailEditHeaderProps {
@@ -42,6 +48,9 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
     null,
   );
   const [saveErrorMessage, setSaveErrorMessage] = useState<string | null>(null);
+  const [reviewCopyErrorMessage, setReviewCopyErrorMessage] = useState<
+    string | null
+  >(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isExportingLocal, setIsExportingLocal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -53,6 +62,9 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   );
   const autoPlacement = useAutoPlacement();
   const saveDetailPage = useSaveDetailPage();
+  const reviewCopy = useReviewCopy();
+  const openCopyReviewPanel = useCopyReviewStore((state) => state.openPanel);
+  const setCopyReviewItems = useCopyReviewStore((state) => state.setItems);
 
   const handleAutoPlaceAll = () => {
     if (!selectedProduct) return;
@@ -81,6 +93,37 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
       onError: () => {
         setAutoPlacementErrorMessage(
           'AI 자동 배치에 실패했어요. 잠시 후 다시 시도해주세요.',
+        );
+      },
+    });
+  };
+
+  const handleReviewCopy = () => {
+    if (!selectedProduct) return;
+
+    const { placedTemplates } = useDetailCanvasStore.getState();
+    const { images } = useImagePlacementStore.getState();
+    const { texts } = useTextPlacementStore.getState();
+
+    const request = buildReviewCopyRequest({
+      productId: Number(selectedProduct.id),
+      placedTemplates,
+      images,
+      texts,
+    });
+
+    reviewCopy.mutate(request, {
+      onSuccess: (response) => {
+        setCopyReviewItems(
+          mapReviewCopyIssuesToItems(response.issues, placedTemplates),
+        );
+        openCopyReviewPanel();
+      },
+      onError: (error) => {
+        setReviewCopyErrorMessage(
+          error instanceof ApiError
+            ? error.message
+            : 'AI 문구 검수에 실패했어요. 잠시 후 다시 시도해주세요.',
         );
       },
     });
@@ -196,6 +239,24 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
             />
           )}
         </div>
+        <button
+          type="button"
+          onClick={handleReviewCopy}
+          disabled={!hasTemplates || !selectedProduct || reviewCopy.isPending}
+          className="bg-btn-secondary-fill border-border-border hover:border-border-subtle disabled:border-border-subtle group flex shrink-0 cursor-pointer items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border px-[var(--padding-5)] py-[var(--padding-3)] disabled:cursor-not-allowed"
+        >
+          <AlignLeft
+            size={16}
+            className="text-icon-gray group-hover:text-icon-gray-light group-disabled:text-icon-disabled"
+          />
+          <Body
+            size="small"
+            bold
+            className="text-text-border group-hover:text-text-subtler group-disabled:text-text-disabled"
+          >
+            {reviewCopy.isPending ? '검수 중...' : 'AI 문구 검수'}
+          </Body>
+        </button>
       </div>
       <div className="flex items-center gap-[var(--gap-4)]">
         <Button
@@ -270,6 +331,13 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
         state="error"
         message={saveErrorMessage ?? ''}
         onClose={() => setSaveErrorMessage(null)}
+      />
+      <Toast
+        usePortal={false}
+        open={reviewCopyErrorMessage !== null}
+        state="error"
+        message={reviewCopyErrorMessage ?? ''}
+        onClose={() => setReviewCopyErrorMessage(null)}
       />
     </header>
   );

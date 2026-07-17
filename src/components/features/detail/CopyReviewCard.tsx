@@ -2,8 +2,7 @@
 
 import { Check, Loader2 } from 'lucide-react';
 import { Body } from '@/components/commons/Typography';
-
-export type CopyReviewStatus = 'idle' | 'applying' | 'applied';
+import type { CopyReviewStatus } from '@/types/reviewCopy';
 
 interface CopyReviewCardProps {
   pageNumber: number;

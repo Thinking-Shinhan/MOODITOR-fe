@@ -1,14 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { DetailEditHeader } from '@/components/features/detail/DetailEditHeader';
 import { ImagePlacementPanel } from '@/components/features/detail/ImagePlacementPanel';
 import { TemplateListPanel } from '@/components/features/detail/TemplateListPanel';
-import {
-  CopyReviewPanel,
-  type CopyReviewItem,
-} from '@/components/features/detail/CopyReviewPanel';
+import { CopyReviewPanel } from '@/components/features/detail/CopyReviewPanel';
 import { useImagePlacementStore } from '@/stores/imagePlacementStore';
 import { useCopyReviewStore } from '@/stores/copyReviewStore';
 
@@ -20,51 +16,6 @@ const DetailEditCanvas = dynamic(
   { ssr: false },
 );
 
-const MOCK_COPY_REVIEW_ITEMS: CopyReviewItem[] = [
-  {
-    id: '1',
-    pageNumber: 1,
-    subtitle: '메인 카피',
-    issueTag: '어색한 표현',
-    currentText:
-      '최고의 퀄리티를 자랑하는 이 제품은 당신의 일상을 바꿔드립니다.',
-    suggestedText:
-      '뛰어난 품질로 완성된 이 제품이 당신의 일상에 변화를 더해요.',
-    reason: '과장된 표현을 줄이고 자연스러운 문장으로 다듬었어요.',
-    status: 'idle',
-  },
-  {
-    id: '2',
-    pageNumber: 2,
-    subtitle: '상세 설명',
-    issueTag: '맞춤법 오류',
-    currentText: '이 제품은 오랜기간 사용하셔도 변함없는 퀄리티를 유지합니다.',
-    suggestedText: '이 제품은 오랜 기간 사용하셔도 변함없는 품질을 유지해요.',
-    reason: '띄어쓰기를 바로잡고 외래어를 다듬었어요.',
-    status: 'idle',
-  },
-  {
-    id: '3',
-    pageNumber: 2,
-    subtitle: '상세 설명',
-    issueTag: '맞춤법 오류',
-    currentText: '이 제품은 오랜기간 사용하셔도 변함없는 퀄리티를 유지합니다.',
-    suggestedText: '이 제품은 오랜 기간 사용하셔도 변함없는 품질을 유지해요.',
-    reason: '띄어쓰기를 바로잡고 외래어를 다듬었어요.',
-    status: 'idle',
-  },
-  {
-    id: '4',
-    pageNumber: 2,
-    subtitle: '상세 설명',
-    issueTag: '맞춤법 오류',
-    currentText: '이 제품은 오랜기간 사용하셔도 변함없는 퀄리티를 유지합니다.',
-    suggestedText: '이 제품은 오랜 기간 사용하셔도 변함없는 품질을 유지해요.',
-    reason: '띄어쓰기를 바로잡고 외래어를 다듬었어요.',
-    status: 'idle',
-  },
-];
-
 export default function DetailEditPage() {
   const isImagePanelOpen = useImagePlacementStore((state) => state.isPanelOpen);
   const closeImagePanel = useImagePlacementStore((state) => state.closePanel);
@@ -72,32 +23,17 @@ export default function DetailEditPage() {
     (state) => state.isPanelOpen,
   );
   const closeCopyReviewPanel = useCopyReviewStore((state) => state.closePanel);
-
-  const [copyReviewItems, setCopyReviewItems] = useState(
-    MOCK_COPY_REVIEW_ITEMS,
-  );
-
-  const handleApplyCopyReview = (id: string) => {
-    setCopyReviewItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, status: 'applied' } : item,
-      ),
-    );
-  };
-
-  const handleApplyAllCopyReview = () => {
-    setCopyReviewItems((items) =>
-      items.map((item) => ({ ...item, status: 'applied' })),
-    );
-  };
+  const copyReviewItems = useCopyReviewStore((state) => state.items);
+  const applyCopyReviewItem = useCopyReviewStore((state) => state.applyItem);
+  const applyAllCopyReviewItems = useCopyReviewStore((state) => state.applyAll);
 
   return (
     <div className="flex h-full">
       {isCopyReviewPanelOpen ? (
         <CopyReviewPanel
           items={copyReviewItems}
-          onApply={handleApplyCopyReview}
-          onApplyAll={handleApplyAllCopyReview}
+          onApply={applyCopyReviewItem}
+          onApplyAll={applyAllCopyReviewItems}
           onClose={closeCopyReviewPanel}
           applyAllDisabled={copyReviewItems.every(
             (item) => item.status === 'applied',
