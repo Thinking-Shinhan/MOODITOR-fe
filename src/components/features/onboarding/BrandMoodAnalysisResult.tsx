@@ -4,7 +4,6 @@ import { Body, Heading } from '@/components/commons/Typography';
 import type { BrandMoodAnalysis } from '@/types/onboarding';
 
 interface BrandMoodAnalysisResultProps {
-  brandName: string;
   analysis: BrandMoodAnalysis;
 }
 
@@ -49,7 +48,6 @@ const TagList = ({ items }: { items: string[] }) => (
 );
 
 export const BrandMoodAnalysisResult = ({
-  brandName,
   analysis,
 }: BrandMoodAnalysisResultProps) => {
   return (
@@ -59,7 +57,7 @@ export const BrandMoodAnalysisResult = ({
           <CardLabel>브랜드 요약</CardLabel>
           <div className="flex flex-col items-center gap-[var(--gap-3)]">
             <Heading size="xsmall" className="text-text-basic w-[200px]">
-              {brandName}
+              {analysis.brandName}
             </Heading>
             <Body
               size="medium"

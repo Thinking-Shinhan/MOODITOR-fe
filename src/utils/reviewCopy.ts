@@ -11,6 +11,8 @@ import {
   REVIEW_COPY_TEXT_ROLE_LABEL,
 } from '@/constants/reviewCopy';
 
+export const NO_SUGGESTION_TEXT = '제안 문구가 없어요.';
+
 interface BuildReviewCopyRequestParams {
   productId: number;
   placedTemplates: PlacedTemplate[];
@@ -28,8 +30,6 @@ export const buildReviewCopyRequest = ({
   templateBlocks: buildTemplateBlocks(placedTemplates, images, texts),
 });
 
-// 이슈는 instanceKey에 해당하는 블록의 캔버스 상 순서(blockOrder)를 모르므로,
-// 요청 시점의 placedTemplates 순서를 그대로 페이지 번호로 매핑해 표시한다
 export const mapReviewCopyIssuesToItems = (
   issues: ReviewCopyIssue[],
   placedTemplates: PlacedTemplate[],
@@ -40,11 +40,13 @@ export const mapReviewCopyIssuesToItems = (
 
   return issues.map((issue) => ({
     id: `${issue.instanceKey}-${issue.slotKey}`,
+    instanceKey: issue.instanceKey,
+    slotKey: issue.slotKey,
     pageNumber: pageNumberByInstanceKey.get(issue.instanceKey) ?? 0,
     subtitle: REVIEW_COPY_TEXT_ROLE_LABEL[issue.textRole],
     issueTag: REVIEW_COPY_ISSUE_CATEGORY_LABEL[issue.category],
     currentText: issue.targetCopy,
-    suggestedText: issue.suggestion ?? '제안 문구가 없어요.',
+    suggestedText: issue.suggestion ?? NO_SUGGESTION_TEXT,
     reason: issue.issue,
     status: 'idle',
   }));

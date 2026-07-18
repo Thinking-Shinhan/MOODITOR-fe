@@ -84,7 +84,9 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   const saveDetailPage = useSaveDetailPage();
   const reviewCopy = useReviewCopy();
   const openCopyReviewPanel = useCopyReviewStore((state) => state.openPanel);
+  const closeCopyReviewPanel = useCopyReviewStore((state) => state.closePanel);
   const setCopyReviewItems = useCopyReviewStore((state) => state.setItems);
+  const setCopyReviewLoading = useCopyReviewStore((state) => state.setLoading);
   const [isAutoPlacing, setIsAutoPlacing] = useState(false);
   const {
     progress: autoPlacementProgress,
@@ -147,14 +149,20 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
       texts,
     });
 
+    setCopyReviewItems([]);
+    setCopyReviewLoading(true);
+    openCopyReviewPanel();
+
     reviewCopy.mutate(request, {
       onSuccess: (response) => {
         setCopyReviewItems(
           mapReviewCopyIssuesToItems(response.issues, placedTemplates),
         );
-        openCopyReviewPanel();
+        setCopyReviewLoading(false);
       },
       onError: (error) => {
+        setCopyReviewLoading(false);
+        closeCopyReviewPanel();
         setReviewCopyErrorMessage(
           error instanceof ApiError
             ? error.message
