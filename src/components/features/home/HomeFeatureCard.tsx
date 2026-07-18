@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { MouseEvent } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { Body, Heading } from '@/components/commons/Typography';
 
@@ -6,15 +7,18 @@ interface HomeFeatureCardProps {
   href: string;
   title: string;
   description: string;
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export const HomeFeatureCard = ({
   href,
   title,
   description,
+  onClick,
 }: HomeFeatureCardProps) => (
   <Link
     href={href}
+    onClick={onClick}
     className="bg-bg-gray-subtler hover:bg-bg-gray-subtle active:bg-bg-gray-subtle active:border-btn-outline-border-pressed flex h-full w-full flex-1 flex-col items-end gap-[var(--gap-7)] rounded-[var(--radius-medium2)] border border-transparent p-[var(--padding-9)] transition-colors"
   >
     <div className="flex w-full flex-col items-start gap-[var(--gap-3)]">
