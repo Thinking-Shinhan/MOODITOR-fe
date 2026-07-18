@@ -54,5 +54,13 @@ export const useImageGenerationPolling = ({
     setJobId(initialJob.jobId);
   };
 
-  return { job, startPolling };
+  // 새 생성 요청을 보내기 전에 호출해서 이전 job(완료된 100% 상태)이
+  // 새 요청의 job 생성 API 응답을 기다리는 동안 잠깐 보이는 걸 막는다
+  const reset = () => {
+    handledJobIdRef.current = null;
+    setSeedJob(null);
+    setJobId(null);
+  };
+
+  return { job, startPolling, reset };
 };

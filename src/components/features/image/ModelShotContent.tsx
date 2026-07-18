@@ -156,7 +156,11 @@ export const ModelShotContent = () => {
     };
   }, []);
 
-  const { job, startPolling } = useImageGenerationPolling({
+  const {
+    job,
+    startPolling,
+    reset: resetPolling,
+  } = useImageGenerationPolling({
     onSucceeded: (succeededJob) => {
       const images = succeededJob.results
         .filter(
@@ -196,6 +200,7 @@ export const ModelShotContent = () => {
     }
 
     setSubmitError(null);
+    resetPolling();
     startGenerating();
 
     const outfitItems: OutfitItem[] = selectedProducts.map(

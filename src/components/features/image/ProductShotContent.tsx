@@ -119,7 +119,11 @@ export const ProductShotContent = () => {
     };
   }, []);
 
-  const { job, startPolling } = useImageGenerationPolling({
+  const {
+    job,
+    startPolling,
+    reset: resetPolling,
+  } = useImageGenerationPolling({
     onSucceeded: (succeededJob) => {
       const images = succeededJob.results
         .filter(
@@ -159,6 +163,7 @@ export const ProductShotContent = () => {
     }
 
     setSubmitError(null);
+    resetPolling();
     startGenerating();
 
     const referenceJson: ProductCutReference = {
