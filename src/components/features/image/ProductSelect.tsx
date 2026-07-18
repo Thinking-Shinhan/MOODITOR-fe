@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ImagePlus, Trash2, Plus } from 'lucide-react';
 import { Button } from '@/components/commons/Button';
 import { InputMessage } from '@/components/commons/InputMessage';
@@ -70,9 +71,12 @@ export const ProductSelect = ({
               >
                 <div className="flex min-w-0 items-center gap-[var(--gap-3)]">
                   {product.imageUrl ? (
-                    <img
+                    <Image
                       src={product.imageUrl}
                       alt={product.name}
+                      width={32}
+                      height={32}
+                      quality={50}
                       className="size-8 shrink-0 rounded-(--radius-xsmall2) object-cover"
                     />
                   ) : (
