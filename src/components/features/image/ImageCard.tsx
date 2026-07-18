@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Body } from '@/components/commons/Typography';
 import { Upload } from 'lucide-react';
 
@@ -43,10 +44,12 @@ export const ImageCard = ({
         onClick={onClick}
         className={`relative h-full w-full cursor-pointer overflow-hidden rounded-(--radius-small1)${className}`}
       >
-        <img
+        <Image
           src={imageUrl}
           alt=""
-          className="absolute inset-0 size-full rounded-(--radius-small1) object-cover"
+          fill
+          sizes="200px"
+          className="rounded-(--radius-small1) object-cover"
         />
         {selected && (
           <div className="border-border-primary absolute inset-0 rounded-(--radius-small1) border bg-[rgba(255,94,0,0.1)]" />

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { LikeButton } from '@/components/commons/LikeButton';
 
 interface GeneratedImageCardProps {
@@ -22,11 +23,7 @@ export const GeneratedImageCard = ({
         className,
       ].join(' ')}
     >
-      <img
-        src={url}
-        alt=""
-        className="absolute inset-0 size-full object-cover"
-      />
+      <Image src={url} alt="" fill sizes="400px" className="object-cover" />
       <LikeButton
         liked={liked}
         onToggleLike={onToggleLike}

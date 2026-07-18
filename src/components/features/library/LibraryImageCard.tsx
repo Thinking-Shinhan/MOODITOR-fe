@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Trash2 } from 'lucide-react';
 import { LikeButton } from '@/components/commons/LikeButton';
 import { Body } from '@/components/commons/Typography';
@@ -47,16 +48,20 @@ export const LibraryImageCard = ({
         className={`bg-bg-gray-subtle relative w-full shrink-0 ${isDetailPage ? 'h-[280px]' : 'h-[160px]'}`}
       >
         {isDetailPage ? (
-          <img
+          <Image
             src={imageUrl}
             alt=""
+            width={167}
+            height={256}
             className="absolute bottom-0 left-1/2 h-[256px] w-[167px] -translate-x-1/2 rounded-t-[var(--radius-small2)] object-cover object-top"
           />
         ) : (
-          <img
+          <Image
             src={imageUrl}
             alt=""
-            className="absolute inset-0 size-full object-cover"
+            fill
+            sizes="215px"
+            className="object-cover"
           />
         )}
 
