@@ -42,6 +42,7 @@ export const ProductListRow = ({
             alt={product.name}
             width={24}
             height={24}
+            quality={50}
             className="h-[var(--size-height-6)] w-[var(--size-height-6)] shrink-0 rounded-[var(--radius-xsmall2)] object-cover"
           />
         ) : (

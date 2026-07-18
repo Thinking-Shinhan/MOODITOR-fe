@@ -49,6 +49,7 @@ export const ImageCard = ({
           alt=""
           fill
           sizes="200px"
+          quality={60}
           className="rounded-(--radius-small1) object-cover"
         />
         {selected && (

@@ -76,6 +76,7 @@ export const ProductSelect = ({
                       alt={product.name}
                       width={32}
                       height={32}
+                      quality={50}
                       className="size-8 shrink-0 rounded-(--radius-xsmall2) object-cover"
                     />
                   ) : (

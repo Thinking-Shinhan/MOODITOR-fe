@@ -39,6 +39,7 @@ export const CompositionOptionCard = ({
         alt=""
         fill
         sizes="200px"
+        quality={60}
         className="object-cover"
       />
       {selected && <div className="absolute inset-0 bg-[rgba(255,94,0,0.1)]" />}

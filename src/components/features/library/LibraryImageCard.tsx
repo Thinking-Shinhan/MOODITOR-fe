@@ -53,6 +53,7 @@ export const LibraryImageCard = ({
             alt=""
             width={167}
             height={256}
+            quality={60}
             className="absolute bottom-0 left-1/2 h-[256px] w-[167px] -translate-x-1/2 rounded-t-[var(--radius-small2)] object-cover object-top"
           />
         ) : (
@@ -61,6 +62,7 @@ export const LibraryImageCard = ({
             alt=""
             fill
             sizes="215px"
+            quality={60}
             className="object-cover"
           />
         )}

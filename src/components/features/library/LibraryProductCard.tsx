@@ -56,6 +56,7 @@ export const LibraryProductCard = ({
               alt=""
               fill
               sizes="143px"
+              quality={60}
               className="object-cover"
             />
           )}
@@ -68,6 +69,7 @@ export const LibraryProductCard = ({
                 alt=""
                 fill
                 sizes="116px"
+                quality={60}
                 className="object-cover"
               />
             )}
@@ -79,6 +81,7 @@ export const LibraryProductCard = ({
                 alt=""
                 fill
                 sizes="116px"
+                quality={60}
                 className="object-cover"
               />
             )}

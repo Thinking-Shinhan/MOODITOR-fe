@@ -23,7 +23,14 @@ export const GeneratedImageCard = ({
         className,
       ].join(' ')}
     >
-      <Image src={url} alt="" fill sizes="400px" className="object-cover" />
+      <Image
+        src={url}
+        alt=""
+        fill
+        sizes="400px"
+        quality={65}
+        className="object-cover"
+      />
       <LikeButton
         liked={liked}
         onToggleLike={onToggleLike}
