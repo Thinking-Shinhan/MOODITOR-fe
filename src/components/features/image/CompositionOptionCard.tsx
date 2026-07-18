@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Body } from '@/components/commons/Typography';
 
 interface CompositionOptionCardProps {
@@ -33,10 +34,13 @@ export const CompositionOptionCard = ({
         selected ? 'border-border-primary border' : '',
       ].join(' ')}
     >
-      <img
+      <Image
         src={imageUrl}
         alt=""
-        className="absolute inset-0 size-full object-cover"
+        fill
+        sizes="200px"
+        quality={60}
+        className="object-cover"
       />
       {selected && <div className="absolute inset-0 bg-[rgba(255,94,0,0.1)]" />}
     </div>

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Body } from '@/components/commons/Typography';
 
 interface LibraryProductCardProps {
@@ -48,27 +49,40 @@ export const LibraryProductCard = ({
   return (
     <div className="bg-bg-white border-border-subtler flex w-[267px] cursor-pointer flex-col overflow-hidden rounded-[var(--radius-medium2)] border shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
       <div className="flex items-center gap-[var(--gap-3)]">
-        <div className="bg-bg-gray-subtle h-[184px] w-[143px] shrink-0">
+        <div className="bg-bg-gray-subtle relative h-[184px] w-[143px] shrink-0">
           {mainImage && (
-            <img src={mainImage} alt="" className="size-full object-cover" />
+            <Image
+              src={mainImage}
+              alt=""
+              fill
+              sizes="143px"
+              quality={60}
+              className="object-cover"
+            />
           )}
         </div>
         <div className="flex h-[184px] w-[116px] shrink-0 flex-col gap-[7.2px]">
           <div className="bg-bg-gray-subtle relative min-h-0 flex-1">
             {subImage1 && (
-              <img
+              <Image
                 src={subImage1}
                 alt=""
-                className="absolute inset-0 size-full object-cover"
+                fill
+                sizes="116px"
+                quality={60}
+                className="object-cover"
               />
             )}
           </div>
           <div className="bg-bg-gray-subtle relative min-h-0 flex-1">
             {subImage2 && (
-              <img
+              <Image
                 src={subImage2}
                 alt=""
-                className="absolute inset-0 size-full object-cover"
+                fill
+                sizes="116px"
+                quality={60}
+                className="object-cover"
               />
             )}
           </div>

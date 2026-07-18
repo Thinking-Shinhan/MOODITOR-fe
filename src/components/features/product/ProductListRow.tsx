@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ImagePlus } from 'lucide-react';
 import { Checkbox } from '@/components/commons/Checkbox';
 import { Body } from '@/components/commons/Typography';
@@ -36,9 +37,12 @@ export const ProductListRow = ({
       />
       <div className="flex w-[210px] shrink-0 items-center gap-[var(--gap-3)]">
         {product.productImages.front ? (
-          <img
+          <Image
             src={product.productImages.front.imageUrl}
             alt={product.name}
+            width={24}
+            height={24}
+            quality={50}
             className="h-[var(--size-height-6)] w-[var(--size-height-6)] shrink-0 rounded-[var(--radius-xsmall2)] object-cover"
           />
         ) : (

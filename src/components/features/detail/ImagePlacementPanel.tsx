@@ -98,6 +98,8 @@ export const ImagePlacementPanel = ({ onClose }: ImagePlacementPanelProps) => {
               <img
                 src={image.url}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="pointer-events-none block h-auto w-full"
               />
             </div>
