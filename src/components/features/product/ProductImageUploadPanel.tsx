@@ -154,9 +154,6 @@ export const ProductImageUploadPanel = ({
         <Heading size="small" className="text-text-basic">
           이미지 업로드
         </Heading>
-        <Body size="medium" className="text-text-subtler">
-          선택한 제품의 앞·뒷면 상세 이미지를 업로드해 주세요.
-        </Body>
       </div>
 
       <ImageUploadField
