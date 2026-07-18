@@ -73,7 +73,7 @@ export interface ImageGenerationResult {
 }
 
 export type ImageGenerationProgressItemStatus =
-  'PENDING' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED';
+  'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 
 export interface ImageGenerationProgressItem {
   outputIndex: number;

@@ -19,6 +19,7 @@ import { useCreateImageGenerationJob } from '@/hooks/useCreateImageGenerationJob
 import { useImageGenerationPolling } from '@/hooks/useImageGenerationPolling';
 import { useModelCutResultStore } from '@/stores/imageGenerationResultStore';
 import { ApiError } from '@/libs/apiClient';
+import { buildProgressChecklistItems } from '@/utils/imageGeneration';
 import {
   COLOR_TEMPERATURE_MAP,
   CAMERA_ANGLE_MAP,
@@ -155,7 +156,11 @@ export const ModelShotContent = () => {
     };
   }, []);
 
-  const { job, startPolling } = useImageGenerationPolling({
+  const {
+    job,
+    startPolling,
+    reset: resetPolling,
+  } = useImageGenerationPolling({
     onSucceeded: (succeededJob) => {
       const images = succeededJob.results
         .filter(
@@ -195,6 +200,7 @@ export const ModelShotContent = () => {
     }
 
     setSubmitError(null);
+    resetPolling();
     startGenerating();
 
     const outfitItems: OutfitItem[] = selectedProducts.map(
@@ -388,10 +394,10 @@ export const ModelShotContent = () => {
         progress={job?.progressPercent ?? 0}
         title="이미지 생성 중"
         description={job?.progressMessage ?? ''}
-        items={(job?.progressItems ?? []).map((item) => ({
-          label: `이미지 ${item.outputIndex + 1}장 생성 완료`,
-          active: item.status === 'SUCCEEDED',
-        }))}
+        items={buildProgressChecklistItems(
+          job?.progressItems ?? [],
+          MODEL_CUT_REQUESTED_COUNT,
+        )}
       />
     </div>
   );
