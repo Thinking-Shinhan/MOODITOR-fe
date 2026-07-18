@@ -3,9 +3,11 @@
 import { useState, type MouseEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import { useLogout } from '@/hooks/useLogout';
 import { useIsAuthenticated } from '@/hooks/useIsAuthenticated';
+import { prefetchImageGenerationAssets } from '@/hooks/usePrefetchImageGenerationAssets';
 import { Label } from '@/components/commons/Typography';
 import { AlertModal } from '@/components/commons/AlertModal';
 import {
@@ -23,6 +25,7 @@ type NavItemConfig = {
   icon: React.ElementType;
   label: string;
   loginRequiredMessage?: string;
+  prefetchOnHover?: boolean;
 };
 
 const NAV_ITEMS: NavItemConfig[] = [
@@ -32,6 +35,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     icon: Wand2,
     label: '이미지 만들기',
     loginRequiredMessage: '로그인 후 브랜드에 맞는 이미지를 제작해 보세요.',
+    prefetchOnHover: true,
   },
   {
     href: '/detail-edit',
@@ -62,6 +66,7 @@ export const Sidebar = () => {
   } = useSidebarStore();
   const router = useRouter();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const { logout, isPending: isLoggingOut } = useLogout();
   const { isAuthenticated } = useIsAuthenticated();
   const [loginRequiredMessage, setLoginRequiredMessage] = useState<
@@ -78,6 +83,12 @@ export const Sidebar = () => {
         setLoginRequiredMessage(message);
       }
     };
+
+  const handleNavHover = (prefetchOnHover?: boolean) => () => {
+    if (prefetchOnHover && isAuthenticated === true) {
+      prefetchImageGenerationAssets(queryClient);
+    }
+  };
 
   return (
     <aside
@@ -117,13 +128,20 @@ export const Sidebar = () => {
       {/* navigation items */}
       <nav className="flex flex-1 flex-col gap-[var(--gap-4)]">
         {NAV_ITEMS.map(
-          ({ href, icon: Icon, label, loginRequiredMessage: message }) => {
+          ({
+            href,
+            icon: Icon,
+            label,
+            loginRequiredMessage: message,
+            prefetchOnHover,
+          }) => {
             const isActive = pathname === href;
             return (
               <Link
                 key={href}
                 href={href}
                 onClick={handleNavClick(message)}
+                onMouseEnter={handleNavHover(prefetchOnHover)}
                 aria-label={label}
                 aria-current={isActive ? 'page' : undefined}
                 className={[
