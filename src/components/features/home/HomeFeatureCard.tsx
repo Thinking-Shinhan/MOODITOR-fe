@@ -15,7 +15,7 @@ export const HomeFeatureCard = ({
 }: HomeFeatureCardProps) => (
   <Link
     href={href}
-    className="bg-bg-gray-subtler hover:bg-bg-gray-subtle active:bg-bg-gray-subtle active:border-btn-outline-border-pressed flex h-full flex-1 flex-col items-end gap-[var(--gap-7)] rounded-[var(--radius-medium2)] border border-transparent p-[var(--padding-9)] transition-colors"
+    className="bg-bg-gray-subtler hover:bg-bg-gray-subtle active:bg-bg-gray-subtle active:border-btn-outline-border-pressed flex h-full w-full flex-1 flex-col items-end gap-[var(--gap-7)] rounded-[var(--radius-medium2)] border border-transparent p-[var(--padding-9)] transition-colors"
   >
     <div className="flex w-full flex-col items-start gap-[var(--gap-3)]">
       <Heading size="medium" className="text-text-basic">
