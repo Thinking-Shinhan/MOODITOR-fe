@@ -137,7 +137,13 @@ export default function HomePage() {
             </div>
             <button
               type="button"
-              onClick={() => setIsSheetModalOpen(true)}
+              onClick={() => {
+                if (data?.sheetSynced && data.sheetUrl) {
+                  window.open(data.sheetUrl, '_blank', 'noopener,noreferrer');
+                } else {
+                  setIsSheetModalOpen(true);
+                }
+              }}
               className="bg-btn-secondary-fill border-btn-secondary-border cursor-pointer rounded-[var(--radius-xsmall2)] border px-[var(--padding-4)] py-[var(--size-height-2)]"
             >
               <Body size="xsmall" bold className="text-text-primary-basic">
