@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useProducts } from '@/hooks/useProducts';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ProductList } from '@/components/features/product/ProductList';
@@ -12,7 +12,7 @@ import { Pagination } from '@/components/commons/Pagination';
 import type { Product, ProductGender } from '@/types/product';
 import { Spinner } from '@/components/commons/Spinner';
 
-const PAGE_SIZE = 11;
+const PAGE_SIZE = 12;
 
 export const ProductSelectPage = () => {
   // 상품은 한 번에 하나만 선택 가능
@@ -65,9 +65,11 @@ export const ProductSelectPage = () => {
   return (
     <div className="flex h-full">
       {/* 상품 선택 영역 */}
-      <div className="border-border-subtler bg-bg-white flex w-[999px] shrink-0 flex-col overflow-y-auto border-r p-8">
+      <div className="border-border-subtler bg-bg-white flex w-[999px] shrink-0 flex-col gap-[var(--gap-5)] overflow-y-auto border-r p-8">
         <div className="flex flex-col gap-[var(--gap-8)]">
-          <ProductSelectHeader />
+          <Suspense fallback={null}>
+            <ProductSelectHeader />
+          </Suspense>
           <div className="flex flex-col gap-[var(--gap-5)]">
             <ProductListToolbar
               totalCount={data?.products.totalElements ?? 0}
