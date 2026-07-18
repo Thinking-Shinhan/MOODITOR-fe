@@ -282,7 +282,10 @@ export const ProductShotContent = () => {
         progress={job?.progressPercent ?? 0}
         title="이미지 생성 중"
         description={job?.progressMessage ?? ''}
-        items={buildProgressChecklistItems(job?.progressItems ?? [])}
+        items={buildProgressChecklistItems(
+          job?.progressItems ?? [],
+          compositionReferenceAssetIds.length,
+        )}
       />
     </div>
   );
