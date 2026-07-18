@@ -24,6 +24,13 @@ export const ProductCompositionSelect = ({
   const { data: shotTemplateAssets } = useReferenceAssets('SHOT_TEMPLATE');
   const compositionOptions = shotTemplateAssets?.referenceAssets ?? [];
 
+  const productCompositionOptions = compositionOptions.filter(
+    (asset) => !asset.key.startsWith('REF_ACCESSORY_TEMPLATE'),
+  );
+  const accessoryCompositionOptions = compositionOptions.filter((asset) =>
+    asset.key.startsWith('REF_ACCESSORY_TEMPLATE'),
+  );
+
   const handleSelect = (referenceAssetId: string) => {
     const isSelected = selected.includes(referenceAssetId);
     if (!isSelected && selected.length >= MAX_SELECTED_COMPOSITIONS) return;
@@ -68,9 +75,11 @@ export const ProductCompositionSelect = ({
       </div>
       <SegmentControl
         segments={[
-          // TODO: 악세서리 탭 전용 구도 목록이 API에 없어서 임시로 상하의와 동일한 목록 사용
-          { label: '상하의', content: renderGrid(compositionOptions) },
-          { label: '악세서리', content: renderGrid(compositionOptions) },
+          { label: '상하의', content: renderGrid(productCompositionOptions) },
+          {
+            label: '악세서리',
+            content: renderGrid(accessoryCompositionOptions),
+          },
         ]}
       />
     </div>

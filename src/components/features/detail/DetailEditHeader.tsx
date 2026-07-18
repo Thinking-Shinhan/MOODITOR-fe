@@ -54,7 +54,11 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
   const setPreviewImageUrl = useDetailPagePreviewStore(
     (state) => state.setImageUrl,
   );
-  const [aiTooltipOpen, setAiTooltipOpen] = useState(false);
+  const [autoPlaceTooltipOpen, setAutoPlaceTooltipOpen] = useState(false);
+  const [reviewCopyTooltipOpen, setReviewCopyTooltipOpen] = useState(false);
+  const [previewTooltipOpen, setPreviewTooltipOpen] = useState(false);
+  const [saveTooltipOpen, setSaveTooltipOpen] = useState(false);
+  const [exportTooltipOpen, setExportTooltipOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [autoPlacementErrorMessage, setAutoPlacementErrorMessage] = useState<
@@ -238,8 +242,8 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
     >
       <div className="flex items-center gap-[var(--gap-3)]">
         <div
-          onMouseEnter={() => setAiTooltipOpen(true)}
-          onMouseLeave={() => setAiTooltipOpen(false)}
+          onMouseEnter={() => setAutoPlaceTooltipOpen(true)}
+          onMouseLeave={() => setAutoPlaceTooltipOpen(false)}
           className="relative flex shrink-0 items-center"
         >
           <button
@@ -260,66 +264,122 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
               AI 자동 배치
             </Body>
           </button>
-          {aiTooltipOpen && (
+          {autoPlaceTooltipOpen && (
             <Tooltip
-              text="이미지와 텍스트를 모두 배치하면 더 완성도가 높아져요."
-              placement="right"
-              className="absolute top-1/2 left-full ml-[var(--gap-3)] -translate-y-1/2"
+              text="AI가 이미지와 텍스트를 템플릿에 자동으로 배치해 드려요."
+              placement="bottom"
+              arrowAlign="left"
+              className="absolute top-full left-0 mt-[var(--gap-3)]"
             />
           )}
         </div>
-        <button
-          type="button"
-          onClick={handleReviewCopy}
-          disabled={!hasTemplates || !selectedProduct || reviewCopy.isPending}
-          className="bg-btn-secondary-fill border-border-border hover:border-border-subtle disabled:border-border-subtle group flex shrink-0 cursor-pointer items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border px-[var(--padding-5)] py-[var(--padding-3)] disabled:cursor-not-allowed"
+        <div
+          onMouseEnter={() => setReviewCopyTooltipOpen(true)}
+          onMouseLeave={() => setReviewCopyTooltipOpen(false)}
+          className="relative flex shrink-0 items-center"
         >
-          <AlignLeft
-            size={16}
-            className="text-icon-gray group-hover:text-icon-gray-light group-disabled:text-icon-disabled"
-          />
-          <Body
-            size="small"
-            bold
-            className="text-text-border group-hover:text-text-subtler group-disabled:text-text-disabled"
+          <button
+            type="button"
+            onClick={handleReviewCopy}
+            disabled={!hasTemplates || !selectedProduct || reviewCopy.isPending}
+            className="bg-btn-secondary-fill border-border-border hover:border-border-subtle disabled:border-border-subtle group flex shrink-0 cursor-pointer items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border px-[var(--padding-5)] py-[var(--padding-3)] disabled:cursor-not-allowed"
           >
-            {reviewCopy.isPending ? '검수 중...' : 'AI 문구 검수'}
-          </Body>
-        </button>
+            <AlignLeft
+              size={16}
+              className="text-icon-gray group-hover:text-icon-gray-light group-disabled:text-icon-disabled"
+            />
+            <Body
+              size="small"
+              bold
+              className="text-text-border group-hover:text-text-subtler group-disabled:text-text-disabled"
+            >
+              {reviewCopy.isPending ? '검수 중...' : 'AI 문구 검수'}
+            </Body>
+          </button>
+          {reviewCopyTooltipOpen && (
+            <Tooltip
+              text="AI가 문구를 검토해 브랜드 톤앤매너에 맞는 표현으로 다듬어 드려요."
+              placement="bottom"
+              arrowAlign="left"
+              className="absolute top-full left-0 mt-[var(--gap-3)]"
+            />
+          )}
+        </div>
       </div>
       <div className="flex items-center gap-[var(--gap-4)]">
-        <Button
-          variant="secondary"
-          size="large"
-          disabled={!hasTemplates || isPreviewing}
-          onClick={handlePreview}
-          leftIcon={
-            <Expand
-              size={24}
-              className={
-                hasTemplates ? 'text-icon-primary-basic' : 'text-icon-disabled'
-              }
+        <div
+          onMouseEnter={() => setPreviewTooltipOpen(true)}
+          onMouseLeave={() => setPreviewTooltipOpen(false)}
+          className="relative flex shrink-0 items-center"
+        >
+          <Button
+            variant="secondary"
+            size="large"
+            disabled={!hasTemplates || isPreviewing}
+            onClick={handlePreview}
+            leftIcon={
+              <Expand
+                size={24}
+                className={
+                  hasTemplates
+                    ? 'text-icon-primary-basic'
+                    : 'text-icon-disabled'
+                }
+              />
+            }
+          />
+          {previewTooltipOpen && (
+            <Tooltip
+              text="미리보기"
+              placement="bottom"
+              className="absolute top-full left-1/2 mt-[var(--gap-3)] -translate-x-1/2"
             />
-          }
-        />
-        <Button
-          variant="primary"
-          size="medium"
-          className="w-[108px]"
-          disabled={!hasTemplates || !selectedProduct || isSaving}
-          onClick={handleSave}
+          )}
+        </div>
+        <div
+          onMouseEnter={() => setSaveTooltipOpen(true)}
+          onMouseLeave={() => setSaveTooltipOpen(false)}
+          className="relative flex shrink-0 items-center"
         >
-          {isSaving ? '저장 중...' : '저장하기'}
-        </Button>
-        <Button
-          variant="primary"
-          size="medium"
-          className="w-[108px]"
-          disabled={!hasTemplates || isExportingLocal}
-          onClick={handleExportLocal}
+          <Button
+            variant="primary"
+            size="medium"
+            className="w-[108px]"
+            disabled={!hasTemplates || !selectedProduct || isSaving}
+            onClick={handleSave}
+          >
+            {isSaving ? '저장 중...' : '저장하기'}
+          </Button>
+          {saveTooltipOpen && (
+            <Tooltip
+              text="라이브러리에 저장"
+              placement="bottom"
+              className="absolute top-full left-1/2 mt-[var(--gap-3)] -translate-x-1/2"
+            />
+          )}
+        </div>
+        <div
+          onMouseEnter={() => setExportTooltipOpen(true)}
+          onMouseLeave={() => setExportTooltipOpen(false)}
+          className="relative flex shrink-0 items-center"
         >
-          {isExportingLocal ? '내보내는 중...' : '내보내기'}
-        </Button>
+          <Button
+            variant="primary"
+            size="medium"
+            className="w-[108px]"
+            disabled={!hasTemplates || isExportingLocal}
+            onClick={handleExportLocal}
+          >
+            {isExportingLocal ? '내보내는 중...' : '내보내기'}
+          </Button>
+          {exportTooltipOpen && (
+            <Tooltip
+              text="이미지로 내보내기"
+              placement="bottom"
+              className="absolute top-full left-1/2 mt-[var(--gap-3)] -translate-x-1/2"
+            />
+          )}
+        </div>
       </div>
 
       <AlertModal

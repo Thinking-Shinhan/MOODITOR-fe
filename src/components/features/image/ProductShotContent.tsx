@@ -193,7 +193,7 @@ export const ProductShotContent = () => {
   };
 
   const handleSelectArea = () => {
-    router.push('/products');
+    router.push('/products?shotType=product');
   };
 
   const handleSelectBackground = (id: string | null) => {

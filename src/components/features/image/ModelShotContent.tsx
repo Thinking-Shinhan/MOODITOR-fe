@@ -240,11 +240,11 @@ export const ModelShotContent = () => {
   };
 
   const handleSelectArea = () => {
-    router.push('/products');
+    router.push('/products?shotType=model');
   };
 
   const handleAddMore = () => {
-    router.push('/products');
+    router.push('/products?shotType=model');
   };
 
   const handleSelectModel = (id: string | null) => {
