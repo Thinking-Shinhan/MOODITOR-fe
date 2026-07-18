@@ -34,7 +34,7 @@ const CardLabel = ({ children }: { children: ReactNode }) => (
 );
 
 const TagList = ({ items }: { items: string[] }) => (
-  <div className="flex flex-wrap items-start justify-center gap-[var(--gap-4)]">
+  <div className="flex flex-wrap items-start justify-center gap-x-[var(--gap-3)] gap-y-[var(--gap-2)]">
     {items.map((item) => (
       <Body
         key={item}
@@ -61,14 +61,18 @@ export const BrandMoodAnalysisResult = ({
             <Heading size="xsmall" className="text-text-basic w-[200px]">
               {brandName}
             </Heading>
-            <Body size="medium" bold className="text-text-basic w-full">
+            <Body
+              size="medium"
+              bold
+              className="text-text-basic w-full break-keep"
+            >
               {analysis.brandSummary}
             </Body>
           </div>
         </div>
 
         <div className="flex w-[572px] flex-col items-start gap-[var(--gap-5)]">
-          <div className="border-border-subtler flex w-full items-center gap-[var(--gap-5)] rounded-[var(--radius-xsmall2)] border p-[var(--padding-7)]">
+          <div className="border-border-subtler flex w-full items-center gap-[var(--gap-5)] rounded-[var(--radius-xsmall2)] border px-[var(--padding-7)] py-[11.75px]">
             <div className="bg-bg-gray-subtler flex size-[60px] shrink-0 items-center justify-center rounded-[var(--radius-xsmall2)]">
               <Award size={28} className="text-icon-gray-light" />
             </div>
@@ -76,13 +80,17 @@ export const BrandMoodAnalysisResult = ({
               <Body size="small" className="text-text-subtler w-full">
                 디자인 철학
               </Body>
-              <Body size="medium" bold className="text-text-basic w-full">
+              <Body
+                size="medium"
+                bold
+                className="text-text-basic w-full break-keep"
+              >
                 {analysis.designPhilosophy}
               </Body>
             </div>
           </div>
 
-          <div className="border-border-subtler flex w-full items-center gap-[var(--gap-5)] rounded-[var(--radius-xsmall2)] border p-[var(--padding-7)]">
+          <div className="border-border-subtler flex w-full items-center gap-[var(--gap-5)] rounded-[var(--radius-xsmall2)] border px-[var(--padding-7)] py-[9.75px]">
             <div className="bg-bg-gray-subtler flex size-[60px] shrink-0 items-center justify-center rounded-[var(--radius-xsmall2)]">
               <Album size={28} className="text-icon-gray-light" />
             </div>
@@ -90,7 +98,7 @@ export const BrandMoodAnalysisResult = ({
               <Body size="small" className="text-text-subtler w-full">
                 브랜드 톤
               </Body>
-              <div className="flex w-full flex-wrap items-start gap-[var(--gap-4)]">
+              <div className="flex w-full flex-wrap items-start gap-x-[var(--gap-3)] gap-y-[var(--gap-2)]">
                 {analysis.brandTone.map((tone) => (
                   <Body
                     key={tone}
@@ -128,7 +136,11 @@ export const BrandMoodAnalysisResult = ({
         </div>
         <div className="border-border-subtler flex flex-1 flex-col items-center gap-[var(--gap-3)] rounded-[var(--radius-xsmall2)] border p-[var(--padding-7)] text-center">
           <CardLabel>추가 유의사항</CardLabel>
-          <Body size="medium" bold className="text-text-basic w-full">
+          <Body
+            size="medium"
+            bold
+            className="text-text-basic w-full break-keep"
+          >
             {analysis.customBrandNote}
           </Body>
         </div>
