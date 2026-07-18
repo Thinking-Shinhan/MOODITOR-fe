@@ -23,6 +23,7 @@ export default function DetailEditPage() {
     (state) => state.isPanelOpen,
   );
   const closeCopyReviewPanel = useCopyReviewStore((state) => state.closePanel);
+  const isCopyReviewLoading = useCopyReviewStore((state) => state.isLoading);
   const copyReviewItems = useCopyReviewStore((state) => state.items);
   const applyCopyReviewItem = useCopyReviewStore((state) => state.applyItem);
   const applyAllCopyReviewItems = useCopyReviewStore((state) => state.applyAll);
@@ -40,6 +41,7 @@ export default function DetailEditPage() {
       {isCopyReviewPanelOpen ? (
         <CopyReviewPanel
           items={copyReviewItems}
+          isLoading={isCopyReviewLoading}
           onApply={applyCopyReviewItem}
           onApplyAll={applyAllCopyReviewItems}
           onClose={closeCopyReviewPanel}

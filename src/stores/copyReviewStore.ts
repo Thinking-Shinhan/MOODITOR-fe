@@ -6,10 +6,12 @@ import type { CopyReviewItem } from '@/types/reviewCopy';
 
 interface CopyReviewStore {
   isPanelOpen: boolean;
+  isLoading: boolean;
   items: CopyReviewItem[];
   focusedInstanceKey: string | null;
   openPanel: () => void;
   closePanel: () => void;
+  setLoading: (isLoading: boolean) => void;
   setItems: (items: CopyReviewItem[]) => void;
   applyItem: (id: string) => void;
   applyAll: () => void;
@@ -26,10 +28,12 @@ const applyItemToCanvas = (item: CopyReviewItem) => {
 
 export const useCopyReviewStore = create<CopyReviewStore>((set, get) => ({
   isPanelOpen: false,
+  isLoading: false,
   items: [],
   focusedInstanceKey: null,
   openPanel: () => set({ isPanelOpen: true }),
   closePanel: () => set({ isPanelOpen: false, focusedInstanceKey: null }),
+  setLoading: (isLoading) => set({ isLoading }),
   setItems: (items) => set({ items }),
   applyItem: (id) => {
     const item = get().items.find((item) => item.id === id);
