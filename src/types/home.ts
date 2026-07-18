@@ -6,5 +6,6 @@ export interface HomeSummary {
   toneKeywords: string[];
   productCount: number;
   sheetSynced: boolean;
+  sheetUrl: string | null;
   sheetSyncedAt: string | null;
 }

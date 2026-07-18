@@ -1,26 +1,35 @@
 'use client';
 
+import { useState, type MouseEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { Link2 } from 'lucide-react';
 import { Body, Heading, Label } from '@/components/commons/Typography';
+import { AlertModal } from '@/components/commons/AlertModal';
 import { HomeFeatureCard } from '@/components/features/home/HomeFeatureCard';
 import { HomeBrandSummaryCard } from '@/components/features/home/HomeBrandSummaryCard';
+import { SheetConnectionModal } from '@/components/features/home/SheetConnectionModal';
 import { useHomeSummary } from '@/hooks/useHomeSummary';
+import { useIsAuthenticated } from '@/hooks/useIsAuthenticated';
 
 const BRAND_MOOD_CARD = {
   href: '/onboarding',
   title: '브랜드 무드 분석하기',
   description:
     '브랜드의 톤앤매너를 분석해\n일관된 브랜드 콘텐츠를 제작할 수 있어요.',
+  loginRequiredMessage: '로그인 후 브랜드 무드 분석을 진행해 보세요.',
 };
 const IMAGE_GENERATE_CARD = {
   href: '/image-generate',
   title: '이미지 만들기',
   description: '브랜드 무드에 맞는\n모델컷과 제품컷을 AI로 제작해보세요.',
+  loginRequiredMessage: '로그인 후 브랜드에 맞는 이미지를 제작해 보세요.',
 };
 const DETAIL_EDIT_CARD = {
   href: '/detail-edit',
   title: '상세페이지 편집',
   description: '우리 브랜드에 최적화된\n상세페이지를 자유롭게 만들어보세요.',
+  loginRequiredMessage: '로그인 후 브랜드에 맞는 상세페이지를 제작해 보세요.',
 };
 
 const DEFAULT_FEATURE_CARDS = [
@@ -41,8 +50,23 @@ const formatSyncedAt = (isoDate: string) => {
 };
 
 export default function HomePage() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const { data } = useHomeSummary();
+  const { isAuthenticated } = useIsAuthenticated();
   const hasBrandMood = data?.brandMoodRegistered ?? false;
+  const [isSheetModalOpen, setIsSheetModalOpen] = useState(false);
+  const [loginRequiredMessage, setLoginRequiredMessage] = useState<
+    string | null
+  >(null);
+
+  const guardFeatureClick =
+    (message: string) => (event: MouseEvent<HTMLAnchorElement>) => {
+      if (isAuthenticated === false) {
+        event.preventDefault();
+        setLoginRequiredMessage(message);
+      }
+    };
 
   return (
     <div
@@ -76,6 +100,7 @@ export default function HomePage() {
                     href={card.href}
                     title={card.title}
                     description={card.description}
+                    onClick={guardFeatureClick(card.loginRequiredMessage)}
                   />
                 ))}
               </div>
@@ -88,6 +113,7 @@ export default function HomePage() {
                   href={card.href}
                   title={card.title}
                   description={card.description}
+                  onClick={guardFeatureClick(card.loginRequiredMessage)}
                 />
               ))}
             </div>
@@ -132,7 +158,16 @@ export default function HomePage() {
             </div>
             <button
               type="button"
-              className="bg-btn-secondary-fill border-btn-secondary-border rounded-[var(--radius-xsmall2)] border px-[var(--padding-4)] py-[var(--size-height-2)]"
+              onClick={() => {
+                if (isAuthenticated === false) {
+                  setLoginRequiredMessage('로그인 후 상품을 연동해 보세요.');
+                } else if (data?.sheetSynced && data.sheetUrl) {
+                  window.open(data.sheetUrl, '_blank', 'noopener,noreferrer');
+                } else {
+                  setIsSheetModalOpen(true);
+                }
+              }}
+              className="bg-btn-secondary-fill border-btn-secondary-border cursor-pointer rounded-[var(--radius-xsmall2)] border px-[var(--padding-4)] py-[var(--size-height-2)]"
             >
               <Body size="xsmall" bold className="text-text-primary-basic">
                 {data?.sheetSynced ? '상품 연동 관리' : '상품 연동하기'}
@@ -141,6 +176,26 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      <SheetConnectionModal
+        open={isSheetModalOpen}
+        onClose={() => setIsSheetModalOpen(false)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['homeSummary'] });
+        }}
+      />
+
+      <AlertModal
+        open={loginRequiredMessage !== null}
+        title="로그인이 필요해요."
+        description={loginRequiredMessage ?? ''}
+        confirmText="확인"
+        onConfirm={() => {
+          setLoginRequiredMessage(null);
+          router.push('/login');
+        }}
+        onCancel={() => setLoginRequiredMessage(null)}
+      />
     </div>
   );
 }
