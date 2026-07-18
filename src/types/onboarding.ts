@@ -1,6 +1,7 @@
 export interface BrandMoodAnalysis {
   sourceType: string;
   sourceUrl: string;
+  brandName: string;
   brandSummary: string;
   designPhilosophy: string;
   brandTone: string[];

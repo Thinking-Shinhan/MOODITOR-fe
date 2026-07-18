@@ -17,9 +17,6 @@ import { useSaveBrandMood } from '@/hooks/useSaveBrandMood';
 import { useFakeProgress } from '@/hooks/useFakeProgress';
 import type { BrandMoodAnalysis } from '@/types/onboarding';
 
-// TODO: 회원가입 응답의 브랜드명으로 교체 예정
-const MOCK_BRAND_NAME = '에이븐';
-
 // 100%로 바뀐 걸 잠깐 보여준 뒤 결과 화면으로 전환하기 위한 대기 시간
 const RESULT_TRANSITION_DELAY_MS = 1000;
 
@@ -109,7 +106,7 @@ export default function OnboardingPage() {
     setErrorMessage(null);
     saveBrandMood.mutate(
       {
-        name: MOCK_BRAND_NAME,
+        name: analysis.brandName,
         sourceType: analysis.sourceType,
         sourceUrl: analysis.sourceUrl,
         brandSummary: analysis.brandSummary,
@@ -171,10 +168,7 @@ export default function OnboardingPage() {
             </div>
           }
         >
-          <BrandMoodAnalysisResult
-            brandName={MOCK_BRAND_NAME}
-            analysis={analysis}
-          />
+          <BrandMoodAnalysisResult analysis={analysis} />
         </OnboardingStepLayout>
         {errorToast}
       </>

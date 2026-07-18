@@ -30,6 +30,8 @@ export type CopyReviewStatus = 'idle' | 'applying' | 'applied';
 
 export interface CopyReviewItem {
   id: string;
+  instanceKey: string;
+  slotKey: string;
   pageNumber: number;
   subtitle: string;
   issueTag: string;

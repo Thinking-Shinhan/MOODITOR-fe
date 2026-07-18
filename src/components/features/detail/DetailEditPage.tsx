@@ -23,18 +23,29 @@ export default function DetailEditPage() {
     (state) => state.isPanelOpen,
   );
   const closeCopyReviewPanel = useCopyReviewStore((state) => state.closePanel);
+  const isCopyReviewLoading = useCopyReviewStore((state) => state.isLoading);
   const copyReviewItems = useCopyReviewStore((state) => state.items);
   const applyCopyReviewItem = useCopyReviewStore((state) => state.applyItem);
   const applyAllCopyReviewItems = useCopyReviewStore((state) => state.applyAll);
+  const focusCopyReviewInstance = useCopyReviewStore(
+    (state) => state.focusInstance,
+  );
+
+  const handleFocusCopyReviewItem = (id: string) => {
+    const item = copyReviewItems.find((item) => item.id === id);
+    if (item) focusCopyReviewInstance(item.instanceKey);
+  };
 
   return (
     <div className="flex h-full">
       {isCopyReviewPanelOpen ? (
         <CopyReviewPanel
           items={copyReviewItems}
+          isLoading={isCopyReviewLoading}
           onApply={applyCopyReviewItem}
           onApplyAll={applyAllCopyReviewItems}
           onClose={closeCopyReviewPanel}
+          onFocusItem={handleFocusCopyReviewItem}
           applyAllDisabled={copyReviewItems.every(
             (item) => item.status === 'applied',
           )}

@@ -13,6 +13,7 @@ interface CopyReviewCardProps {
   reason: string;
   status?: CopyReviewStatus;
   onApply?: () => void;
+  onClick?: () => void;
   className?: string;
 }
 
@@ -25,6 +26,7 @@ export const CopyReviewCard = ({
   reason,
   status = 'idle',
   onApply,
+  onClick,
   className = '',
 }: CopyReviewCardProps) => {
   const isApplying = status === 'applying';
@@ -44,7 +46,8 @@ export const CopyReviewCard = ({
 
   return (
     <div
-      className={`bg-bg-white flex w-[296px] flex-col items-start gap-[var(--gap-5)] rounded-[var(--radius-xsmall2)] border p-[var(--padding-5)] transition-colors ${containerStateClass} ${className}`}
+      onClick={onClick}
+      className={`bg-bg-white flex w-[296px] cursor-pointer flex-col items-start gap-[var(--gap-5)] rounded-[var(--radius-xsmall2)] border p-[var(--padding-5)] transition-colors ${containerStateClass} ${className}`}
     >
       <div className="flex w-full flex-col items-start gap-[var(--gap-4)]">
         <div className="flex w-full items-center justify-between">
@@ -111,7 +114,10 @@ export const CopyReviewCard = ({
 
       <button
         type="button"
-        onClick={onApply}
+        onClick={(event) => {
+          event.stopPropagation();
+          onApply?.();
+        }}
         disabled={status !== 'idle'}
         className={`flex w-full items-center justify-center gap-[var(--gap-1)] rounded-[var(--radius-xsmall2)] px-[var(--padding-4)] py-[var(--size-height-2)] transition-colors ${
           isApplied ? 'cursor-not-allowed' : 'cursor-pointer'

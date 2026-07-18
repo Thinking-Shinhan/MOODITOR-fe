@@ -3,22 +3,27 @@
 import { X } from 'lucide-react';
 import { Body, Heading } from '@/components/commons/Typography';
 import { Button } from '@/components/commons/Button';
+import { Spinner } from '@/components/commons/Spinner';
 import { CopyReviewCard } from '@/components/features/detail/CopyReviewCard';
 import type { CopyReviewItem } from '@/types/reviewCopy';
 
 interface CopyReviewPanelProps {
   items: CopyReviewItem[];
+  isLoading?: boolean;
   onApply: (id: string) => void;
   onApplyAll: () => void;
   onClose: () => void;
+  onFocusItem: (id: string) => void;
   applyAllDisabled?: boolean;
 }
 
 export const CopyReviewPanel = ({
   items,
+  isLoading = false,
   onApply,
   onApplyAll,
   onClose,
+  onFocusItem,
   applyAllDisabled = false,
 }: CopyReviewPanelProps) => {
   return (
@@ -44,7 +49,11 @@ export const CopyReviewPanel = ({
             </Body>
           </div>
 
-          {items.length === 0 ? (
+          {isLoading ? (
+            <div className="flex w-full flex-1 items-center justify-center py-[var(--padding-10)]">
+              <Spinner size="large" className="text-icon-gray-light" />
+            </div>
+          ) : items.length === 0 ? (
             <Body size="xsmall" className="text-text-subtler">
               검수할 문구가 없어요.
             </Body>
@@ -60,13 +69,14 @@ export const CopyReviewPanel = ({
                 reason={item.reason}
                 status={item.status}
                 onApply={() => onApply(item.id)}
+                onClick={() => onFocusItem(item.id)}
               />
             ))
           )}
         </div>
       </div>
 
-      {items.length > 0 && (
+      {!isLoading && items.length > 0 && (
         <div className="absolute bottom-[28px] left-[32px] w-[296px]">
           <Button
             variant="primary"
