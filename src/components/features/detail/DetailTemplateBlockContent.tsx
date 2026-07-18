@@ -30,7 +30,9 @@ import {
   getSizeInfoTemplateHeight,
 } from '@/components/features/detail/templates/SizeInfoTemplate';
 import { useDetailPageInit } from '@/hooks/useDetailPageInit';
+import { useCopyReviewStore } from '@/stores/copyReviewStore';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
+import { getTemplateBlockDomId } from '@/utils/templateBlockDom';
 import type { DetailTemplateType } from '@/types/template';
 
 interface DetailTemplateBlockContentProps {
@@ -86,6 +88,9 @@ export const DetailTemplateBlockContent = ({
       ? getSizeInfoTemplateHeight(buildSizeTableFromProduct(data.product))
       : TEMPLATE_HEIGHTS[type];
   const stageRef = useRef<Konva.Stage>(null);
+  const isFocused = useCopyReviewStore(
+    (state) => state.focusedInstanceKey === id,
+  );
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -106,11 +111,20 @@ export const DetailTemplateBlockContent = ({
         moveDownDisabled={moveDownDisabled}
         onDelete={onDelete}
       />
-      <Stage ref={stageRef} width={CANVAS_WIDTH} height={height}>
-        <Layer>
-          <DetailTemplateGroup templateId={id} type={type} />
-        </Layer>
-      </Stage>
+      <div
+        id={getTemplateBlockDomId(id)}
+        className={
+          isFocused
+            ? 'outline-border-primary shadow-[0px_2px_8px_0px_rgba(0,0,0,0.04)] outline-[1.5px]'
+            : ''
+        }
+      >
+        <Stage ref={stageRef} width={CANVAS_WIDTH} height={height}>
+          <Layer>
+            <DetailTemplateGroup templateId={id} type={type} />
+          </Layer>
+        </Stage>
+      </div>
     </div>
   );
 };

@@ -26,6 +26,14 @@ export default function DetailEditPage() {
   const copyReviewItems = useCopyReviewStore((state) => state.items);
   const applyCopyReviewItem = useCopyReviewStore((state) => state.applyItem);
   const applyAllCopyReviewItems = useCopyReviewStore((state) => state.applyAll);
+  const focusCopyReviewInstance = useCopyReviewStore(
+    (state) => state.focusInstance,
+  );
+
+  const handleFocusCopyReviewItem = (id: string) => {
+    const item = copyReviewItems.find((item) => item.id === id);
+    if (item) focusCopyReviewInstance(item.instanceKey);
+  };
 
   return (
     <div className="flex h-full">
@@ -35,6 +43,7 @@ export default function DetailEditPage() {
           onApply={applyCopyReviewItem}
           onApplyAll={applyAllCopyReviewItems}
           onClose={closeCopyReviewPanel}
+          onFocusItem={handleFocusCopyReviewItem}
           applyAllDisabled={copyReviewItems.every(
             (item) => item.status === 'applied',
           )}

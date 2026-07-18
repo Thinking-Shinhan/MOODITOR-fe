@@ -11,6 +11,7 @@ interface CopyReviewPanelProps {
   onApply: (id: string) => void;
   onApplyAll: () => void;
   onClose: () => void;
+  onFocusItem: (id: string) => void;
   applyAllDisabled?: boolean;
 }
 
@@ -19,6 +20,7 @@ export const CopyReviewPanel = ({
   onApply,
   onApplyAll,
   onClose,
+  onFocusItem,
   applyAllDisabled = false,
 }: CopyReviewPanelProps) => {
   return (
@@ -60,6 +62,7 @@ export const CopyReviewPanel = ({
                 reason={item.reason}
                 status={item.status}
                 onApply={() => onApply(item.id)}
+                onClick={() => onFocusItem(item.id)}
               />
             ))
           )}
