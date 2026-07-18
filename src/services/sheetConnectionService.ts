@@ -6,5 +6,5 @@ import type {
 
 export const sheetConnectionService = {
   create: (body: CreateSheetConnectionRequest) =>
-    apiClient.post<SheetConnection>('/sheet-connections', body),
+    apiClient.post<SheetConnection>('/sheets', body),
 };

@@ -1,9 +1,12 @@
 'use client';
 
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Link2 } from 'lucide-react';
 import { Body, Heading, Label } from '@/components/commons/Typography';
 import { HomeFeatureCard } from '@/components/features/home/HomeFeatureCard';
 import { HomeBrandSummaryCard } from '@/components/features/home/HomeBrandSummaryCard';
+import { SheetConnectionModal } from '@/components/features/home/SheetConnectionModal';
 import { useHomeSummary } from '@/hooks/useHomeSummary';
 
 const BRAND_MOOD_CARD = {
@@ -41,8 +44,10 @@ const formatSyncedAt = (isoDate: string) => {
 };
 
 export default function HomePage() {
+  const queryClient = useQueryClient();
   const { data } = useHomeSummary();
   const hasBrandMood = data?.brandMoodRegistered ?? false;
+  const [isSheetModalOpen, setIsSheetModalOpen] = useState(false);
 
   return (
     <div
@@ -132,7 +137,8 @@ export default function HomePage() {
             </div>
             <button
               type="button"
-              className="bg-btn-secondary-fill border-btn-secondary-border rounded-[var(--radius-xsmall2)] border px-[var(--padding-4)] py-[var(--size-height-2)]"
+              onClick={() => setIsSheetModalOpen(true)}
+              className="bg-btn-secondary-fill border-btn-secondary-border cursor-pointer rounded-[var(--radius-xsmall2)] border px-[var(--padding-4)] py-[var(--size-height-2)]"
             >
               <Body size="xsmall" bold className="text-text-primary-basic">
                 {data?.sheetSynced ? '상품 연동 관리' : '상품 연동하기'}
@@ -141,6 +147,14 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      <SheetConnectionModal
+        open={isSheetModalOpen}
+        onClose={() => setIsSheetModalOpen(false)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['homeSummary'] });
+        }}
+      />
     </div>
   );
 }
