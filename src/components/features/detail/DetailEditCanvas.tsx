@@ -155,9 +155,6 @@ export const DetailEditCanvas = () => {
               items={placedTemplates.map((item) => item.id)}
               strategy={verticalListSortingStrategy}
             >
-              {/* DragOverlay는 position: fixed로 뷰포트 기준 배치되기 때문에,
-                  transform이 걸린 조상 안에 있으면 안 된다. 줌 스케일은
-                  블록 목록에만 적용하고 DragOverlay는 형제로 남겨둔다. */}
               <div
                 style={{
                   transform: `scale(${zoom / 100})`,
@@ -183,16 +180,23 @@ export const DetailEditCanvas = () => {
             </SortableContext>
             <DragOverlay>
               {activeTemplate && (
-                <DetailTemplateBlockContent
-                  id={activeTemplate.id}
-                  type={activeTemplate.type}
-                  pageNumber={activeIndex + 1}
-                  onMoveUp={noop}
-                  onMoveDown={noop}
-                  moveUpDisabled
-                  moveDownDisabled
-                  onDelete={noop}
-                />
+                <div
+                  style={{
+                    transform: `scale(${zoom / 100})`,
+                    transformOrigin: 'top left',
+                  }}
+                >
+                  <DetailTemplateBlockContent
+                    id={activeTemplate.id}
+                    type={activeTemplate.type}
+                    pageNumber={activeIndex + 1}
+                    onMoveUp={noop}
+                    onMoveDown={noop}
+                    moveUpDisabled
+                    moveDownDisabled
+                    onDelete={noop}
+                  />
+                </div>
               )}
             </DragOverlay>
           </DndContext>
