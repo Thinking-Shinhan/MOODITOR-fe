@@ -159,7 +159,7 @@ export const ProductImageUploadPanel = ({
   };
 
   return (
-    <div className="flex w-full flex-col gap-[var(--gap-8)]">
+    <div className="flex h-full min-h-0 w-full flex-col gap-[var(--gap-8)]">
       <div className="flex flex-col gap-[var(--gap-2)]">
         <Heading size="small" className="text-text-basic">
           이미지 업로드
@@ -172,6 +172,7 @@ export const ProductImageUploadPanel = ({
         previewUrl={frontPreviewUrl}
         onUpload={handleUploadFront}
         onRemove={handleRemoveFront}
+        className="min-h-0 flex-1"
       />
 
       <ImageUploadField
@@ -180,6 +181,7 @@ export const ProductImageUploadPanel = ({
         previewUrl={backPreviewUrl}
         onUpload={handleUploadBack}
         onRemove={handleRemoveBack}
+        className="min-h-0 flex-1"
       />
 
       {errorMessage && <InputMessage state="error" message={errorMessage} />}
@@ -189,7 +191,7 @@ export const ProductImageUploadPanel = ({
         size="medium"
         disabled={!isReady || isPending}
         onClick={handleGoToImageGenerate}
-        className="w-full rounded-[var(--radius-medium1)]!"
+        className="w-[calc((100vh-290px)/2)] rounded-[var(--radius-medium1)]!"
       >
         {isPending ? '업로드 중...' : '이미지 생성하러 가기'}
       </Button>

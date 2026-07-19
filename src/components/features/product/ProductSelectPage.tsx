@@ -107,7 +107,7 @@ export const ProductSelectPage = () => {
 
       {/* 이미지 업로드 영역 */}
       <div
-        className={`bg-bg-gray-subtler flex flex-1 justify-center ${selectedProduct ? 'p-8' : ''}`}
+        className={`bg-bg-gray-subtler flex flex-1 overflow-hidden ${selectedProduct ? 'p-8' : 'justify-center'}`}
       >
         {selectedProduct ? (
           <ProductImageUploadPanel
