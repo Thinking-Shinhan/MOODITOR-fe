@@ -15,12 +15,14 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { DetailTemplateBlock } from '@/components/features/detail/DetailTemplateBlock';
 import { DetailTemplateBlockContent } from '@/components/features/detail/DetailTemplateBlockContent';
 import { Body } from '@/components/commons/Typography';
 import { Toast } from '@/components/commons/Toast';
 import { useDetailCanvasStore } from '@/stores/detailCanvasStore';
 import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
+import { useDetailCanvasZoomStore } from '@/stores/detailCanvasZoomStore';
 import type { DetailTemplate } from '@/types/template';
 import { SquareMousePointer } from 'lucide-react';
 
@@ -48,6 +50,7 @@ export const DetailEditCanvas = () => {
   const selectedProduct = useDetailProductSelectionStore(
     (state) => state.selectedProduct,
   );
+  const zoom = useDetailCanvasZoomStore((state) => state.zoom);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -144,6 +147,7 @@ export const DetailEditCanvas = () => {
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
             onDragStart={handleDragStart}
             onDragEnd={handleReorder}
           >
@@ -151,20 +155,30 @@ export const DetailEditCanvas = () => {
               items={placedTemplates.map((item) => item.id)}
               strategy={verticalListSortingStrategy}
             >
-              <div className="flex flex-col gap-[var(--gap-7)]">
-                {placedTemplates.map((placed, index) => (
-                  <DetailTemplateBlock
-                    key={placed.id}
-                    id={placed.id}
-                    type={placed.type}
-                    pageNumber={index + 1}
-                    onMoveUp={() => handleMoveUp(index)}
-                    onMoveDown={() => handleMoveDown(index)}
-                    moveUpDisabled={index === 0}
-                    moveDownDisabled={index === placedTemplates.length - 1}
-                    onDelete={() => handleDelete(placed.id)}
-                  />
-                ))}
+              {/* DragOverlay는 position: fixed로 뷰포트 기준 배치되기 때문에,
+                  transform이 걸린 조상 안에 있으면 안 된다. 줌 스케일은
+                  블록 목록에만 적용하고 DragOverlay는 형제로 남겨둔다. */}
+              <div
+                style={{
+                  transform: `scale(${zoom / 100})`,
+                  transformOrigin: 'top center',
+                }}
+              >
+                <div className="flex flex-col gap-[var(--gap-7)]">
+                  {placedTemplates.map((placed, index) => (
+                    <DetailTemplateBlock
+                      key={placed.id}
+                      id={placed.id}
+                      type={placed.type}
+                      pageNumber={index + 1}
+                      onMoveUp={() => handleMoveUp(index)}
+                      onMoveDown={() => handleMoveDown(index)}
+                      moveUpDisabled={index === 0}
+                      moveDownDisabled={index === placedTemplates.length - 1}
+                      onDelete={() => handleDelete(placed.id)}
+                    />
+                  ))}
+                </div>
               </div>
             </SortableContext>
             <DragOverlay>
