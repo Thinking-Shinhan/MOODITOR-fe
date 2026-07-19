@@ -1,12 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { useQueryClient } from '@tanstack/react-query';
 import { Heading, Body } from '@/components/commons/Typography';
 import { Spinner } from '@/components/commons/Spinner';
 import { LibraryProductCard } from '@/components/features/library/LibraryProductCard';
 import { useImageFolders } from '@/hooks/useImageFolders';
+import { prefetchImageFolderAssets } from '@/hooks/useImageFolderAssets';
 
 export const LibraryPage = () => {
+  const queryClient = useQueryClient();
   const { data, isLoading, isError } = useImageFolders();
   const imageFolders = data?.imageFolders ?? [];
 
@@ -43,6 +46,9 @@ export const LibraryPage = () => {
               <Link
                 key={folder.productId}
                 href={`/library/${folder.productId}`}
+                onMouseEnter={() =>
+                  prefetchImageFolderAssets(queryClient, folder.productId)
+                }
                 className="contents"
               >
                 <LibraryProductCard
