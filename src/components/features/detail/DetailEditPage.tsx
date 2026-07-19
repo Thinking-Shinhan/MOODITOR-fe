@@ -64,7 +64,7 @@ export default function DetailEditPage() {
             <div className="h-[240px] w-full shrink-0" />
           </div>
         </div>
-        <DetailCanvasZoomControl className="absolute right-[var(--gap-7)] bottom-[var(--gap-7)]" />
+        <DetailCanvasZoomControl className="absolute right-[32px] bottom-[32px]" />
       </div>
     </div>
   );

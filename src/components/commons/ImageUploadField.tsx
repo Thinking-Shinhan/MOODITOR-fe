@@ -50,7 +50,7 @@ export const ImageUploadField = ({
 
   return (
     <div className={`flex w-full flex-col gap-[var(--gap-4)] ${className}`}>
-      <div className="flex w-full items-center justify-between">
+      <div className="flex w-[calc((100vh-290px)/2)] items-center justify-between">
         <Body size="medium" bold className="text-text-subtle">
           {label}
         </Body>

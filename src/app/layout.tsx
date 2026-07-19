@@ -15,8 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Aven Studio',
-  description: 'Aven Studio - AI Content Creation Tool',
+  title: 'MOODITOR',
+  description: 'MOODITOR - AI Content Creation Tool',
+  icons: {
+    icon: '/assets/icons/mooditor-icon.svg',
+  },
 };
 
 export default function RootLayout({

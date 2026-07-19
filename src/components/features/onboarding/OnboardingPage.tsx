@@ -232,6 +232,7 @@ export default function OnboardingPage() {
       currentStep={1}
       title="브랜드 웹사이트 링크를 입력해 주세요."
       subtitle="브랜드의 웹사이트를 분석해 이미지와 상세페이지에 반영할 톤앤매너를 파악해요."
+      onPrevious={() => router.back()}
       onNext={() => setCurrentStep(2)}
       nextDisabled={websiteUrl.trim().length === 0}
     >
