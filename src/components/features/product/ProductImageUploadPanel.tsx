@@ -11,7 +11,6 @@ import { useUploadProductImages } from '@/hooks/useUploadProductImages';
 import { useDeleteAsset } from '@/hooks/useDeleteAsset';
 import { useObjectUrl } from '@/hooks/useObjectUrl';
 import { ApiError } from '@/libs/apiClient';
-import { assetService } from '@/services/assetService';
 import type { Product } from '@/types/product';
 import type { UploadProductImagesItem } from '@/services/assetService';
 
@@ -65,7 +64,11 @@ export const ProductImageUploadPanel = ({
     if (existingFrontAsset) {
       setErrorMessage(null);
       try {
-        await deleteAsset(existingFrontAsset.assetId);
+        await deleteAsset({
+          assetId: existingFrontAsset.assetId,
+          productId: selectedProduct.id,
+          role: 'front',
+        });
         setFrontRemoved(true);
       } catch (error) {
         setErrorMessage(
@@ -91,7 +94,11 @@ export const ProductImageUploadPanel = ({
     if (existingBackAsset) {
       setErrorMessage(null);
       try {
-        await deleteAsset(existingBackAsset.assetId);
+        await deleteAsset({
+          assetId: existingBackAsset.assetId,
+          productId: selectedProduct.id,
+          role: 'back',
+        });
         setBackRemoved(true);
       } catch (error) {
         setErrorMessage(
@@ -112,29 +119,32 @@ export const ProductImageUploadPanel = ({
       if (frontImage) items.push({ file: frontImage, role: 'PRODUCT_FRONT' });
       if (backImage) items.push({ file: backImage, role: 'PRODUCT_BACK' });
 
-      if (items.length > 0) {
-        await uploadProductImages({ productId: selectedProduct.id, items });
-      }
-
-      const latestImages = await assetService.getProductImages(
-        selectedProduct.id,
-      );
-      const latestFrontAsset = latestImages.find(
+      const uploadedAssets =
+        items.length > 0
+          ? await uploadProductImages({ productId: selectedProduct.id, items })
+          : [];
+      const uploadedFrontAsset = uploadedAssets.find(
         (asset) => asset.assetRole === 'PRODUCT_FRONT',
       );
-      const latestBackAsset = latestImages.find(
+      const uploadedBackAsset = uploadedAssets.find(
         (asset) => asset.assetRole === 'PRODUCT_BACK',
       );
+
+      const finalFrontAsset =
+        uploadedFrontAsset ?? (frontRemoved ? undefined : existingFrontAsset);
+      const finalBackAsset =
+        uploadedBackAsset ?? (backRemoved ? undefined : existingBackAsset);
+
       const assetIds = [
-        latestFrontAsset?.assetId,
-        latestBackAsset?.assetId,
+        finalFrontAsset?.assetId,
+        finalBackAsset?.assetId,
       ].filter((id): id is number => id !== undefined);
 
       addProducts([
         {
           id: String(selectedProduct.id),
           name: selectedProduct.name,
-          imageUrl: latestFrontAsset?.imageUrl,
+          imageUrl: finalFrontAsset?.imageUrl,
           assetIds,
         },
       ]);
@@ -149,7 +159,7 @@ export const ProductImageUploadPanel = ({
   };
 
   return (
-    <div className="flex w-full flex-col gap-[var(--gap-8)]">
+    <div className="flex h-full min-h-0 w-full flex-col gap-[var(--gap-8)]">
       <div className="flex flex-col gap-[var(--gap-2)]">
         <Heading size="small" className="text-text-basic">
           이미지 업로드
@@ -162,6 +172,7 @@ export const ProductImageUploadPanel = ({
         previewUrl={frontPreviewUrl}
         onUpload={handleUploadFront}
         onRemove={handleRemoveFront}
+        className="min-h-0 flex-1"
       />
 
       <ImageUploadField
@@ -170,6 +181,7 @@ export const ProductImageUploadPanel = ({
         previewUrl={backPreviewUrl}
         onUpload={handleUploadBack}
         onRemove={handleRemoveBack}
+        className="min-h-0 flex-1"
       />
 
       {errorMessage && <InputMessage state="error" message={errorMessage} />}
@@ -179,7 +191,7 @@ export const ProductImageUploadPanel = ({
         size="medium"
         disabled={!isReady || isPending}
         onClick={handleGoToImageGenerate}
-        className="w-full rounded-[var(--radius-medium1)]!"
+        className="w-[calc((100vh-290px)/2)] rounded-[var(--radius-medium1)]!"
       >
         {isPending ? '업로드 중...' : '이미지 생성하러 가기'}
       </Button>
