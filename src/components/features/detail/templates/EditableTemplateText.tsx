@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Text } from 'react-konva';
 import type Konva from 'konva';
+import { useDetailCanvasZoomStore } from '@/stores/detailCanvasZoomStore';
 
 interface EditableTemplateTextProps {
   x?: number;
@@ -16,10 +17,6 @@ interface EditableTemplateTextProps {
   fontStyle?: string;
 }
 
-// 더블클릭하면 Konva Text 자리에 정확히 겹치는 textarea를 띄워 값을 편집하고,
-// 포커스가 빠지면 편집을 마치고 Konva Text로 되돌린다.
-// textarea 위치는 캔버스가 화면에 그려진 실제 픽셀 좌표를 런타임에 계산해야 해서
-// Tailwind 클래스로 표현할 수 없어 인라인 스타일이 불가피하다.
 export const EditableTemplateText = ({
   x = 0,
   y = 0,
@@ -33,6 +30,7 @@ export const EditableTemplateText = ({
 }: EditableTemplateTextProps) => {
   const textRef = useRef<Konva.Text>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const zoom = useDetailCanvasZoomStore((state) => state.zoom);
 
   useEffect(() => {
     const textNode = textRef.current;
@@ -41,18 +39,20 @@ export const EditableTemplateText = ({
     const stage = textNode.getStage();
     if (!stage) return;
 
+    const zoomScale = zoom / 100;
     const stageBox = stage.container().getBoundingClientRect();
     const absolutePosition = textNode.absolutePosition();
+    const scaledFontSize = fontSize * zoomScale;
 
     const textarea = document.createElement('textarea');
     document.body.appendChild(textarea);
     textarea.value = text;
     textarea.style.position = 'absolute';
-    textarea.style.top = `${stageBox.top + window.scrollY + absolutePosition.y}px`;
-    textarea.style.left = `${stageBox.left + window.scrollX + absolutePosition.x}px`;
-    textarea.style.width = `${width}px`;
-    textarea.style.minHeight = `${fontSize * lineHeight}px`;
-    textarea.style.fontSize = `${fontSize}px`;
+    textarea.style.top = `${stageBox.top + window.scrollY + absolutePosition.y * zoomScale}px`;
+    textarea.style.left = `${stageBox.left + window.scrollX + absolutePosition.x * zoomScale}px`;
+    textarea.style.width = `${width * zoomScale}px`;
+    textarea.style.minHeight = `${scaledFontSize * lineHeight}px`;
+    textarea.style.fontSize = `${scaledFontSize}px`;
     textarea.style.lineHeight = String(lineHeight);
     textarea.style.fontFamily = 'inherit';
     textarea.style.fontWeight = fontStyle === 'bold' ? 'bold' : 'normal';
@@ -90,7 +90,17 @@ export const EditableTemplateText = ({
         textarea.parentNode.removeChild(textarea);
       }
     };
-  }, [isEditing, text, width, fontSize, lineHeight, fill, fontStyle, onChange]);
+  }, [
+    isEditing,
+    text,
+    width,
+    fontSize,
+    lineHeight,
+    fill,
+    fontStyle,
+    onChange,
+    zoom,
+  ]);
 
   return (
     <Text
