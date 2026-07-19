@@ -12,6 +12,7 @@ import { SheetConnectionModal } from '@/components/features/home/SheetConnection
 import { useHomeSummary } from '@/hooks/useHomeSummary';
 import { useIsAuthenticated } from '@/hooks/useIsAuthenticated';
 import { usePrefetchImageGenerationAssets } from '@/hooks/usePrefetchImageGenerationAssets';
+import { usePrefetchLibraryFolders } from '@/hooks/usePrefetchLibraryFolders';
 
 const BRAND_MOOD_CARD = {
   href: '/onboarding',
@@ -56,6 +57,7 @@ export default function HomePage() {
   const { data } = useHomeSummary();
   const { isAuthenticated } = useIsAuthenticated();
   usePrefetchImageGenerationAssets(isAuthenticated === true);
+  usePrefetchLibraryFolders(isAuthenticated === true);
   const hasBrandMood = data?.brandMoodRegistered ?? false;
   const [isSheetModalOpen, setIsSheetModalOpen] = useState(false);
   const [loginRequiredMessage, setLoginRequiredMessage] = useState<

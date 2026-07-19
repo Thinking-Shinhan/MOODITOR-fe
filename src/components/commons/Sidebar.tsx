@@ -3,11 +3,12 @@
 import { useState, type MouseEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import { useLogout } from '@/hooks/useLogout';
 import { useIsAuthenticated } from '@/hooks/useIsAuthenticated';
 import { prefetchImageGenerationAssets } from '@/hooks/usePrefetchImageGenerationAssets';
+import { prefetchLibraryFolders } from '@/hooks/usePrefetchLibraryFolders';
 import { Label } from '@/components/commons/Typography';
 import { AlertModal } from '@/components/commons/AlertModal';
 import {
@@ -25,7 +26,7 @@ type NavItemConfig = {
   icon: React.ElementType;
   label: string;
   loginRequiredMessage?: string;
-  prefetchOnHover?: boolean;
+  onHoverPrefetch?: (queryClient: QueryClient) => void;
 };
 
 const NAV_ITEMS: NavItemConfig[] = [
@@ -35,7 +36,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     icon: Wand2,
     label: '이미지 만들기',
     loginRequiredMessage: '로그인 후 브랜드에 맞는 이미지를 제작해 보세요.',
-    prefetchOnHover: true,
+    onHoverPrefetch: prefetchImageGenerationAssets,
   },
   {
     href: '/detail-edit',
@@ -48,6 +49,7 @@ const NAV_ITEMS: NavItemConfig[] = [
     icon: Library,
     label: '라이브러리',
     loginRequiredMessage: '로그인 후 라이브러리를 이용해 보세요.',
+    onHoverPrefetch: prefetchLibraryFolders,
   },
 ];
 
@@ -84,11 +86,12 @@ export const Sidebar = () => {
       }
     };
 
-  const handleNavHover = (prefetchOnHover?: boolean) => () => {
-    if (prefetchOnHover && isAuthenticated === true) {
-      prefetchImageGenerationAssets(queryClient);
-    }
-  };
+  const handleNavHover =
+    (onHoverPrefetch?: (queryClient: QueryClient) => void) => () => {
+      if (onHoverPrefetch && isAuthenticated === true) {
+        onHoverPrefetch(queryClient);
+      }
+    };
 
   return (
     <aside
@@ -133,7 +136,7 @@ export const Sidebar = () => {
             icon: Icon,
             label,
             loginRequiredMessage: message,
-            prefetchOnHover,
+            onHoverPrefetch,
           }) => {
             const isActive = pathname === href;
             return (
@@ -141,7 +144,7 @@ export const Sidebar = () => {
                 key={href}
                 href={href}
                 onClick={handleNavClick(message)}
-                onMouseEnter={handleNavHover(prefetchOnHover)}
+                onMouseEnter={handleNavHover(onHoverPrefetch)}
                 aria-label={label}
                 aria-current={isActive ? 'page' : undefined}
                 className={[
