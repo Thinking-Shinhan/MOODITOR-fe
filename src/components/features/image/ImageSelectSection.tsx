@@ -29,6 +29,7 @@ interface ImageGridProps {
   onUpload?: () => void;
   selectedId?: string | null;
   onSelect?: (id: string) => void;
+  disabled?: boolean;
 }
 
 const ImageGrid = ({
@@ -37,6 +38,7 @@ const ImageGrid = ({
   onUpload,
   selectedId,
   onSelect,
+  disabled = false,
 }: ImageGridProps) => {
   const slots: SlotItem[] = Array.from({ length: GRID_SIZE }, (_, i) => {
     if (showUpload && i === 0) return { type: 'upload', id: 'upload' };
@@ -54,6 +56,7 @@ const ImageGrid = ({
           isUpload={slot.type === 'upload'}
           imageUrl={slot.type === 'image' ? slot.url : undefined}
           selected={slot.type === 'image' && slot.id === selectedId}
+          disabled={disabled}
           onClick={
             slot.type === 'upload'
               ? onUpload
@@ -80,6 +83,7 @@ interface ImageSelectSectionProps {
   warningMessage?: string;
   // 선택 변경 시 부모에 알림 (선택 해제 시 null)
   onSelect?: (id: string | null) => void;
+  disabled?: boolean;
 }
 
 export const ImageSelectSection = ({
@@ -92,6 +96,7 @@ export const ImageSelectSection = ({
   onUpload,
   warningMessage,
   onSelect,
+  disabled = false,
 }: ImageSelectSectionProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -126,6 +131,7 @@ export const ImageSelectSection = ({
                   onUpload={seg.onUpload}
                   selectedId={selectedId}
                   onSelect={handleSelect}
+                  disabled={disabled}
                 />
                 {seg.warningMessage && (
                   <InputMessage
@@ -147,6 +153,7 @@ export const ImageSelectSection = ({
             onUpload={onUpload}
             selectedId={selectedId}
             onSelect={handleSelect}
+            disabled={disabled}
           />
           {warningMessage && (
             <InputMessage

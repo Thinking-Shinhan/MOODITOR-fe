@@ -70,6 +70,19 @@ export const ProductShotContent = () => {
       url: asset.imageUrl,
     })) ?? [];
 
+  // 실측가이드 구도를 선택하면 배경/색온도/프롬프트를 막고 비율을 1:1로 고정한다
+  // (label은 한글 자유 텍스트라 key로 매칭 — REF_PRODUCT_TEMPLATE_MEASUREMENT_GUIDE / REF_ACCESSORY_TEMPLATE_MEASUREMENT_GUIDE)
+  const { data: shotTemplateAssets } = useReferenceAssets('SHOT_TEMPLATE');
+  const isMeasurementGuideSelected =
+    shotTemplateAssets?.referenceAssets.some(
+      (asset) =>
+        asset.key.endsWith('_MEASUREMENT_GUIDE') &&
+        compositionReferenceAssetIds.includes(asset.referenceAssetId),
+    ) ?? false;
+
+  // 실측가이드 선택 시에는 사용자가 고른 값과 무관하게 1:1로 고정해서 보여준다
+  const effectiveAspectRatio = isMeasurementGuideSelected ? '1:1' : aspectRatio;
+
   const formData = useMemo<ProductShotFormData>(
     () => ({
       products: selectedProducts,
@@ -135,7 +148,10 @@ export const ProductShotContent = () => {
           url: result.imageUrl,
         }));
       successTimeoutRef.current = setTimeout(() => {
-        setGenerationResult(images, (aspectRatio as ImageAspectRatio) ?? '3:4');
+        setGenerationResult(
+          images,
+          (effectiveAspectRatio as ImageAspectRatio) ?? '3:4',
+        );
       }, SUCCESS_HOLD_DURATION_MS);
     },
     onFailed: (failedJob) => {
@@ -180,7 +196,9 @@ export const ProductShotContent = () => {
       prompt: prompt.trim().length > 0 ? prompt.trim() : '_',
       userOptionsJson: {
         colorTemperature: colorTone ? COLOR_TEMPERATURE_MAP[colorTone] : null,
-        aspectRatio: aspectRatio ? REQUEST_ASPECT_RATIO_MAP[aspectRatio] : null,
+        aspectRatio: effectiveAspectRatio
+          ? REQUEST_ASPECT_RATIO_MAP[effectiveAspectRatio]
+          : null,
       },
       referenceJson,
     };
@@ -240,6 +258,7 @@ export const ProductShotContent = () => {
               { label: '추천 배경', images: backgroundImages },
               { label: '내 배경', showUpload: true },
             ]}
+            disabled={isMeasurementGuideSelected}
           />
         </div>
       </div>
@@ -249,7 +268,11 @@ export const ProductShotContent = () => {
       {/* 2. 이미지 스타일 */}
       <div className="flex flex-col gap-[var(--gap-6)]">
         <StepSectionHeader number={2} title="이미지 스타일" />
-        <ColorToneSelect value={colorTone} onChange={setColorTone} />
+        <ColorToneSelect
+          value={colorTone}
+          onChange={setColorTone}
+          disabled={isMeasurementGuideSelected}
+        />
       </div>
 
       <div className="border-border-subtler border-t" />
@@ -260,8 +283,16 @@ export const ProductShotContent = () => {
 
         {/* 섹션들 */}
         <div className="flex flex-col gap-[var(--gap-7)]">
-          <PromptInput value={prompt} onChange={setPrompt} />
-          <AspectRatioSelect value={aspectRatio} onChange={setAspectRatio} />
+          <PromptInput
+            value={prompt}
+            onChange={setPrompt}
+            disabled={isMeasurementGuideSelected}
+          />
+          <AspectRatioSelect
+            value={effectiveAspectRatio}
+            onChange={setAspectRatio}
+            disabled={isMeasurementGuideSelected}
+          />
         </div>
       </div>
 
