@@ -11,7 +11,6 @@ import { useUploadProductImages } from '@/hooks/useUploadProductImages';
 import { useDeleteAsset } from '@/hooks/useDeleteAsset';
 import { useObjectUrl } from '@/hooks/useObjectUrl';
 import { ApiError } from '@/libs/apiClient';
-import { assetService } from '@/services/assetService';
 import type { Product } from '@/types/product';
 import type { UploadProductImagesItem } from '@/services/assetService';
 
@@ -112,29 +111,32 @@ export const ProductImageUploadPanel = ({
       if (frontImage) items.push({ file: frontImage, role: 'PRODUCT_FRONT' });
       if (backImage) items.push({ file: backImage, role: 'PRODUCT_BACK' });
 
-      if (items.length > 0) {
-        await uploadProductImages({ productId: selectedProduct.id, items });
-      }
-
-      const latestImages = await assetService.getProductImages(
-        selectedProduct.id,
-      );
-      const latestFrontAsset = latestImages.find(
+      const uploadedAssets =
+        items.length > 0
+          ? await uploadProductImages({ productId: selectedProduct.id, items })
+          : [];
+      const uploadedFrontAsset = uploadedAssets.find(
         (asset) => asset.assetRole === 'PRODUCT_FRONT',
       );
-      const latestBackAsset = latestImages.find(
+      const uploadedBackAsset = uploadedAssets.find(
         (asset) => asset.assetRole === 'PRODUCT_BACK',
       );
+
+      const finalFrontAsset =
+        uploadedFrontAsset ?? (frontRemoved ? undefined : existingFrontAsset);
+      const finalBackAsset =
+        uploadedBackAsset ?? (backRemoved ? undefined : existingBackAsset);
+
       const assetIds = [
-        latestFrontAsset?.assetId,
-        latestBackAsset?.assetId,
+        finalFrontAsset?.assetId,
+        finalBackAsset?.assetId,
       ].filter((id): id is number => id !== undefined);
 
       addProducts([
         {
           id: String(selectedProduct.id),
           name: selectedProduct.name,
-          imageUrl: latestFrontAsset?.imageUrl,
+          imageUrl: finalFrontAsset?.imageUrl,
           assetIds,
         },
       ]);
