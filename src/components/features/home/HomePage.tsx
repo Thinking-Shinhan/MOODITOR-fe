@@ -3,6 +3,7 @@
 import { useState, type MouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import Image from 'next/image';
 import { Link2 } from 'lucide-react';
 import { Body, Heading, Label } from '@/components/commons/Typography';
 import { AlertModal } from '@/components/commons/AlertModal';
@@ -13,6 +14,7 @@ import { useHomeSummary } from '@/hooks/useHomeSummary';
 import { useIsAuthenticated } from '@/hooks/useIsAuthenticated';
 import { usePrefetchImageGenerationAssets } from '@/hooks/usePrefetchImageGenerationAssets';
 import { usePrefetchLibraryFolders } from '@/hooks/usePrefetchLibraryFolders';
+import heroImage from '@/assets/hero.webp';
 
 const BRAND_MOOD_CARD = {
   href: '/onboarding',
@@ -73,32 +75,57 @@ export default function HomePage() {
     };
 
   return (
-    <div
-      className={`flex h-full justify-center px-[60px] ${hasBrandMood ? 'pt-[56.5px]' : 'pt-[173px]'}`}
-    >
-      <div className="flex w-[1100px] flex-col items-start gap-[var(--gap-8)]">
-        <div className="flex flex-col items-start gap-[var(--gap-3)]">
-          <Heading size="small" className="text-text-basic">
-            안녕하세요.
-          </Heading>
-          <Heading size="large" className="text-text-basic whitespace-pre-line">
-            {
-              'Mooditor가 브랜드 무드에 맞는 이미지를 제작하고,\n상세페이지까지 완성해 드려요!'
-            }
-          </Heading>
-        </div>
+    <div className="flex h-full flex-col">
+      {!isAuthenticated && (
+        <Image
+          src={heroImage}
+          alt="Mooditor Hero"
+          priority
+          className="h-auto w-full"
+        />
+      )}
+      <div
+        className={`flex flex-1 justify-center px-[60px] ${hasBrandMood ? 'pt-[56.5px]' : 'pt-[173px]'}`}
+      >
+        <div className="flex w-[1100px] flex-col items-start gap-[var(--gap-8)]">
+          <div className="flex flex-col items-start gap-[var(--gap-3)]">
+            <Heading size="small" className="text-text-basic">
+              안녕하세요.
+            </Heading>
+            <Heading
+              size="large"
+              className="text-text-basic whitespace-pre-line"
+            >
+              {
+                'Mooditor가 브랜드 무드에 맞는 이미지를 제작하고,\n상세페이지까지 완성해 드려요!'
+              }
+            </Heading>
+          </div>
 
-        <div className="flex w-full flex-col items-start gap-[var(--gap-7)]">
-          {hasBrandMood && data ? (
-            <div className="flex w-full items-start gap-[var(--gap-7)]">
-              <HomeBrandSummaryCard
-                brandName={data.brandName}
-                brandSummary={data.brandSummary}
-                designPhilosophy={data.designPhilosophy}
-                toneKeywords={data.toneKeywords}
-              />
-              <div className="flex flex-1 flex-col items-start gap-[var(--gap-6)]">
-                {BRAND_REGISTERED_FEATURE_CARDS.map((card) => (
+          <div className="flex w-full flex-col items-start gap-[var(--gap-7)]">
+            {hasBrandMood && data ? (
+              <div className="flex w-full items-start gap-[var(--gap-7)]">
+                <HomeBrandSummaryCard
+                  brandName={data.brandName}
+                  brandSummary={data.brandSummary}
+                  designPhilosophy={data.designPhilosophy}
+                  toneKeywords={data.toneKeywords}
+                />
+                <div className="flex flex-1 flex-col items-start gap-[var(--gap-6)]">
+                  {BRAND_REGISTERED_FEATURE_CARDS.map((card) => (
+                    <HomeFeatureCard
+                      key={card.href}
+                      href={card.href}
+                      title={card.title}
+                      description={card.description}
+                      onClick={guardFeatureClick(card.loginRequiredMessage)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex w-full items-start gap-[var(--gap-6)]">
+                {DEFAULT_FEATURE_CARDS.map((card) => (
                   <HomeFeatureCard
                     key={card.href}
                     href={card.href}
@@ -108,76 +135,65 @@ export default function HomePage() {
                   />
                 ))}
               </div>
-            </div>
-          ) : (
-            <div className="flex w-full items-start gap-[var(--gap-6)]">
-              {DEFAULT_FEATURE_CARDS.map((card) => (
-                <HomeFeatureCard
-                  key={card.href}
-                  href={card.href}
-                  title={card.title}
-                  description={card.description}
-                  onClick={guardFeatureClick(card.loginRequiredMessage)}
-                />
-              ))}
-            </div>
-          )}
+            )}
 
-          <div className="bg-btn-secondary-fill-hovered flex w-full items-center justify-between px-[var(--padding-5)] py-[var(--padding-4)]">
-            <div className="flex items-center gap-[var(--gap-4)]">
-              <span className="bg-btn-primary-fill flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-small1)]">
-                <Link2 size={16} className="text-icon-inverse" />
-              </span>
-              {data?.sheetSynced ? (
-                <div className="flex flex-col items-start gap-[var(--gap-1)]">
-                  <Body
-                    size="small"
-                    bold
-                    className="text-text-basic whitespace-nowrap"
-                  >
-                    {data.productCount}개 상품이 연동되었습니다.
-                  </Body>
-                  {data.sheetSyncedAt && (
-                    <div className="flex items-start gap-[var(--gap-2)]">
-                      <Label size="xsmall" className="text-text-basic">
-                        마지막 연동
-                      </Label>
-                      <Label size="xsmall" className="text-text-basic">
-                        {formatSyncedAt(data.sheetSyncedAt)}
-                      </Label>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex flex-col items-start gap-[var(--gap-1)]">
-                  <Body size="small" bold className="text-text-basic">
-                    브랜드 상품을 연동해주세요.
-                  </Body>
-                  <Label size="xsmall" className="text-text-basic">
-                    상품을 연동하면 브랜드에 맞는 이미지와 상세페이지를 더욱
-                    쉽게 제작할 수 있어요.
-                  </Label>
-                </div>
-              )}
+            <div className="bg-btn-secondary-fill-hovered flex w-full items-center justify-between px-[var(--padding-5)] py-[var(--padding-4)]">
+              <div className="flex items-center gap-[var(--gap-4)]">
+                <span className="bg-btn-primary-fill flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-small1)]">
+                  <Link2 size={16} className="text-icon-inverse" />
+                </span>
+                {data?.sheetSynced ? (
+                  <div className="flex flex-col items-start gap-[var(--gap-1)]">
+                    <Body
+                      size="small"
+                      bold
+                      className="text-text-basic whitespace-nowrap"
+                    >
+                      {data.productCount}개 상품이 연동되었습니다.
+                    </Body>
+                    {data.sheetSyncedAt && (
+                      <div className="flex items-start gap-[var(--gap-2)]">
+                        <Label size="xsmall" className="text-text-basic">
+                          마지막 연동
+                        </Label>
+                        <Label size="xsmall" className="text-text-basic">
+                          {formatSyncedAt(data.sheetSyncedAt)}
+                        </Label>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-start gap-[var(--gap-1)]">
+                    <Body size="small" bold className="text-text-basic">
+                      브랜드 상품을 연동해주세요.
+                    </Body>
+                    <Label size="xsmall" className="text-text-basic">
+                      상품을 연동하면 브랜드에 맞는 이미지와 상세페이지를 더욱
+                      쉽게 제작할 수 있어요.
+                    </Label>
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (isAuthenticated === false) {
+                    setLoginRequiredMessage('로그인 후 상품을 연동해 보세요.');
+                  } else if (data?.sheetSynced && data.sheetUrl) {
+                    window.open(data.sheetUrl, '_blank', 'noopener,noreferrer');
+                  } else {
+                    setIsSheetModalOpen(true);
+                  }
+                }}
+                className="bg-btn-secondary-fill border-btn-secondary-border cursor-pointer rounded-[var(--radius-xsmall2)] border px-[var(--padding-4)] py-[var(--size-height-2)]"
+              >
+                <Body size="xsmall" bold className="text-text-primary-basic">
+                  {data?.sheetSynced ? '상품 연동 관리' : '상품 연동하기'}
+                </Body>
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                if (isAuthenticated === false) {
-                  setLoginRequiredMessage('로그인 후 상품을 연동해 보세요.');
-                } else if (data?.sheetSynced && data.sheetUrl) {
-                  window.open(data.sheetUrl, '_blank', 'noopener,noreferrer');
-                } else {
-                  setIsSheetModalOpen(true);
-                }
-              }}
-              className="bg-btn-secondary-fill border-btn-secondary-border cursor-pointer rounded-[var(--radius-xsmall2)] border px-[var(--padding-4)] py-[var(--size-height-2)]"
-            >
-              <Body size="xsmall" bold className="text-text-primary-basic">
-                {data?.sheetSynced ? '상품 연동 관리' : '상품 연동하기'}
-              </Body>
-            </button>
           </div>
+          {!isAuthenticated && <div className="h-[160px] w-full shrink-0" />}
         </div>
       </div>
 
