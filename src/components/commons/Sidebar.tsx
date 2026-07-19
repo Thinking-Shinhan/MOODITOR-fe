@@ -109,15 +109,17 @@ export const Sidebar = () => {
         ].join(' ')}
       >
         {!collapsed && (
-          <div className="flex min-w-0 flex-1 items-center gap-4">
-            {/* 추후 변경 */}
-            <div className="bg-icon-gray h-6 w-6 shrink-0 rounded-[var(--radius-xsmall2)]" />
+          <div className="flex min-w-0 flex-1 items-center gap-[var(--gap-3)]">
+            <img
+              src="/assets/icons/mooditor-icon.svg"
+              alt=""
+              className="h-6 w-6 shrink-0"
+            />
             <span className="text-text-border text-[16px] leading-[1.5] font-bold whitespace-nowrap">
-              SERVICE
+              MOODITOR
             </span>
           </div>
         )}
-        {/* 아이콘 뒤에 네모 추가 필요 */}
         <button
           type="button"
           onClick={toggleCollapsed}
