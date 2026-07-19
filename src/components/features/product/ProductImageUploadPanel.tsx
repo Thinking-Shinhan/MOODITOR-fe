@@ -64,7 +64,11 @@ export const ProductImageUploadPanel = ({
     if (existingFrontAsset) {
       setErrorMessage(null);
       try {
-        await deleteAsset(existingFrontAsset.assetId);
+        await deleteAsset({
+          assetId: existingFrontAsset.assetId,
+          productId: selectedProduct.id,
+          role: 'front',
+        });
         setFrontRemoved(true);
       } catch (error) {
         setErrorMessage(
@@ -90,7 +94,11 @@ export const ProductImageUploadPanel = ({
     if (existingBackAsset) {
       setErrorMessage(null);
       try {
-        await deleteAsset(existingBackAsset.assetId);
+        await deleteAsset({
+          assetId: existingBackAsset.assetId,
+          productId: selectedProduct.id,
+          role: 'back',
+        });
         setBackRemoved(true);
       } catch (error) {
         setErrorMessage(
