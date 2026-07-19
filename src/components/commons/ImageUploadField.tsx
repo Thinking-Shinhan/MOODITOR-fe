@@ -65,7 +65,7 @@ export const ImageUploadField = ({
       </div>
 
       {previewUrl ? (
-        <div className="group relative h-[280px] w-full overflow-hidden rounded-[var(--radius-medium2)]">
+        <div className="group relative aspect-square min-h-0 flex-1 self-start overflow-hidden rounded-[var(--radius-medium2)]">
           <img
             src={previewUrl}
             alt={label}
@@ -89,7 +89,7 @@ export const ImageUploadField = ({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={[
-            'flex h-[280px] w-full cursor-pointer flex-col items-center justify-center gap-[var(--gap-3)]',
+            'flex aspect-square min-h-0 w-auto flex-1 cursor-pointer flex-col items-center justify-center gap-[var(--gap-3)] self-start',
             'rounded-[var(--radius-large1)] border-[0.8px] border-dashed px-[var(--padding-7)] py-[var(--gap-6)] transition-colors',
             isDragOver
               ? 'bg-bg-gray-subtle'
