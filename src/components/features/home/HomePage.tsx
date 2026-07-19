@@ -111,7 +111,7 @@ export default function HomePage() {
                   designPhilosophy={data.designPhilosophy}
                   toneKeywords={data.toneKeywords}
                 />
-                <div className="flex flex-1 flex-col items-start gap-[var(--gap-6)]">
+                <div className="flex h-full flex-1 flex-col items-start gap-[var(--gap-6)]">
                   {BRAND_REGISTERED_FEATURE_CARDS.map((card) => (
                     <HomeFeatureCard
                       key={card.href}

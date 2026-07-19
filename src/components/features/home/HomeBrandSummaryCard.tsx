@@ -26,7 +26,7 @@ export const HomeBrandSummaryCard = ({
         </Heading>
         {brandSummary && (
           <Heading
-            size="medium"
+            size="small"
             className="text-text-border-inverse w-full break-keep whitespace-pre-line"
           >
             {brandSummary}
