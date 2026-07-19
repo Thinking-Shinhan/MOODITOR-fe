@@ -31,13 +31,25 @@ export const ProductCompositionSelect = ({
     asset.key.startsWith('REF_ACCESSORY_TEMPLATE'),
   );
 
-  const handleSelect = (referenceAssetId: string) => {
-    const isSelected = selected.includes(referenceAssetId);
-    if (!isSelected && selected.length >= MAX_SELECTED_COMPOSITIONS) return;
+  const isMeasurementGuideId = (id: string) =>
+    compositionOptions
+      .find((asset) => String(asset.referenceAssetId) === id)
+      ?.key.endsWith('_MEASUREMENT_GUIDE') ?? false;
+  const isMeasurementGuideSelected = selected.some(isMeasurementGuideId);
 
-    const next = isSelected
-      ? selected.filter((id) => id !== referenceAssetId)
-      : [...selected, referenceAssetId];
+  const handleSelect = (referenceAssetId: string, isGuide: boolean) => {
+    const isSelected = selected.includes(referenceAssetId);
+
+    let next: string[];
+    if (isGuide) {
+      next = isSelected ? [] : [referenceAssetId];
+    } else {
+      if (isMeasurementGuideSelected) return;
+      if (!isSelected && selected.length >= MAX_SELECTED_COMPOSITIONS) return;
+      next = isSelected
+        ? selected.filter((id) => id !== referenceAssetId)
+        : [...selected, referenceAssetId];
+    }
     setSelected(next);
     onSelect?.(next);
   };
@@ -47,16 +59,20 @@ export const ProductCompositionSelect = ({
       {options.map((asset) => {
         const id = String(asset.referenceAssetId);
         const isSelected = selected.includes(id);
+        const isGuide = asset.key.endsWith('_MEASUREMENT_GUIDE');
+        const disabled =
+          !isGuide &&
+          !isSelected &&
+          (isMeasurementGuideSelected ||
+            selected.length >= MAX_SELECTED_COMPOSITIONS);
         return (
           <CompositionOptionCard
             key={id}
             label={asset.label}
             imageUrl={asset.imageUrl}
             selected={isSelected}
-            disabled={
-              !isSelected && selected.length >= MAX_SELECTED_COMPOSITIONS
-            }
-            onClick={() => handleSelect(id)}
+            disabled={disabled}
+            onClick={() => handleSelect(id, isGuide)}
           />
         );
       })}

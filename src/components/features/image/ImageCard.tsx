@@ -8,6 +8,7 @@ interface ImageCardProps {
   imageUrl?: string;
   selected?: boolean;
   isUpload?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
   className?: string;
 }
@@ -16,6 +17,7 @@ export const ImageCard = ({
   imageUrl,
   selected = false,
   isUpload = false,
+  disabled = false,
   onClick,
   className = '',
 }: ImageCardProps) => {
@@ -24,7 +26,8 @@ export const ImageCard = ({
       <button
         type="button"
         onClick={onClick}
-        className={`border-btn-outline-border hover:bg-bg-gray-subtler relative flex h-full w-full cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-(--radius-small1) border-[0.8px] border-dashed px-[13px] transition-colors ${className}`}
+        disabled={disabled}
+        className={`border-btn-outline-border hover:enabled:bg-bg-gray-subtler relative flex h-full w-full cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-(--radius-small1) border-[0.8px] border-dashed px-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       >
         <Upload size={16} className="text-text-disabled-on" />
         <Body
@@ -42,7 +45,8 @@ export const ImageCard = ({
       <button
         type="button"
         onClick={onClick}
-        className={`relative h-full w-full cursor-pointer overflow-hidden rounded-(--radius-small1)${className}`}
+        disabled={disabled}
+        className={`relative h-full w-full cursor-pointer overflow-hidden rounded-(--radius-small1) disabled:cursor-not-allowed disabled:opacity-50${className}`}
       >
         <Image
           src={imageUrl}

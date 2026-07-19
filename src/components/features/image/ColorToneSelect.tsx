@@ -7,9 +7,14 @@ import { COLOR_TONE_OPTIONS } from '@/constants/image-generation';
 interface ColorToneSelectProps {
   value: string | null;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }
 
-export const ColorToneSelect = ({ value, onChange }: ColorToneSelectProps) => (
+export const ColorToneSelect = ({
+  value,
+  onChange,
+  disabled = false,
+}: ColorToneSelectProps) => (
   <div className="flex flex-col gap-[var(--gap-4)]">
     <Body size="medium" bold className="text-text-subtle">
       이미지 색온도
@@ -19,6 +24,7 @@ export const ColorToneSelect = ({ value, onChange }: ColorToneSelectProps) => (
         <OptionButton
           key={option}
           selected={value === option}
+          disabled={disabled}
           onClick={() => onChange(option)}
           className="flex-1"
         >
