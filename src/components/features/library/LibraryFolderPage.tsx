@@ -13,6 +13,7 @@ import {
   LibraryImageCard,
   type LibraryImageCardType,
 } from '@/components/features/library/LibraryImageCard';
+import { LibraryImagePreviewModal } from '@/components/features/library/LibraryImagePreviewModal';
 import { useImageFolderAssets } from '@/hooks/useImageFolderAssets';
 import { useDeleteLibraryAsset } from '@/hooks/useDeleteLibraryAsset';
 import { useDeleteDetailPage } from '@/hooks/useDeleteDetailPage';
@@ -45,6 +46,10 @@ export const LibraryFolderPage = () => {
   const [isDetailPageDeleteConfirmOpen, setIsDetailPageDeleteConfirmOpen] =
     useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<{
+    url: string;
+    fileName: string;
+  } | null>(null);
 
   const assetsQueryKey = ['imageFolderAssets', productId];
 
@@ -206,6 +211,12 @@ export const LibraryFolderPage = () => {
                 liked={asset.isLiked}
                 onToggleLike={() => handleToggleLike(asset.assetId)}
                 onDelete={() => setAssetIdToDelete(asset.assetId)}
+                onClick={() =>
+                  setPreviewImage({
+                    url: asset.imageUrl,
+                    fileName: getFileNameFromUrl(asset.imageUrl),
+                  })
+                }
               />
             ))}
           </div>
@@ -231,6 +242,13 @@ export const LibraryFolderPage = () => {
           </div>
         </div>
       )}
+
+      <LibraryImagePreviewModal
+        open={previewImage !== null}
+        imageUrl={previewImage?.url ?? ''}
+        fileName={previewImage?.fileName ?? ''}
+        onClose={() => setPreviewImage(null)}
+      />
 
       <AlertModal
         open={assetIdToDelete !== null}
