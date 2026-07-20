@@ -9,7 +9,7 @@ export interface PlacedTemplate {
 
 interface DetailCanvasStore {
   placedTemplates: PlacedTemplate[];
-  addTemplate: (type: DetailTemplateType) => void;
+  addTemplate: (type: DetailTemplateType, index?: number) => void;
   reorderTemplates: (activeId: string, overId: string) => void;
   moveTemplateUp: (index: number) => void;
   moveTemplateDown: (index: number) => void;
@@ -18,13 +18,13 @@ interface DetailCanvasStore {
 
 export const useDetailCanvasStore = create<DetailCanvasStore>((set) => ({
   placedTemplates: [],
-  addTemplate: (type) =>
-    set((state) => ({
-      placedTemplates: [
-        ...state.placedTemplates,
-        { id: crypto.randomUUID(), type },
-      ],
-    })),
+  addTemplate: (type, index) =>
+    set((state) => {
+      const next = [...state.placedTemplates];
+      const insertAt = Math.max(0, Math.min(index ?? next.length, next.length));
+      next.splice(insertAt, 0, { id: crypto.randomUUID(), type });
+      return { placedTemplates: next };
+    }),
   reorderTemplates: (activeId, overId) =>
     set((state) => {
       const oldIndex = state.placedTemplates.findIndex(

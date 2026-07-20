@@ -1,6 +1,6 @@
 'use client';
 
-import { DragEvent, useState } from 'react';
+import { DragEvent, Fragment, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -31,6 +31,10 @@ const NO_PRODUCT_SELECTED_MESSAGE =
 
 const noop = () => {};
 
+const DropIndicatorLine = () => (
+  <div className="bg-btn-primary-fill h-[3px] w-full shrink-0 rounded-[var(--radius-max)]" />
+);
+
 export const DetailEditCanvas = () => {
   const placedTemplates = useDetailCanvasStore(
     (state) => state.placedTemplates,
@@ -47,6 +51,9 @@ export const DetailEditCanvas = () => {
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [noProductToastOpen, setNoProductToastOpen] = useState(false);
+  const [dropIndicatorIndex, setDropIndicatorIndex] = useState<number | null>(
+    null,
+  );
   const selectedProduct = useDetailProductSelectionStore(
     (state) => state.selectedProduct,
   );
@@ -56,13 +63,35 @@ export const DetailEditCanvas = () => {
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
 
+  const getInsertIndexFromEvent = (event: DragEvent<HTMLDivElement>) => {
+    const blockEls =
+      event.currentTarget.querySelectorAll<HTMLElement>('[data-template-id]');
+    for (let i = 0; i < blockEls.length; i++) {
+      const rect = blockEls[i].getBoundingClientRect();
+      if (event.clientY < rect.top + rect.height / 2) {
+        return i;
+      }
+    }
+    return placedTemplates.length;
+  };
+
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'copy';
+    if (placedTemplates.length > 0) {
+      setDropIndicatorIndex(getInsertIndexFromEvent(event));
+    }
+  };
+
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setDropIndicatorIndex(null);
+    }
   };
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setDropIndicatorIndex(null);
 
     const raw = event.dataTransfer.getData('application/json');
     if (!raw) return;
@@ -79,9 +108,7 @@ export const DetailEditCanvas = () => {
       return;
     }
 
-    // 드롭 위치와 무관하게 항상 맨 아래에 순서대로 쌓는다
-    // TODO: 드롭 위치에 따라 순서를 조정하는 기능 추가
-    addTemplate(template.type);
+    addTemplate(template.type, getInsertIndexFromEvent(event));
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -116,11 +143,12 @@ export const DetailEditCanvas = () => {
     <>
       <div
         onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={
           placedTemplates.length === 0
             ? 'flex w-full flex-1 items-center justify-center'
-            : 'inline-flex'
+            : 'flex w-full flex-col items-center pb-[300px]'
         }
       >
         {placedTemplates.length === 0 ? (
@@ -162,18 +190,23 @@ export const DetailEditCanvas = () => {
                 }}
               >
                 <div className="flex flex-col gap-[var(--gap-7)]">
+                  {dropIndicatorIndex === 0 && <DropIndicatorLine />}
                   {placedTemplates.map((placed, index) => (
-                    <DetailTemplateBlock
-                      key={placed.id}
-                      id={placed.id}
-                      type={placed.type}
-                      pageNumber={index + 1}
-                      onMoveUp={() => handleMoveUp(index)}
-                      onMoveDown={() => handleMoveDown(index)}
-                      moveUpDisabled={index === 0}
-                      moveDownDisabled={index === placedTemplates.length - 1}
-                      onDelete={() => handleDelete(placed.id)}
-                    />
+                    <Fragment key={placed.id}>
+                      <DetailTemplateBlock
+                        id={placed.id}
+                        type={placed.type}
+                        pageNumber={index + 1}
+                        onMoveUp={() => handleMoveUp(index)}
+                        onMoveDown={() => handleMoveDown(index)}
+                        moveUpDisabled={index === 0}
+                        moveDownDisabled={index === placedTemplates.length - 1}
+                        onDelete={() => handleDelete(placed.id)}
+                      />
+                      {dropIndicatorIndex === index + 1 && (
+                        <DropIndicatorLine />
+                      )}
+                    </Fragment>
                   ))}
                 </div>
               </div>

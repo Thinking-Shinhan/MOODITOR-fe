@@ -45,13 +45,13 @@ export const EditableTemplateText = ({
     const scaledFontSize = fontSize * zoomScale;
 
     const textarea = document.createElement('textarea');
+    textarea.rows = 1;
     document.body.appendChild(textarea);
     textarea.value = text;
     textarea.style.position = 'absolute';
     textarea.style.top = `${stageBox.top + window.scrollY + absolutePosition.y * zoomScale}px`;
     textarea.style.left = `${stageBox.left + window.scrollX + absolutePosition.x * zoomScale}px`;
     textarea.style.width = `${width * zoomScale}px`;
-    textarea.style.minHeight = `${scaledFontSize * lineHeight}px`;
     textarea.style.fontSize = `${scaledFontSize}px`;
     textarea.style.lineHeight = String(lineHeight);
     textarea.style.fontFamily = 'inherit';
@@ -66,6 +66,8 @@ export const EditableTemplateText = ({
     textarea.style.resize = 'none';
     textarea.style.wordBreak = 'break-all';
     textarea.style.zIndex = '1000';
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
     textarea.focus();
     textarea.select();
 
