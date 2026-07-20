@@ -181,7 +181,8 @@ export const SheetConnectionModal = ({
             variant="primary"
             size="small"
             onClick={handleConnect}
-            disabled={!url.trim() || createSheetConnection.isPending}
+            disabled={!url.trim()}
+            loading={createSheetConnection.isPending}
             className="flex-1 rounded-[var(--radius-small1)]!"
           >
             {createSheetConnection.isPending ? '연동 중...' : '연동하기'}

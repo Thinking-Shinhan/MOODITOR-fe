@@ -95,7 +95,7 @@ export const ImagePreviewModal = ({
           className="w-full"
           leftIcon={<Download size={16} />}
           onClick={handleExport}
-          disabled={isExporting}
+          loading={isExporting}
         >
           {isExporting ? '내보내는 중...' : '내보내기'}
         </Button>

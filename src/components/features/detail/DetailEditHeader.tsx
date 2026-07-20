@@ -8,6 +8,7 @@ import { Button } from '@/components/commons/Button';
 import { Body } from '@/components/commons/Typography';
 import { Toast } from '@/components/commons/Toast';
 import { Tooltip } from '@/components/commons/Tooltip';
+import { Spinner } from '@/components/commons/Spinner';
 import { ProgressStepModal } from '@/components/commons/ProgressStepModal';
 import { TEMPLATE_HEIGHTS } from '@/components/features/detail/DetailTemplateBlockContent';
 import { useAutoPlacement } from '@/hooks/useAutoPlacement';
@@ -292,10 +293,17 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
             disabled={!hasTemplates || !selectedProduct || reviewCopy.isPending}
             className="bg-btn-secondary-fill border-border-border hover:border-border-subtle disabled:border-border-subtle group flex shrink-0 cursor-pointer items-center gap-[var(--gap-3)] rounded-[var(--radius-max)] border px-[var(--padding-5)] py-[var(--padding-3)] disabled:cursor-not-allowed"
           >
-            <AlignLeft
-              size={16}
-              className="text-icon-gray group-hover:text-icon-gray-light group-disabled:text-icon-disabled"
-            />
+            {reviewCopy.isPending ? (
+              <Spinner
+                size="small"
+                className="text-icon-gray group-hover:text-icon-gray-light group-disabled:text-icon-disabled"
+              />
+            ) : (
+              <AlignLeft
+                size={16}
+                className="text-icon-gray group-hover:text-icon-gray-light group-disabled:text-icon-disabled"
+              />
+            )}
             <Body
               size="small"
               bold
@@ -353,7 +361,8 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
             variant="primary"
             size="medium"
             className="w-[108px]"
-            disabled={!hasTemplates || !selectedProduct || isSaving}
+            disabled={!hasTemplates || !selectedProduct}
+            loading={isSaving}
             onClick={handleSave}
           >
             {isSaving ? '저장 중...' : '저장하기'}
@@ -375,7 +384,8 @@ export const DetailEditHeader = ({ className = '' }: DetailEditHeaderProps) => {
             variant="primary"
             size="medium"
             className="w-[108px]"
-            disabled={!hasTemplates || isExportingLocal}
+            disabled={!hasTemplates}
+            loading={isExportingLocal}
             onClick={handleExportLocal}
           >
             {isExportingLocal ? '내보내는 중...' : '내보내기'}

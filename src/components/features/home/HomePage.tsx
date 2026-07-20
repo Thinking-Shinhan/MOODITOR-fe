@@ -15,6 +15,7 @@ import { useIsAuthenticated } from '@/hooks/useIsAuthenticated';
 import { usePrefetchImageGenerationAssets } from '@/hooks/usePrefetchImageGenerationAssets';
 import { usePrefetchLibraryFolders } from '@/hooks/usePrefetchLibraryFolders';
 import heroImage from '@/assets/hero.webp';
+import { Button } from '@/components/commons/Button';
 
 const BRAND_MOOD_CARD = {
   href: '/onboarding',
@@ -174,7 +175,9 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
-              <button
+              <Button
+                variant="secondary"
+                size="xsmall"
                 type="button"
                 onClick={() => {
                   if (isAuthenticated === false) {
@@ -185,12 +188,11 @@ export default function HomePage() {
                     setIsSheetModalOpen(true);
                   }
                 }}
-                className="bg-btn-secondary-fill border-btn-secondary-border cursor-pointer rounded-[var(--radius-xsmall2)] border px-[var(--padding-4)] py-[var(--size-height-2)]"
               >
                 <Body size="xsmall" bold className="text-text-primary-basic">
                   {data?.sheetSynced ? '상품 연동 관리' : '상품 연동하기'}
                 </Body>
-              </button>
+              </Button>
             </div>
           </div>
           {!isAuthenticated && <div className="h-[160px] w-full shrink-0" />}

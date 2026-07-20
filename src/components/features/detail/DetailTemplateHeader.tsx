@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { AlertModal } from '@/components/commons/AlertModal';
 import { Body } from '@/components/commons/Typography';
+import { Spinner } from '@/components/commons/Spinner';
 import { Toast } from '@/components/commons/Toast';
 import { isAutoPlaceableTemplateType } from '@/constants/auto-placement';
 import { useAutoPlacement } from '@/hooks/useAutoPlacement';
@@ -97,6 +98,9 @@ export const DetailTemplateHeader = ({
         disabled={!canAutoEdit || !selectedProduct || autoPlacement.isPending}
         className="bg-btn-tertiary-fill flex cursor-pointer items-center justify-center gap-[var(--gap-1)] rounded-[var(--radius-xsmall2)] px-[var(--padding-4)] py-[var(--size-height-2)] disabled:cursor-not-allowed disabled:opacity-40"
       >
+        {autoPlacement.isPending && (
+          <Spinner size="small" className="text-icon-disabled" />
+        )}
         <Body size="xsmall" bold className="text-text-subtler">
           {autoPlacement.isPending ? '수정 중...' : 'AI 수정하기'}
         </Body>

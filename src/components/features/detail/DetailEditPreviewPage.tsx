@@ -118,7 +118,8 @@ export const DetailEditPreviewPage = () => {
               variant="primary"
               size="medium"
               className="w-[108px]"
-              disabled={!imageUrl || !selectedProduct || isSaving}
+              disabled={!imageUrl || !selectedProduct}
+              loading={isSaving}
               onClick={handleSave}
             >
               {isSaving ? '저장 중...' : '저장하기'}
@@ -128,7 +129,8 @@ export const DetailEditPreviewPage = () => {
             variant="primary"
             size="medium"
             className="w-[108px]"
-            disabled={!imageUrl || isExportingLocal}
+            disabled={!imageUrl}
+            loading={isExportingLocal}
             onClick={handleExportLocal}
           >
             {isExportingLocal ? '내보내는 중...' : '내보내기'}

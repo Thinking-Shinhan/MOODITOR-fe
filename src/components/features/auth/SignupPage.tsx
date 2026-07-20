@@ -115,7 +115,7 @@ export default function SignupPage() {
                 type="submit"
                 variant="primary"
                 size="medium"
-                disabled={isPending}
+                loading={isPending}
                 className="w-full"
               >
                 {isPending ? '처리 중...' : '회원가입 완료'}
