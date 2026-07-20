@@ -13,11 +13,12 @@ import {
   LibraryImageCard,
   type LibraryImageCardType,
 } from '@/components/features/library/LibraryImageCard';
-import { LibraryImagePreviewModal } from '@/components/features/library/LibraryImagePreviewModal';
+import { ImagePreviewModal } from '@/components/commons/ImagePreviewModal';
 import { useImageFolderAssets } from '@/hooks/useImageFolderAssets';
 import { useDeleteLibraryAsset } from '@/hooks/useDeleteLibraryAsset';
 import { useDeleteDetailPage } from '@/hooks/useDeleteDetailPage';
 import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
+import { getFileNameFromUrl } from '@/utils/url';
 import type {
   ImageFolderAssetsResponse,
   LibraryImageAsset,
@@ -26,15 +27,6 @@ import type {
 interface MutationContext {
   previous: ImageFolderAssetsResponse | undefined;
 }
-
-const getFileNameFromUrl = (url: string) => {
-  try {
-    const pathname = new URL(url).pathname;
-    return pathname.split('/').pop() || url;
-  } catch {
-    return url;
-  }
-};
 
 export const LibraryFolderPage = () => {
   const params = useParams<{ productId: string }>();
@@ -243,7 +235,7 @@ export const LibraryFolderPage = () => {
         </div>
       )}
 
-      <LibraryImagePreviewModal
+      <ImagePreviewModal
         open={previewImage !== null}
         imageUrl={previewImage?.url ?? ''}
         fileName={previewImage?.fileName ?? ''}
