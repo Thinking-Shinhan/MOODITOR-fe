@@ -75,11 +75,16 @@ export const DetailEditCanvas = () => {
     return placedTemplates.length;
   };
 
+  const isTemplateDrag = (event: DragEvent<HTMLDivElement>) =>
+    Array.from(event.dataTransfer.types).includes('application/json');
+
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'copy';
-    if (placedTemplates.length > 0) {
+    if (placedTemplates.length > 0 && isTemplateDrag(event)) {
       setDropIndicatorIndex(getInsertIndexFromEvent(event));
+    } else {
+      setDropIndicatorIndex(null);
     }
   };
 
