@@ -148,7 +148,7 @@ export const LibraryFolderPage = () => {
 
   const handleViewDetailPage = () => {
     if (!data?.hasDetailPage || !data.detailPage) return;
-    setDetailPagePreviewImageUrl(data.detailPage.fileUrl);
+    setDetailPagePreviewImageUrl(data.detailPage.fileUrl, 'library');
     setSelectedDetailProduct({
       id: String(data.productId),
       name: data.productName,

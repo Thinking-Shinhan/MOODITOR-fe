@@ -15,6 +15,8 @@ import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionS
 export const DetailEditPreviewPage = () => {
   const router = useRouter();
   const imageUrl = useDetailPagePreviewStore((state) => state.imageUrl);
+  const source = useDetailPagePreviewStore((state) => state.source);
+  const isFromLibrary = source === 'library';
   const selectedProduct = useDetailProductSelectionStore(
     (state) => state.selectedProduct,
   );
@@ -30,7 +32,11 @@ export const DetailEditPreviewPage = () => {
   const [isExportingLocal, setIsExportingLocal] = useState(false);
 
   const handleClose = () => {
-    router.push('/detail-edit');
+    if (isFromLibrary) {
+      router.back();
+    } else {
+      router.push('/detail-edit');
+    }
   };
 
   const handleSave = async () => {
@@ -91,23 +97,27 @@ export const DetailEditPreviewPage = () => {
           <X size={24} />
         </button>
         <div className="flex items-center gap-[var(--gap-4)]">
-          <Button
-            variant="secondary"
-            size="large"
-            onClick={handleClose}
-            leftIcon={
-              <Minimize2 size={24} className="text-icon-primary-basic" />
-            }
-          />
-          <Button
-            variant="primary"
-            size="medium"
-            className="w-[108px]"
-            disabled={!imageUrl || !selectedProduct || isSaving}
-            onClick={handleSave}
-          >
-            {isSaving ? '저장 중...' : '저장하기'}
-          </Button>
+          {!isFromLibrary && (
+            <Button
+              variant="secondary"
+              size="large"
+              onClick={handleClose}
+              leftIcon={
+                <Minimize2 size={24} className="text-icon-primary-basic" />
+              }
+            />
+          )}
+          {!isFromLibrary && (
+            <Button
+              variant="primary"
+              size="medium"
+              className="w-[108px]"
+              disabled={!imageUrl || !selectedProduct || isSaving}
+              onClick={handleSave}
+            >
+              {isSaving ? '저장 중...' : '저장하기'}
+            </Button>
+          )}
           <Button
             variant="primary"
             size="medium"
