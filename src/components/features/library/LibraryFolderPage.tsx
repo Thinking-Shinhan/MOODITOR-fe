@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { AlertModal } from '@/components/commons/AlertModal';
@@ -18,6 +18,8 @@ import { useImageFolderAssets } from '@/hooks/useImageFolderAssets';
 import { useDeleteLibraryAsset } from '@/hooks/useDeleteLibraryAsset';
 import { useDeleteDetailPage } from '@/hooks/useDeleteDetailPage';
 import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
+import { useDetailPagePreviewStore } from '@/stores/detailPagePreviewStore';
+import { useDetailProductSelectionStore } from '@/stores/detailProductSelectionStore';
 import { getFileNameFromUrl } from '@/utils/url';
 import type {
   ImageFolderAssetsResponse,
@@ -31,7 +33,14 @@ interface MutationContext {
 export const LibraryFolderPage = () => {
   const params = useParams<{ productId: string }>();
   const productId = Number(params.productId);
+  const router = useRouter();
   const queryClient = useQueryClient();
+  const setDetailPagePreviewImageUrl = useDetailPagePreviewStore(
+    (state) => state.setImageUrl,
+  );
+  const setSelectedDetailProduct = useDetailProductSelectionStore(
+    (state) => state.setSelectedProduct,
+  );
 
   const { data, isLoading, isError } = useImageFolderAssets(productId);
   const [assetIdToDelete, setAssetIdToDelete] = useState<number | null>(null);
@@ -137,6 +146,17 @@ export const LibraryFolderPage = () => {
     toggleLike.mutate(assetId);
   };
 
+  const handleViewDetailPage = () => {
+    if (!data?.hasDetailPage || !data.detailPage) return;
+    setDetailPagePreviewImageUrl(data.detailPage.fileUrl);
+    setSelectedDetailProduct({
+      id: String(data.productId),
+      name: data.productName,
+      assetIds: [],
+    });
+    router.push('/detail-edit/preview');
+  };
+
   if (isLoading) {
     return (
       <div className="flex w-full items-center justify-center p-[var(--padding-9)]">
@@ -230,6 +250,7 @@ export const LibraryFolderPage = () => {
               fileName={data.detailPage.fileName}
               createdAt={data.detailPage.createdAt}
               onDelete={() => setIsDetailPageDeleteConfirmOpen(true)}
+              onClick={handleViewDetailPage}
             />
           </div>
         </div>
