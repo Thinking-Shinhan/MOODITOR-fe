@@ -8,7 +8,7 @@ import { Button } from '@/components/commons/Button';
 import { Toast } from '@/components/commons/Toast';
 import { Heading } from '@/components/commons/Typography';
 
-interface LibraryImagePreviewModalProps {
+interface ImagePreviewModalProps {
   open: boolean;
   imageUrl: string;
   fileName: string;
@@ -24,12 +24,12 @@ const useIsClient = () =>
     () => false,
   );
 
-export const LibraryImagePreviewModal = ({
+export const ImagePreviewModal = ({
   open,
   imageUrl,
   fileName,
   onClose,
-}: LibraryImagePreviewModalProps) => {
+}: ImagePreviewModalProps) => {
   const isClient = useIsClient();
   const [isExporting, setIsExporting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
