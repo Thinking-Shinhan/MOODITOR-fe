@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Body, Heading } from '@/components/commons/Typography';
 import { Button } from '@/components/commons/Button';
+import { Spinner } from '@/components/commons/Spinner';
 import { Toast } from '@/components/commons/Toast';
 import { useCreateSheetConnection } from '@/hooks/useCreateSheetConnection';
 import { ApiError } from '@/libs/apiClient';
@@ -182,6 +183,11 @@ export const SheetConnectionModal = ({
             size="small"
             onClick={handleConnect}
             disabled={!url.trim() || createSheetConnection.isPending}
+            leftIcon={
+              createSheetConnection.isPending ? (
+                <Spinner size="small" />
+              ) : undefined
+            }
             className="flex-1 rounded-[var(--radius-small1)]!"
           >
             {createSheetConnection.isPending ? '연동 중...' : '연동하기'}
