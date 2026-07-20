@@ -66,17 +66,23 @@ export const DetailEditPreviewPage = () => {
     }
   };
 
-  const handleExportLocal = () => {
+  const handleExportLocal = async () => {
     if (!imageUrl) return;
 
     setIsExportingLocal(true);
     try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = imageUrl;
+      link.href = blobUrl;
       link.download = `상세페이지-${
         selectedProduct?.name ?? '상품'
       }-${Date.now()}.png`;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
       setExportModalOpen(true);
     } catch {
       setExportErrorMessage('이미지 내보내기에 실패했어요. 다시 시도해주세요.');

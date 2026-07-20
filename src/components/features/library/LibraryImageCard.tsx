@@ -89,15 +89,20 @@ export const LibraryImageCard = ({
           </button>
         )}
 
-        <div onClick={(event) => event.stopPropagation()} className="contents">
-          <LikeButton
-            liked={liked}
-            onToggleLike={onToggleLike}
-            strokeWidth={1.3}
-            iconClassName={liked ? 'text-icon-gray' : 'text-icon-inverse'}
-            className="absolute right-[var(--padding-4)] bottom-[var(--padding-4)]"
-          />
-        </div>
+        {!isDetailPage ? (
+          <div
+            onClick={(event) => event.stopPropagation()}
+            className="contents"
+          >
+            <LikeButton
+              liked={liked}
+              onToggleLike={onToggleLike}
+              strokeWidth={1.3}
+              iconClassName={liked ? 'text-icon-gray' : 'text-icon-inverse'}
+              className="absolute right-[var(--padding-4)] bottom-[var(--padding-4)]"
+            />
+          </div>
+        ) : null}
       </div>
 
       <div className="flex w-full flex-col gap-[var(--gap-2)] px-[var(--padding-5)] py-[var(--padding-4)]">
