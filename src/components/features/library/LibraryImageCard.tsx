@@ -15,6 +15,7 @@ interface LibraryImageCardProps {
   liked?: boolean;
   onToggleLike?: () => void;
   onDelete?: () => void;
+  onClick?: () => void;
 }
 
 const CATEGORY_LABEL: Record<LibraryImageCardType, string> = {
@@ -39,13 +40,15 @@ export const LibraryImageCard = ({
   liked = false,
   onToggleLike,
   onDelete,
+  onClick,
 }: LibraryImageCardProps) => {
   const isDetailPage = type === 'DETAIL_PAGE';
 
   return (
     <div className="bg-bg-white border-border-subtler hover:border-border-basic group flex w-[215px] shrink-0 flex-col items-start overflow-hidden rounded-[var(--radius-medium2)] border shadow-[0px_2px_8px_rgba(0,0,0,0.04)]">
       <div
-        className={`bg-bg-gray-subtle relative w-full shrink-0 ${isDetailPage ? 'h-[280px]' : 'h-[160px]'}`}
+        onClick={onClick}
+        className={`bg-bg-gray-subtle relative w-full shrink-0 ${isDetailPage ? 'h-[280px]' : 'h-[160px]'} ${onClick ? 'cursor-pointer' : ''}`}
       >
         {isDetailPage ? (
           <Image
@@ -76,20 +79,30 @@ export const LibraryImageCard = ({
         {onDelete && (
           <button
             type="button"
-            onClick={onDelete}
+            onClick={(event) => {
+              event.stopPropagation();
+              onDelete();
+            }}
             className="bg-btn-tertiary-fill absolute top-[var(--padding-4)] right-[var(--padding-4)] flex size-[20px] cursor-pointer items-center justify-center rounded-[var(--radius-xsmall2)] opacity-0 transition-opacity group-hover:opacity-100"
           >
             <Trash2 size={14} className="text-icon-gray-light" />
           </button>
         )}
 
-        <LikeButton
-          liked={liked}
-          onToggleLike={onToggleLike}
-          strokeWidth={1.3}
-          iconClassName={liked ? 'text-icon-gray' : 'text-icon-inverse'}
-          className="absolute right-[var(--padding-4)] bottom-[var(--padding-4)]"
-        />
+        {!isDetailPage ? (
+          <div
+            onClick={(event) => event.stopPropagation()}
+            className="contents"
+          >
+            <LikeButton
+              liked={liked}
+              onToggleLike={onToggleLike}
+              strokeWidth={1.3}
+              iconClassName={liked ? 'text-icon-gray' : 'text-icon-inverse'}
+              className="absolute right-[var(--padding-4)] bottom-[var(--padding-4)]"
+            />
+          </div>
+        ) : null}
       </div>
 
       <div className="flex w-full flex-col gap-[var(--gap-2)] px-[var(--padding-5)] py-[var(--padding-4)]">

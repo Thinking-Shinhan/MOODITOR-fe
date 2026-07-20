@@ -6,8 +6,10 @@ import { Check, ChevronRight } from 'lucide-react';
 import { Body } from '@/components/commons/Typography';
 import { TextButton } from '@/components/commons/TextButton';
 import { Toast } from '@/components/commons/Toast';
+import { ImagePreviewModal } from '@/components/commons/ImagePreviewModal';
 import { GeneratedImageCard } from '@/components/features/image/GeneratedImageCard';
 import { useToggleAssetLike } from '@/hooks/useToggleAssetLike';
+import { getFileNameFromUrl } from '@/utils/url';
 import type { ImageAspectRatio } from '@/types/image';
 
 interface GeneratedImage {
@@ -45,6 +47,10 @@ export const ImageGenerateResultCanvas = ({
   const router = useRouter();
   const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<{
+    url: string;
+    fileName: string;
+  } | null>(null);
   const toggleLike = useToggleAssetLike();
 
   const flipLiked = (assetId: number, liked: boolean) => {
@@ -58,7 +64,6 @@ export const ImageGenerateResultCanvas = ({
 
   const handleToggleLike = (assetId: number) => {
     const wasLiked = likedIds.has(assetId);
-    // 응답을 기다리지 않고 즉시 반영하고, 실패하면 원래 상태로 되돌린다
     flipLiked(assetId, !wasLiked);
 
     toggleLike.mutate(assetId, {
@@ -103,6 +108,12 @@ export const ImageGenerateResultCanvas = ({
             url={image.url}
             liked={likedIds.has(image.assetId)}
             onToggleLike={() => handleToggleLike(image.assetId)}
+            onClick={() =>
+              setPreviewImage({
+                url: image.url,
+                fileName: getFileNameFromUrl(image.url),
+              })
+            }
             className={cardClassName}
           />
         ))}
@@ -116,6 +127,13 @@ export const ImageGenerateResultCanvas = ({
       >
         라이브러리 가기
       </TextButton>
+
+      <ImagePreviewModal
+        open={previewImage !== null}
+        imageUrl={previewImage?.url ?? ''}
+        fileName={previewImage?.fileName ?? ''}
+        onClose={() => setPreviewImage(null)}
+      />
 
       <Toast
         open={errorMessage !== null}
