@@ -391,7 +391,7 @@ export const ModelShotContent = () => {
         variant="primary"
         size="large"
         onClick={handleSubmit}
-        disabled={isGenerating}
+        loading={isGenerating}
         className="w-full"
       >
         {isGenerating ? '생성 중...' : '완료'}

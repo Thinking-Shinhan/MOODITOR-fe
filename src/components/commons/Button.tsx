@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { Spinner } from '@/components/commons/Spinner';
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 type ButtonSize = 'large' | 'medium' | 'small' | 'xsmall';
@@ -8,8 +9,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: ButtonSize;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
+  loading?: boolean;
   children?: ReactNode;
 }
+
+const spinnerSizeBySize: Record<ButtonSize, 'small' | 'medium'> = {
+  large: 'medium',
+  medium: 'medium',
+  small: 'small',
+  xsmall: 'small',
+};
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: [
@@ -80,16 +89,24 @@ export const Button = ({
   size = 'large',
   leftIcon,
   rightIcon,
+  loading = false,
   children,
   className = '',
+  disabled,
   ...props
 }: ButtonProps) => {
   const { base, iconOnly, radius, text, iconSize } = sizeStyles[size];
   const isIconOnly = !children;
+  const resolvedLeftIcon = loading ? (
+    <Spinner size={spinnerSizeBySize[size]} />
+  ) : (
+    leftIcon
+  );
 
   return (
     <button
       type="button"
+      disabled={disabled || loading}
       className={[
         'inline-flex items-center justify-center transition-colors',
         'cursor-pointer disabled:cursor-not-allowed',
@@ -100,11 +117,11 @@ export const Button = ({
       ].join(' ')}
       {...props}
     >
-      {leftIcon && (
+      {resolvedLeftIcon && (
         <span
           className={`shrink-0 ${iconSize} flex items-center justify-center`}
         >
-          {leftIcon}
+          {resolvedLeftIcon}
         </span>
       )}
       {children && (

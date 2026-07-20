@@ -161,7 +161,7 @@ export default function OnboardingPage() {
                 size="large"
                 className="flex-1"
                 onClick={handleSave}
-                disabled={saveBrandMood.isPending}
+                loading={saveBrandMood.isPending}
               >
                 {saveBrandMood.isPending ? '저장 중...' : '시작하기'}
               </Button>

@@ -69,7 +69,7 @@ export default function LoginPage() {
                 type="submit"
                 variant="primary"
                 size="medium"
-                disabled={isPending}
+                loading={isPending}
                 className="w-full"
               >
                 {isPending ? '로그인 중...' : '로그인'}

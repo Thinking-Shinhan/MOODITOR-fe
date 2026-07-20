@@ -189,7 +189,8 @@ export const ProductImageUploadPanel = ({
       <Button
         variant="primary"
         size="medium"
-        disabled={!isReady || isPending}
+        disabled={!isReady}
+        loading={isPending}
         onClick={handleGoToImageGenerate}
         className="w-[calc((100vh-290px)/2)] rounded-[var(--radius-medium1)]!"
       >
