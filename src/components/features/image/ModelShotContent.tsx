@@ -17,6 +17,7 @@ import { useProductSelectionStore } from '@/stores/productSelectionStore';
 import { useReferenceAssets } from '@/hooks/useReferenceAssets';
 import { useCreateImageGenerationJob } from '@/hooks/useCreateImageGenerationJob';
 import { useImageGenerationPolling } from '@/hooks/useImageGenerationPolling';
+import { useSmoothedProgress } from '@/hooks/useSmoothedProgress';
 import { useModelCutResultStore } from '@/stores/imageGenerationResultStore';
 import { ApiError } from '@/libs/apiClient';
 import { buildProgressChecklistItems } from '@/utils/imageGeneration';
@@ -181,6 +182,12 @@ export const ModelShotContent = () => {
     },
   });
 
+  const { progress: smoothedProgress, reset: resetSmoothedProgress } =
+    useSmoothedProgress(
+      job?.progressPercent ?? 0,
+      generationStatus === 'loading',
+    );
+
   const handleSubmit = async () => {
     setSubmitAttempted(true);
 
@@ -201,6 +208,7 @@ export const ModelShotContent = () => {
 
     setSubmitError(null);
     resetPolling();
+    resetSmoothedProgress();
     startGenerating();
 
     const outfitItems: OutfitItem[] = selectedProducts.map(
@@ -391,7 +399,7 @@ export const ModelShotContent = () => {
 
       <ProgressStepModal
         open={generationStatus === 'loading'}
-        progress={job?.progressPercent ?? 0}
+        progress={smoothedProgress}
         title="이미지 생성 중"
         description={job?.progressMessage ?? ''}
         items={buildProgressChecklistItems(
