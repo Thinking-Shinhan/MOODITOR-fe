@@ -79,9 +79,20 @@ export const DetailEditCanvas = () => {
       return;
     }
 
-    // 드롭 위치와 무관하게 항상 맨 아래에 순서대로 쌓는다
-    // TODO: 드롭 위치에 따라 순서를 조정하는 기능 추가
-    addTemplate(template.type);
+    // 드롭 지점(clientY)이 어느 블록의 세로 중앙보다 위인지로 삽입 위치를 정한다.
+    // 모든 블록보다 아래에 드롭하면(빈 공간 포함) 맨 뒤에 추가된다
+    const blockEls =
+      event.currentTarget.querySelectorAll<HTMLElement>('[data-template-id]');
+    let insertIndex = placedTemplates.length;
+    for (let i = 0; i < blockEls.length; i++) {
+      const rect = blockEls[i].getBoundingClientRect();
+      if (event.clientY < rect.top + rect.height / 2) {
+        insertIndex = i;
+        break;
+      }
+    }
+
+    addTemplate(template.type, insertIndex);
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -120,7 +131,7 @@ export const DetailEditCanvas = () => {
         className={
           placedTemplates.length === 0
             ? 'flex w-full flex-1 items-center justify-center'
-            : 'inline-flex'
+            : 'flex w-full flex-col items-center pb-[300px]'
         }
       >
         {placedTemplates.length === 0 ? (

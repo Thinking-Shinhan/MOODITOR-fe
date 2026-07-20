@@ -38,6 +38,7 @@ export const DetailTemplateBlock = ({
   return (
     <div
       ref={setNodeRef}
+      data-template-id={id}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
