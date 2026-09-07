@@ -222,6 +222,9 @@ export const LibraryFolderPage = () => {
                 createdAt={asset.createdAt}
                 liked={asset.isLiked}
                 onToggleLike={() => handleToggleLike(asset.assetId)}
+                likePending={
+                  toggleLike.isPending && toggleLike.variables === asset.assetId
+                }
                 onDelete={() => setAssetIdToDelete(asset.assetId)}
                 onClick={() =>
                   setPreviewImage({

@@ -113,6 +113,9 @@ export const ImageGenerateResultCanvas = ({
             url={image.url}
             liked={likedIds.has(image.assetId)}
             onToggleLike={() => handleToggleLike(image.assetId)}
+            likePending={
+              toggleLike.isPending && toggleLike.variables === image.assetId
+            }
             onClick={() =>
               setPreviewImage({
                 url: image.url,
