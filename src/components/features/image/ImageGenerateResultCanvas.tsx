@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronRight } from 'lucide-react';
 import { Body } from '@/components/commons/Typography';
 import { TextButton } from '@/components/commons/TextButton';
@@ -45,6 +46,7 @@ export const ImageGenerateResultCanvas = ({
   aspectRatio,
 }: ImageGenerateResultCanvasProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<{
@@ -67,6 +69,9 @@ export const ImageGenerateResultCanvas = ({
     flipLiked(assetId, !wasLiked);
 
     toggleLike.mutate(assetId, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['imageFolderAssets'] });
+      },
       onError: () => {
         flipLiked(assetId, wasLiked);
         setErrorMessage('요청을 처리하지 못했어요. 다시 시도해주세요.');
