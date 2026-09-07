@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 import { AlertModal } from '@/components/commons/AlertModal';
 import { Toast } from '@/components/commons/Toast';
 import { Heading, Body } from '@/components/commons/Typography';
@@ -73,63 +73,64 @@ export const LibraryFolderPage = () => {
     queryClient.invalidateQueries({ queryKey: assetsQueryKey });
   };
 
-  const deleteAsset = useDeleteLibraryAsset<MutationContext>({
-    onMutate: async (assetId) => {
+  const createOptimisticOptions = <TVariables,>(
+    updater: (
+      previous: ImageFolderAssetsResponse,
+      variables: TVariables,
+    ) => ImageFolderAssetsResponse,
+  ): Pick<
+    UseMutationOptions<unknown, unknown, TVariables, MutationContext>,
+    'onMutate' | 'onError' | 'onSettled'
+  > => ({
+    onMutate: async (variables) => {
       const context = await snapshotAssets();
       if (context.previous) {
-        queryClient.setQueryData<ImageFolderAssetsResponse>(assetsQueryKey, {
-          ...context.previous,
-          modelCutAssets: context.previous.modelCutAssets.filter(
-            (asset) => asset.assetId !== assetId,
-          ),
-          productCutAssets: context.previous.productCutAssets.filter(
-            (asset) => asset.assetId !== assetId,
-          ),
-        });
+        queryClient.setQueryData<ImageFolderAssetsResponse>(
+          assetsQueryKey,
+          updater(context.previous, variables),
+        );
       }
       return context;
     },
-    onError: (_error, _assetId, context) => rollback(context),
+    onError: (_error, _variables, context) => rollback(context),
     onSettled: invalidateAssets,
   });
 
-  const deleteDetailPage = useDeleteDetailPage<MutationContext>({
-    onMutate: async () => {
-      const context = await snapshotAssets();
-      if (context.previous) {
-        queryClient.setQueryData<ImageFolderAssetsResponse>(assetsQueryKey, {
-          ...context.previous,
-          hasDetailPage: false,
-          detailPage: null,
-        });
-      }
-      return context;
-    },
-    onError: (_error, _productId, context) => rollback(context),
-    onSettled: invalidateAssets,
-  });
+  const deleteAsset = useDeleteLibraryAsset<MutationContext>(
+    createOptimisticOptions<number>((previous, assetId) => ({
+      ...previous,
+      modelCutAssets: previous.modelCutAssets.filter(
+        (asset) => asset.assetId !== assetId,
+      ),
+      productCutAssets: previous.productCutAssets.filter(
+        (asset) => asset.assetId !== assetId,
+      ),
+    })),
+  );
 
-  const toggleLike = useToggleAssetLike<MutationContext>({
-    onMutate: async (assetId) => {
-      const context = await snapshotAssets();
-      if (context.previous) {
-        const flip = (assets: LibraryImageAsset[]) =>
-          assets.map((asset) =>
-            asset.assetId === assetId
-              ? { ...asset, isLiked: !asset.isLiked }
-              : asset,
-          );
-        queryClient.setQueryData<ImageFolderAssetsResponse>(assetsQueryKey, {
-          ...context.previous,
-          modelCutAssets: flip(context.previous.modelCutAssets),
-          productCutAssets: flip(context.previous.productCutAssets),
-        });
-      }
-      return context;
-    },
-    onError: (_error, _assetId, context) => rollback(context),
-    onSettled: invalidateAssets,
-  });
+  const deleteDetailPage = useDeleteDetailPage<MutationContext>(
+    createOptimisticOptions<number>((previous) => ({
+      ...previous,
+      hasDetailPage: false,
+      detailPage: null,
+    })),
+  );
+
+  const toggleLike = useToggleAssetLike<MutationContext>(
+    createOptimisticOptions<number>((previous, assetId) => {
+      const flip = (assets: LibraryImageAsset[]) =>
+        assets.map((asset) =>
+          asset.assetId === assetId
+            ? { ...asset, isLiked: !asset.isLiked }
+            : asset,
+        );
+      return {
+        ...previous,
+        modelCutAssets: flip(previous.modelCutAssets),
+        productCutAssets: flip(previous.productCutAssets),
+      };
+    }),
+  );
 
   const handleConfirmDelete = () => {
     if (assetIdToDelete === null) return;
