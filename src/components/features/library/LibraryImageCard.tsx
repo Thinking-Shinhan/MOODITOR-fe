@@ -14,6 +14,7 @@ interface LibraryImageCardProps {
   createdAt: string;
   liked?: boolean;
   onToggleLike?: () => void;
+  likePending?: boolean;
   onDelete?: () => void;
   onClick?: () => void;
 }
@@ -39,6 +40,7 @@ export const LibraryImageCard = ({
   createdAt,
   liked = false,
   onToggleLike,
+  likePending = false,
   onDelete,
   onClick,
 }: LibraryImageCardProps) => {
@@ -97,6 +99,7 @@ export const LibraryImageCard = ({
             <LikeButton
               liked={liked}
               onToggleLike={onToggleLike}
+              disabled={likePending}
               strokeWidth={1.3}
               iconClassName={liked ? 'text-icon-gray' : 'text-icon-inverse'}
               className="absolute right-[var(--padding-4)] bottom-[var(--padding-4)]"
