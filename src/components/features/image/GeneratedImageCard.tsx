@@ -7,6 +7,7 @@ interface GeneratedImageCardProps {
   url: string;
   liked: boolean;
   onToggleLike: () => void;
+  likePending?: boolean;
   onClick?: () => void;
   className: string;
 }
@@ -15,6 +16,7 @@ export const GeneratedImageCard = ({
   url,
   liked,
   onToggleLike,
+  likePending = false,
   onClick,
   className,
 }: GeneratedImageCardProps) => {
@@ -39,6 +41,7 @@ export const GeneratedImageCard = ({
         <LikeButton
           liked={liked}
           onToggleLike={onToggleLike}
+          disabled={likePending}
           className={[
             'absolute right-[16px] bottom-[16px] transition-opacity',
             liked ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
